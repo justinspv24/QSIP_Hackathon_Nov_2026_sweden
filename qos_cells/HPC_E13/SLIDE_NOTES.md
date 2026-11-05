@@ -6,6 +6,12 @@
 - The centroid is weak on this data (B: 0.85 vs logreg 0.90–0.95). The test covers the sketchable classifier only.
 - Figure: `HPC_E13/figures/fig_e13_sstar_vs_N.png`
 
+## Stage 2 — The "few hundred counters" result holds on all 5 splits, on PBMC68k and PBMC3k alike
+- 5 splits × 5 seeds, 105 jobs. Gene pairs: best one-pass S*/N ≤ 0.016 on every split (K=2048: ≤ 4.9·10⁻⁴, ≤ 1,024 counters).
+- PBMC68k needs 2–10× more relative memory than PBMC3k (B: ~900 vs ~180 counters): same order, far below N.
+- On 1,024 genes S*/N swings 0.03–1.0 between splits (small N, tight band), still ≤ 8 kB.
+- Figure: `HPC_E13/figures/fig_e13_robustness.png`
+
 ## Stage 4 — Under the paper's own ridge protocol, small classical sketches do lose ~0.1 accuracy (gap reproduced, not an advantage proof)
 - Paper's file, its 100 random pairs, RidgeClassifier, 5-fold CV accuracy: full ridge 0.901. Classical sketches at S = 64: 0.80–0.81. Within 0.01 of full ridge needs ~1,900 genes (truncation) to ~8,192 features (hashing / sparse JL).
 - Fair-baseline fixes (tuned alpha, s=4 JL, count-sketch selection) do not close the gap. The paper's baselines are general-purpose, data-oblivious methods.

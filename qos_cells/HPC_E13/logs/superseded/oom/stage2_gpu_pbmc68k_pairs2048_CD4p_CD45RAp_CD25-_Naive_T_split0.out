@@ -1,0 +1,33 @@
+[e13 21:19:31] pbmc68k pairs K=2048 CD4+/CD45RA+/CD25- Naive T split0: N=2,098,176 exact BA 0.7277 AUPRC 0.0555 d_eff 5709 (build 5 s, train nnz 3.167e+09)
+[e13 21:19:32] pbmc68k pairs K=2048 CD4+/CD45RA+/CD25- Naive T split0: M/N=100 stream BA 0.7230±0.0022 rel.err 4.048 records 6.60e+06
+[e13 21:19:34] pbmc68k pairs K=2048 CD4+/CD45RA+/CD25- Naive T split0: M/N=300 stream BA 0.7263±0.0017 rel.err 2.335 records 1.98e+07
+[e13 21:19:37] pbmc68k pairs K=2048 CD4+/CD45RA+/CD25- Naive T split0: M/N=900 stream BA 0.7263±0.0015 rel.err 1.343 records 5.94e+07
+[e13 21:19:44] pbmc68k pairs K=2048 CD4+/CD45RA+/CD25- Naive T split0: M/N=2700 stream BA 0.7264±0.0008 rel.err 0.782 records 1.78e+08
+[e13 21:20:03] pbmc68k pairs K=2048 CD4+/CD45RA+/CD25- Naive T split0: M/N=8100 stream BA 0.7262±0.0008 rel.err 0.446 records 5.34e+08
+[e13 21:20:26] pbmc68k pairs K=2048 CD4+/CD45RA+/CD25- Naive T split0: count_sketch       S* = 1024 (Minf 512) [23.2 s]
+[e13 21:20:45] pbmc68k pairs K=2048 CD4+/CD45RA+/CD25- Naive T split0: hashing            S* = 1024 (Minf 512) [18.8 s]
+[e13 21:21:13] pbmc68k pairs K=2048 CD4+/CD45RA+/CD25- Naive T split0: jl_sparse          S* = 256 (Minf 512) [28.1 s]
+[e13 21:21:31] pbmc68k pairs K=2048 CD4+/CD45RA+/CD25- Naive T split0: heavy_hitters_mg   S* = 131072 (Minf 131072) [17.6 s]
+[e13 21:21:50] pbmc68k pairs K=2048 CD4+/CD45RA+/CD25- Naive T split0: heavy_hitters_top  S* = 16384 (Minf 8192) [18.7 s]
+Traceback (most recent call last):
+  File "/mnt/clarsa-fs/home/lu_jpvarkey/oracle_sketching/qos_cells_e13/qos_cells/HPC_E13/scripts/e13_stage3.py", line 353, in <module>
+    job(a) if a.cmd == "job" else merge(partial=not a.final)
+    ^^^^^^
+  File "/mnt/clarsa-fs/home/lu_jpvarkey/oracle_sketching/qos_cells_e13/qos_cells/HPC_E13/scripts/e13_stage3.py", line 257, in job
+    H = hashed_features(pd, np.arange(pd.n), grid, seeds)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/clarsa-fs/home/lu_jpvarkey/oracle_sketching/qos_cells_e13/qos_cells/HPC/scripts/pairs_gpu.py", line 368, in hashed_features
+    out = {S: cp.zeros((len(cells), S), dtype=cp.float32) for S in S_list}
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/clarsa-fs/home/lu_jpvarkey/oracle_sketching/qos_cells_e13/qos_cells/HPC_E13/.venv/lib/python3.12/site-packages/cupy/_creation/basic.py", line 252, in zeros
+    a = cupy.ndarray(shape, dtype, order=order)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "cupy/_core/core.pyx", line 176, in cupy._core.core.ndarray.__new__
+  File "cupy/_core/core.pyx", line 282, in cupy._core.core._ndarray_base._init
+  File "cupy/cuda/memory.pyx", line 904, in cupy.cuda.memory.alloc
+  File "cupy/cuda/memory.pyx", line 1614, in cupy.cuda.memory.MemoryPool.malloc
+  File "cupy/cuda/memory.pyx", line 1635, in cupy.cuda.memory.MemoryPool.malloc
+  File "cupy/cuda/memory.pyx", line 1350, in cupy.cuda.memory.SingleDeviceMemoryPool.malloc
+  File "cupy/cuda/memory.pyx", line 1376, in cupy.cuda.memory.SingleDeviceMemoryPool._malloc
+  File "cupy/cuda/memory.pyx", line 1560, in cupy.cuda.memory.SingleDeviceMemoryPool._try_malloc
+cupy.cuda.memory.OutOfMemoryError: Out of memory allocating 4,494,393,344 bytes (allocated so far: 6,097,754,112 bytes).

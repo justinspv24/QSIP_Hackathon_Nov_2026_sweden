@@ -5,7 +5,8 @@
 - Stage 1: on 1,024 genes, S*/N reaches 0.5–1.0 for B and naive CD4 T. N is small and the ±0.01 band is strict; it is still ≤ 8 kB.
 - Stage 1: Th2 (97 cells) has no signal (exact BA 0.55–0.60, logreg 0.50). Its S* means nothing.
 - Stage 4 (paper's protocol: ridge, 46 cell-type pairs, CV accuracy): **the paper's gap is reproduced with fair baselines.** At S ≈ 64, classical sketches give 0.80–0.81 vs 0.90 for full ridge (= the ideal quantum LS-SVM, formula only); matching it takes ~2,000–8,000 numbers. Not an advantage claim: the quantum side is not simulated, and sample and time costs are not compared.
-- Stages 2–3: pending.
+- Stage 2 (5 splits × 5 seeds): **stable.** Pairs S*/N ≤ 0.016 on every split (K=2048: ≤ 4.9·10⁻⁴). Same order as PBMC3k (68k needs 2–10× more relative memory). Genes K=1024 are unstable (S*/N 0.03–1.0).
+- Stage 3: pending.
 
 Branch `hpc-e13` (worktree `qos_cells_e13`). All numbers come from `results/*.json`, and all figures are built from that JSON.
 **Not pushed**: this node has no GitHub credentials. Push with `git push -u origin hpc-e13` from the worktree.
@@ -71,6 +72,35 @@ What it means:
 - Linear sketches (hashing, JL, count-sketch) beat heavy hitters by 10–1,000× on PBMC68k. d_eff is 1,300–5,700, so Δ is spread out and a top-S list needs many entries.
 - The centroid itself is a weak classifier here: B 0.85 vs logreg 0.90–0.95, and naive CD4 T AUPRC 0.06. The memory question is answered for the centroid. A stronger classifier needs more than this test shows.
 - Th2: logreg overfits its 68 training positives (test BA 0.50). It is kept and flagged, not dropped.
+
+## Stage 2 — robustness (`results/e13_stage2.json`, `figures/fig_e13_robustness.png`)
+
+5 stratified 70/30 splits (split k uses seed 7 + 1000k; split 0 = Stage 1's) × 5 stream/hash seeds, for every Stage-1 task, plus PBMC3k (E7 setup: B, DC, Mk) on the same grid. 105 jobs. Pair jobs ran on the GPU path; record cap 10⁹ per seed; M→∞ variant 5 seeds; hashing+logreg 2 seeds (S ≤ 2¹⁴); no full-N logreg.
+
+Best one-pass S*/N over the 5 splits (mean ± sd; S* never reached counts as 1):
+
+| features | task | PBMC68k S*/N | PBMC68k S* (counters, mean) | PBMC3k task | PBMC3k S*/N |
+|---|---|---|---|---|---|
+| genes K=1024 | B | 0.70 ± 0.25 | 717 | B | 0.24 ± 0.15 |
+| genes K=1024 | CD34+ | 0.027 ± 0.020 | 27 | DC | 0.11 ± 0.20 |
+| genes K=1024 | naive CD4 T | 0.45 ± 0.10 | 461 | Mk | 0.0078 ± 0 |
+| genes K=1024 | Th2 (weak, BA 0.63) | 0.28 ± 0.37 (1 split never) | — | | |
+| pairs K=512 | B | 7.0e-3 ± 4.5e-3 | 922 | B | 1.7e-3 ± 1.2e-3 |
+| pairs K=512 | CD34+ | 6.6e-4 ± 6.6e-4 | 86 | DC | 8.5e-5 ± 3.0e-5 |
+| pairs K=512 | naive CD4 T | 2.1e-3 ± 9.6e-4 | 282 | Mk | 8.5e-5 ± 3.0e-5 |
+| pairs K=512 | Th2 (weak, BA 0.63) | 9.2e-3 ± 1.1e-2 | — | | |
+| pairs K=2048 | B | 4.4e-4 ± 9.8e-5 | 921 | B | 8.5e-5 ± 3.0e-5 |
+| pairs K=2048 | CD34+ | 1.7e-5 ± 1.2e-5 | 36 | DC | 1.2e-5 ± 1.0e-5 |
+| pairs K=2048 | naive CD4 T | 1.7e-4 ± 6.0e-5 | 359 | Mk | 1.0e-5 ± 1.0e-5 |
+| pairs K=2048 | Th2 (no signal, BA 0.57) | 5.3e-5 ± 4.2e-5 | — | | |
+
+Exact centroid BA is stable over splits (sd ≤ 0.011 on PBMC68k signal tasks; Th2 sd 0.03–0.06). Per-method S*/N for every cell is in `robustness[].methods` and printed by `scripts/e13_tables.py 2`.
+
+What it means:
+- Stage 1's verdict holds on every split. On pairs, the worst PBMC68k split needs S*/N = 0.016 (K=512 B); at K=2048 every split is ≤ 4.9·10⁻⁴ (≤ 1,024 counters).
+- PBMC68k needs about 2–10× more relative memory than PBMC3k at the same N (B ~900 counters vs ~180), but it is the same order and far below N.
+- On 1,024 genes the result is unstable (one split moves S*/N between 0.5 and 1.0) because N is small and the band is tight. "S* ≈ N" there means ≤ 8 kB.
+- hashing+logreg shows S*/N = 1 for some tasks only because its grid stops at S = 2¹⁴ (and Th2 / naive CD4 logreg is below the centroid); it is not a true S* = N.
 
 ## Stage 4 — the paper's protocol (`results/e13_stage4.json`, `figures/fig_e13_paper_protocol.png`)
 

@@ -65,3 +65,8 @@ Decisions:
 
 - Full ridge 0.901 (= ideal quantum accuracy, formula machine size 44). Classical at S=64: 0.80–0.81. Within 0.01 of full ridge: truncation 1,934 genes, sketches 8,192. Tuned alpha, JL s=4 and count-sketch selection do not close the gap.
 - D18. Fairness pass: alpha tuned by nested LOO (RidgeClassifierCV on each training fold) for S ≤ 2,048, and count-sketch gene selection + ridge. Neither changes the verdict.
+
+## 22:05 — Stage 2 done
+
+- 105/105 jobs final. 3 GPU jobs had died from GPU OOM while 3+ jobs shared GPU 0 (21:17–21:30); rerun alone, old logs in logs/superseded/oom/.
+- Pairs: best one-pass S*/N ≤ 0.016 on every split (K=2048 ≤ 4.9e-4). PBMC68k needs 2–10× more relative memory than PBMC3k, same order. Genes K=1024 unstable (0.03–1.0).

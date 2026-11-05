@@ -88,7 +88,7 @@ def fig_robustness():
     d = load("e13_stage2.json")
     rob = d["robustness"]
     groups = [g for g in rob if g["n_splits"] > 0]
-    fsets = list(dict.fromkeys(g["feature_set"] for g in groups))
+    fsets = sorted(dict.fromkeys(g["feature_set"] for g in groups), key=lambda f: min(g["N"] for g in groups if g["feature_set"] == f))
     fig, axes = plt.subplots(1, len(fsets), figsize=(4.2 * len(fsets), 4.4), sharey=True, squeeze=False)
     for ax, fs in zip(axes[0], fsets):
         gs = [g for g in groups if g["feature_set"] == fs]
@@ -106,11 +106,11 @@ def fig_robustness():
         ax.set_xticks(range(len(gs)))
         ax.set_xticklabels(labels, rotation=55, ha="right", fontsize=7.5)
         ax.set_yscale("log")
-        ax.set_title(fs, fontsize=9.5, loc="left")
-    axes[0][0].set_ylabel("best one-pass S*/N (5 splits; bar = geometric mean ± 1 sd)")
+        ax.set_title(f"{fs} (N = {gs[0]['N']:,})", fontsize=9.5, loc="left")
+    axes[0][0].set_ylabel("best one-pass S*/N\n(dots = splits; bar = geo. mean ± 1 sd)")
     fig.suptitle("Robustness: S*/N over 5 train/test splits × 5 seeds · black = PBMC68k, grey = PBMC3k (E7 setup) · * = no signal",
                  fontsize=9.5, x=0.01, ha="left")
-    fig.tight_layout()
+    fig.tight_layout(rect=(0, 0, 1, 0.94))
     fig.savefig(FIG / "fig_e13_robustness.png")
     print("wrote fig_e13_robustness.png")
 
