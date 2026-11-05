@@ -1,0 +1,12 @@
+{
+ "schema_version": 1,
+ "experiment": "e13_selftest_pairs",
+ "K": 512,
+ "n": 2638,
+ "nnz": 88587709,
+ "same_structure": true,
+ "max_abs_value_diff": 1.4551915228366852e-11,
+ "seconds_e7": 1.242337942123413,
+ "seconds_fast": 5.127847194671631,
+ "pass": true
+}
