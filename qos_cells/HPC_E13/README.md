@@ -1,15 +1,14 @@
 # E13 — PBMC68k (the paper's own scRNA-seq dataset)
 
-**Summary (updated per stage)**
-- Stage 1: **no memory advantage on PBMC68k.** On gene pairs (N = 1.3·10⁵ – 2.1·10⁶), a one-pass sketch matches the exact centroid with S* = 16–512 counters (S*/N ≤ 3.9·10⁻³, ≤ 4 kB). This matches PBMC3k (S* = 8–1,024).
-- Stage 1: on 1,024 genes, S*/N reaches 0.5–1.0 for B and naive CD4 T. N is small and the ±0.01 band is strict; it is still ≤ 8 kB.
-- Stage 1: Th2 (97 cells) has no signal (exact BA 0.55–0.60, logreg 0.50). Its S* means nothing.
-- Stage 4 (paper's protocol: ridge, 46 cell-type pairs, CV accuracy): **the paper's gap is reproduced with fair baselines.** At S ≈ 64, classical sketches give 0.80–0.81 vs 0.90 for full ridge (= the ideal quantum LS-SVM, formula only); matching it takes ~2,000–8,000 numbers. Not an advantage claim: the quantum side is not simulated, and sample and time costs are not compared.
-- Stage 2 (5 splits × 5 seeds): **stable.** Pairs S*/N ≤ 0.016 on every split (K=2048: ≤ 4.9·10⁻⁴). Same order as PBMC3k (68k needs 2–10× more relative memory). Genes K=1024 are unstable (S*/N 0.03–1.0).
-- Stage 3: pending.
+**Summary**
+- Stage 1 (PBMC68k, split 0): **no memory advantage.** Gene pairs N = 1.3·10⁵–2.1·10⁶: a one-pass sketch matches the exact centroid with 16–512 counters (S*/N ≤ 3.9·10⁻³). Same as PBMC3k. 1,024 genes: S*/N up to 1.0 (small N, ≤ 8 kB).
+- Stage 2 (5 splits × 5 seeds): **stable.** Pairs S*/N ≤ 0.016 on every split. PBMC68k needs 2–10× more relative memory than PBMC3k: same order.
+- Stage 3 (N = 3.4·10⁷ and 1.5·10⁸, 26–28 qubits): **still no advantage.** S* = 512–4,096 counters (S*/N ≤ 3.1·10⁻⁵). S* is flat for B and naive CD4 T but grows about ∝ N for CD34+ (S*/N ≈ 2–3·10⁻⁵).
+- Stage 4 (paper's ridge protocol): **the paper's gap reproduces with fair baselines.** Sketches at S = 64 give 0.80–0.81 vs 0.90 for full ridge (ideal quantum, formula only). Not an advantage claim: the quantum side is not simulated and costs are not compared.
+- Th2 (97 cells) has no signal in any feature set; its S* is not informative. The centroid is weaker than logreg / ridge on this data.
 
 Branch `hpc-e13` (worktree `qos_cells_e13`). All numbers come from `results/*.json`, and all figures are built from that JSON.
-**Not pushed**: this node has no GitHub credentials. Push with `git push -u origin hpc-e13` from the worktree.
+Pushed to `origin/hpc-e13` after each stage (credentials were added at 21:30; Stage 1 was pushed then).
 
 ## Data
 
@@ -101,6 +100,29 @@ What it means:
 - PBMC68k needs about 2–10× more relative memory than PBMC3k at the same N (B ~900 counters vs ~180), but it is the same order and far below N.
 - On 1,024 genes the result is unstable (one split moves S*/N between 0.5 and 1.0) because N is small and the band is tight. "S* ≈ N" there means ≤ 8 kB.
 - hashing+logreg shows S*/N = 1 for some tasks only because its grid stops at S = 2¹⁴ (and Th2 / naive CD4 logreg is below the centroid); it is not a true S* = N.
+
+## Stage 3 — maximum feature space (`results/e13_stage3.json`, points in `figures/fig_e13_sstar_vs_N.png`)
+
+Gene pairs at K = 8,192 (N = 33,558,528, 26 index qubits) and all genes detected in ≥ 3 training cells (K = 17,087–17,138 per task, N = 1.46–1.47·10⁸, 28 index qubits). Pair vectors are never built: the centroid is the upper triangle of a scaled Gram matrix of u = x²/√Z, with Z = ((Σx²)² + Σx⁴)/2, computed in row blocks on the GPU (E9's `pairs_gpu.py`, unchanged).
+Check vs direct materialisation at K=512 (CD34+): identical Δ (max diff 0 in float64 output, 3·10⁻⁷ in an earlier float32 run), identical BA/AUPRC, closed-form Z within 8·10⁻⁵ (float32 input).
+Timing rule: the first all-genes task (CD34+) took 25 min, so the projected time for each size was < 2 h and all 4 tasks ran (25–51 min each, one GPU per task). Peak VRAM 43.9 GB, peak RAM 35.6 GB. Logreg on all N needed scipy L-BFGS memory m=3 above N = 1.4·10⁸ (int32 workspace limit; the first attempt crashed, D16).
+
+| features | N | qubits | task | exact BA | logreg BA (all N) | quantum-sim BA | d_eff | best one-pass | S* | S*/N | bytes | S*/N (M→∞) |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| pairs K=8192 | 3.36·10⁷ | 26 | B | 0.848 | 0.889 | 0.848 | 1,564 | hashing | 1,024 | 3.1e-5 | 8,208 | 1.5e-5 |
+| pairs K=8192 | 3.36·10⁷ | 26 | CD34+ | 0.843 | 0.940 | 0.843 | 3,551 | count-sketch | 1,024 | 3.1e-5 | 8,232 | 1.2e-4 |
+| pairs K=8192 | 3.36·10⁷ | 26 | naive CD4 T | 0.718 | 0.596 | 0.718 | 5,811 | hashing | 512 | 1.5e-5 | 4,112 | 1.5e-5 |
+| pairs K=8192 | 3.36·10⁷ | 26 | Th2 (no signal) | 0.559 | 0.500 | 0.558 | 7,368 | hashing | 8 | 2.4e-7 | 80 | 9.8e-4 |
+| pairs, all genes | 1.46·10⁸ | 28 | B | 0.846 | 0.869 | 0.846 | 1,569 | hashing | 1,024 | 7.0e-6 | 8,208 | 7.0e-6 |
+| pairs, all genes | 1.47·10⁸ | 28 | CD34+ | 0.847 | 0.946 | 0.841 | 3,440 | count-sketch | 4,096 | 2.8e-5 | 32,808 | 7.0e-6 |
+| pairs, all genes | 1.46·10⁸ | 28 | naive CD4 T | 0.711 | 0.602 | 0.714 | 5,819 | hashing | 512 | 4.0e-6 | 4,112 | 1.0e-6 |
+| pairs, all genes | 1.46·10⁸ | 28 | Th2 (no signal) | 0.578 | 0.500 | 0.566 | 9,815 | count-sketch | 524,288 | 3.6e-3 | 4.2 MB | 4.4e-7 |
+
+What it means:
+- Up to N = 1.5·10⁸ the best one-pass sketch needs ≤ 4,096 counters (≤ 33 kB) for every task with signal. The verdict of Stages 1–2 extends to the largest space.
+- S* is not always flat. For B and naive CD4 T it stays at 512–1,024 from N = 1.3·10⁵ to 1.5·10⁸. For CD34+ it grows from ~36 (K=2048, Stage-2 mean) to 1,024 and 4,096, i.e. roughly ∝ N with S*/N ≈ 2–3·10⁻⁵. If that trend continued, a sketch would need ~3·10⁻⁵·N counters.
+- The simulated quantum readout (p · sin(φ), phases rescaled) gives the same BA as the exact centroid within 0.006, and the stream converges at M/N = 900–2,700 (72,900 for Th2).
+- Logreg on all N is below the centroid for naive CD4 T (0.60 vs 0.71): it overfits; more N does not help it.
 
 ## Stage 4 — the paper's protocol (`results/e13_stage4.json`, `figures/fig_e13_paper_protocol.png`)
 

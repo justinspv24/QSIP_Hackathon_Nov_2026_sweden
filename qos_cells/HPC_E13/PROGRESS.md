@@ -70,3 +70,16 @@ Decisions:
 
 - 105/105 jobs final. 3 GPU jobs had died from GPU OOM while 3+ jobs shared GPU 0 (21:17–21:30); rerun alone, old logs in logs/superseded/oom/.
 - Pairs: best one-pass S*/N ≤ 0.016 on every split (K=2048 ≤ 4.9e-4). PBMC68k needs 2–10× more relative memory than PBMC3k, same order. Genes K=1024 unstable (0.03–1.0).
+
+## 22:02 — status 3 (T+2 h)
+
+| stage | state | ETA |
+|---|---|---|
+| 1, 2, 4 | done and pushed (902820e, be9b946, c504567) | — |
+| 3 | K=8192 4/4 done. All genes (N ≈ 1.46e8, 28 qubits): CD34+ done (26 min); B, Th2 in sketches; naive CD4 T still in full-N logreg (≤ 200 iterations × ~20 s) | ~23:00 |
+
+## 22:30 — Stage 3 done, all stages finished
+
+- All-genes pairs (N = 1.46–1.47e8, 28 qubits), 4 tasks in parallel on GPUs 1, 2, 6, 7: 25–51 min each (< 2 h rule). Peak VRAM 43.9 GB.
+- Best one-pass S* ≤ 4,096 counters for every task with signal (S*/N ≤ 3.1e-5). Flat for B and naive CD4 T; ~∝ N for CD34+ (S*/N 2–3e-5).
+- Total: Stage 1 902820e, Stage 4 c504567, Stage 2 be9b946, Stage 3 this commit. Wall time 2 h 30 min of the 10 h budget.

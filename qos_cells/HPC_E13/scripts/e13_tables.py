@@ -19,7 +19,7 @@ def f(x, d=3):
 
 def stage_tasks(st):
     d = json.loads((RES / f"e13_stage{st}.json").read_text())
-    return d, sorted(d["tasks"], key=lambda t: (t["N"], t["positive"]))
+    return d, sorted([t for t in d["tasks"] if "gate_vs_materialised" not in t and "methods" in t], key=lambda t: (t["N"], t["positive"]))
 
 
 def t1(st=1):

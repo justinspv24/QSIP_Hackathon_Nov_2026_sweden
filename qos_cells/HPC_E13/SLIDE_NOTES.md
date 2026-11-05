@@ -12,6 +12,12 @@
 - On 1,024 genes S*/N swings 0.03–1.0 between splits (small N, tight band), still ≤ 8 kB.
 - Figure: `HPC_E13/figures/fig_e13_robustness.png`
 
+## Stage 3 — Even at N = 1.5·10⁸ gene pairs (28 qubits), ≤ 4,096 classical counters match the exact centroid
+- K = 8,192 (N = 3.4·10⁷) and all ≈ 17,100 expressed genes (N = 1.46·10⁸), centroid via Gram matrix, never materialised (checked vs materialisation at K=512).
+- Best one-pass S* = 512–4,096 counters (S*/N ≤ 3.1·10⁻⁵). Flat for B and naive CD4 T; grows ~∝ N for CD34+ (S*/N ≈ 2–3·10⁻⁵).
+- Simulated quantum readout = exact centroid (±0.006 BA); logreg on all N is not better than at K=2048.
+- Figure: `HPC_E13/figures/fig_e13_sstar_vs_N.png`
+
 ## Stage 4 — Under the paper's own ridge protocol, small classical sketches do lose ~0.1 accuracy (gap reproduced, not an advantage proof)
 - Paper's file, its 100 random pairs, RidgeClassifier, 5-fold CV accuracy: full ridge 0.901. Classical sketches at S = 64: 0.80–0.81. Within 0.01 of full ridge needs ~1,900 genes (truncation) to ~8,192 features (hashing / sparse JL).
 - Fair-baseline fixes (tuned alpha, s=4 JL, count-sketch selection) do not close the gap. The paper's baselines are general-purpose, data-oblivious methods.

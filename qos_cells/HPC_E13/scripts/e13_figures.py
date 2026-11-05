@@ -53,7 +53,7 @@ def fig_sstar():
     tasks = []
     for d in (s1, s3):
         if d:
-            tasks += [t for t in d["tasks"] if t.get("split", 0) == 0]
+            tasks += [t for t in d["tasks"] if t.get("split", 0) == 0 and "gate_vs_materialised" not in t and "methods" in t]
     order = list(dict.fromkeys(t["positive"] for t in tasks))
     for i, pos in enumerate(order):
         pts = sorted([(t["N"], best(t)[0], t.get("signal", True)) for t in tasks if t["positive"] == pos], key=lambda x: x[0])
@@ -73,7 +73,7 @@ def fig_sstar():
     ax.set_ylim(1.6, None)
     ax.set_xscale("log")
     ax.set_yscale("log", base=2)
-    ax.set_xlabel("feature-space size N (genes K=1024, gene pairs K=512, 2048, …)")
+    ax.set_xlabel("feature-space size N (genes K=1024; gene pairs K=512, 2048, 8192, all ≈ 17,100 genes)")
     ax.set_ylabel("S* = counters the best one-pass sketch needs")
     ax.set_title("PBMC68k: classical memory S* needed to match the exact centroid\n"
                  "best of count-sketch / hashing / sparse JL / Misra–Gries · split 0 · stream at M_run (E7 protocol)",
