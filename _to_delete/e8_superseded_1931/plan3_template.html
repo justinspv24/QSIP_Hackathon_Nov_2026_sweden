@@ -1,0 +1,483 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Streaming Cells Into Qubits</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F5F3EF;--ink:#08090B;--gold:#FFC900;--dim:rgba(8,9,11,.55);--faint:rgba(8,9,11,.14);--line:rgba(8,9,11,.25);--red:#FF5A4E}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--ink);font-family:"Space Grotesk",system-ui,sans-serif;overflow:hidden}
+#viewport{position:fixed;inset:0;display:grid;place-items:center}
+#stage{width:1280px;height:720px;position:relative;transform-origin:center center}
+.slide{position:absolute;inset:0;padding:56px 80px 66px;display:none;flex-direction:column}
+.slide.active{display:flex;animation:in .35s ease}
+@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.step{font-family:"JetBrains Mono",monospace;font-size:14px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink);margin-bottom:12px;display:flex;gap:14px;align-items:center}
+.step .num{background:var(--gold);border-radius:999px;width:28px;height:28px;display:grid;place-items:center;letter-spacing:0}
+.step.backup .num{background:var(--faint)}
+h1{font-size:68px;line-height:1.04;font-weight:700;letter-spacing:-.02em}
+h2{font-size:38px;line-height:1.08;font-weight:700;letter-spacing:-.015em;margin-bottom:16px;max-width:1120px}
+:not(.card).gold{color:var(--ink);background:linear-gradient(transparent 58%,var(--gold) 58%,var(--gold) 92%,transparent 92%);padding:0 .08em}
+.card.gold{background:rgba(255,201,0,.10);border-color:var(--gold)}
+h3.gold{background:none;padding:0;border-bottom:3px solid var(--gold);align-self:flex-start}
+td.gold,.n.gold{font-weight:700;background:none}
+.dim{color:var(--dim)}
+p.lead{font-size:24px;line-height:1.4;color:var(--dim);max-width:960px}
+.mono{font-family:"JetBrains Mono",monospace}
+.row{display:flex;gap:28px;flex:1;min-height:0}
+.col{flex:1;display:flex;flex-direction:column;justify-content:center;min-width:0}
+.card{border:1.5px solid var(--line);border-radius:14px;padding:18px 22px}
+.card h3{font-size:20px;margin-bottom:6px}
+.card p{font-size:17px;line-height:1.42;color:var(--dim)}
+.big{font-size:56px;font-weight:700;line-height:1}
+.tag{align-self:flex-start;display:inline-block;font-family:"JetBrains Mono",monospace;font-size:12px;padding:3px 10px;border-radius:999px;border:1.5px solid var(--gold);background:rgba(255,201,0,.18);color:var(--ink)}
+ul.clean{list-style:none;display:flex;flex-direction:column;gap:12px}
+ul.clean li{font-size:20px;line-height:1.35;padding-left:26px;position:relative}
+ul.clean li::before{content:"";position:absolute;left:0;top:10px;width:11px;height:11px;background:var(--gold);outline:1px solid rgba(8,9,11,.25);border-radius:3px}
+table{border-collapse:collapse;width:100%;font-size:17px}
+th,td{text-align:left;padding:8px 12px;border-bottom:1px solid var(--faint);vertical-align:top}
+th{font-family:"JetBrains Mono",monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);font-weight:400}
+td.n{font-family:"JetBrains Mono",monospace}
+svg text{font-family:"Space Grotesk",sans-serif}
+.footer{position:absolute;left:80px;right:80px;bottom:24px;display:flex;justify-content:space-between;font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--dim);letter-spacing:.06em}
+#progress{position:fixed;left:0;bottom:0;height:4px;background:var(--gold);transition:width .3s}
+#hint{position:fixed;left:50%;transform:translateX(-50%);bottom:12px;font:12px "JetBrains Mono",monospace;color:var(--dim);opacity:.6}
+.pipeline{display:flex;align-items:stretch;gap:0;margin-top:6px}
+.pipeline .pstep{flex:1;border:1.5px solid var(--line);padding:14px 14px;border-radius:12px}
+.pipeline .arrow{width:30px;display:grid;place-items:center;color:var(--ink);font-size:22px}
+.pipeline .pstep b{display:inline-block;font-size:12px;font-family:"JetBrains Mono",monospace;color:var(--ink);background:var(--gold);padding:1px 6px;border-radius:4px;margin-bottom:6px}
+.pipeline .pstep span{display:block;font-size:16px;line-height:1.3;margin-top:4px}
+.note{font-size:14px;color:var(--dim);margin-top:8px;line-height:1.38}
+.eq{font-family:"JetBrains Mono",monospace;font-size:19px;background:rgba(255,201,0,.12);border-left:4px solid var(--gold);padding:10px 14px;border-radius:0 8px 8px 0;line-height:1.5}
+.kpi{display:flex;gap:18px;margin-top:10px}
+.kpi .card{flex:1;padding:12px 16px}
+.kpi .big{font-size:40px}
+.kpi p{font-size:14px}
+@media print{html,body{overflow:visible}#viewport{position:static;display:block}#stage{transform:none!important}.slide{display:flex!important;position:relative;page-break-after:always;height:720px;animation:none}#progress,#hint{display:none}}
+</style>
+</head>
+<body>
+<script>
+/* ===== RESULTS: generated by scripts/08_slides.py from results/*.json — never edited by hand ===== */
+const RESULTS = /*__RESULTS__*/null;
+</script>
+<div id="viewport"><div id="stage">
+
+<!-- 1 · HOOK -->
+<section class="slide">
+  <div class="step">QSIP Hackathon · ExtremeData4QML · Stockholm · 6 Nov 2026</div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:28px">
+    <h1 style="font-size:54px">1 in 70 blood cells is a dendritic cell.<br>1 in a million is a tumour cell.<br><span class="gold">Can qubits learn them from a stream too big to store?</span></h1>
+    <p class="lead">Quantum oracle sketching on single-cell RNA-seq: each streamed record is one phase gate, the register keeps log₂(genes) qubits, and we measure exactly what rare classes cost.</p>
+  </div>
+  <div class="pipeline">
+    <div class="pstep"><b>01</b><span>Dataset: PBMC3k</span></div><div class="arrow">→</div>
+    <div class="pstep"><b>02</b><span>Challenge: huge, sparse, rare</span></div><div class="arrow">→</div>
+    <div class="pstep"><b>03</b><span>Technique: oracle sketching</span></div><div class="arrow">→</div>
+    <div class="pstep"><b>04</b><span>Prototype: sim → IQM Garnet</span></div><div class="arrow">→</div>
+    <div class="pstep"><b>05</b><span>Real world: atlases, biopsies</span></div>
+  </div>
+</section>
+
+<!-- 2 · DATA + CHALLENGE -->
+<section class="slide">
+  <div class="step"><span class="num">1</span>Dataset &nbsp;·&nbsp; <span class="num">2</span>Challenge</div>
+  <h2>PBMC3k: <span class="gold">huge feature space, almost all zeros, and the class you care about is rare</span></h2>
+  <div class="row">
+    <div class="col" style="flex:1.05">
+      <svg id="classbars" viewBox="0 0 560 330" width="100%"></svg>
+      <p class="note">Cells per type (log scale), 2,638 blood cells after QC. Rare types in gold.</p>
+    </div>
+    <div class="col" style="gap:12px;flex:1">
+      <table>
+        <tr><th>property</th><th>number</th><th>why it hurts</th></tr>
+        <tr><td>genes measured</td><td class="n gold" id="t-genes"></td><td>memory grows with features; p ≫ n</td></tr>
+        <tr><td>cells</td><td class="n" id="t-cells"></td><td>few samples per feature</td></tr>
+        <tr><td>zeros</td><td class="n gold" id="t-zeros"></td><td>the signal sits in a few genes per cell</td></tr>
+        <tr><td>dendritic cells</td><td class="n gold" id="t-dc"></td><td>the rare class is the interesting one</td></tr>
+        <tr><td>megakaryocytes</td><td class="n gold" id="t-mk"></td><td>15 examples to learn from</td></tr>
+        <tr><td>in the wild</td><td class="n">10⁷–10⁸ cells</td><td>atlases arrive as a stream; you cannot keep it</td></tr>
+      </table>
+      <p class="note"><b>The hard part is not accuracy on 2,638 cells</b> (classical solves that). It is learning from a stream whose feature space is bigger than the memory you can afford, while the class you need is ~1 % of it.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 3 · MECHANISM -->
+<section class="slide">
+  <div class="step"><span class="num">3</span>The quantum technique</div>
+  <h2>Oracle sketching: <span class="gold">each record is one phase kick, then it is gone</span></h2>
+  <svg viewBox="0 0 1120 250" width="100%">
+    <defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10z" fill="#FFC900"/></marker></defs>
+    <text x="16" y="28" fill="#08090B" fill-opacity=".6" font-size="14">① stream of records x = (cell, gene, label, value)</text>
+    <g font-family="JetBrains Mono" font-size="12" fill="#F5F3EF">
+      <rect x="16" y="46" width="62" height="40" rx="6" fill="#08090B" opacity=".85"/><text x="47" y="71" text-anchor="middle" font-size="14">x₁</text>
+      <rect x="88" y="46" width="62" height="40" rx="6" fill="#08090B" opacity=".85"/><text x="119" y="71" text-anchor="middle" font-size="14">x₂</text>
+      <rect x="160" y="46" width="62" height="40" rx="6" fill="#FFC900"/><text x="191" y="71" text-anchor="middle" font-size="14" fill="#08090B">x₃</text>
+      <text x="232" y="72" fill="#08090B" font-size="18">…</text>
+      <rect x="258" y="46" width="62" height="40" rx="6" fill="#08090B" opacity=".85"/><text x="289" y="71" text-anchor="middle" font-size="14">x_M</text>
+    </g>
+    <text x="16" y="112" fill="#08090B" fill-opacity=".55" font-size="13">read once · never stored · zero entries make no gate</text>
+    <line x1="326" y1="66" x2="352" y2="66" stroke="#FFC900" stroke-width="2" marker-end="url(#ah)"/>
+    <text x="362" y="28" fill="#08090B" fill-opacity=".6" font-size="14">② one diagonal phase gate per record on n = log₂N qubits</text>
+    <g stroke="#08090B" stroke-opacity=".5" stroke-width="1.5"><line x1="362" y1="52" x2="760" y2="52"/><line x1="362" y1="76" x2="760" y2="76"/><line x1="362" y1="100" x2="760" y2="100"/></g>
+    <g font-family="JetBrains Mono" font-size="12" font-weight="700" fill="#08090B">
+      <rect x="386" y="40" width="82" height="72" rx="8" fill="#F5F3EF" stroke="#FFC900" stroke-width="2.5"/><text x="427" y="72" text-anchor="middle">V(x₁)</text><text x="427" y="92" text-anchor="middle" font-size="10" font-weight="400">e^{iτw₁/M}|g₁⟩⟨g₁|</text>
+      <rect x="480" y="40" width="82" height="72" rx="8" fill="#F5F3EF" stroke="#FFC900" stroke-width="2.5"/><text x="521" y="72" text-anchor="middle">V(x₂)</text><text x="521" y="92" text-anchor="middle" font-size="10" font-weight="400">e^{iτw₂/M}|g₂⟩⟨g₂|</text>
+      <text x="578" y="80" font-size="18">…</text>
+      <rect x="608" y="40" width="82" height="72" rx="8" fill="#F5F3EF" stroke="#FFC900" stroke-width="2.5"/><text x="649" y="72" text-anchor="middle">V(x_M)</text><text x="649" y="92" text-anchor="middle" font-size="10" font-weight="400">e^{iτw_M/M}|g_M⟩⟨g_M|</text>
+    </g>
+    <text x="362" y="134" fill="#08090B" fill-opacity=".55" font-size="13">on basis state |gₜ⟩ only · all gates commute → the register keeps the SUM of the kicks</text>
+    <line x1="770" y1="76" x2="814" y2="76" stroke="#FFC900" stroke-width="2" marker-end="url(#ah)"/>
+    <text x="824" y="28" fill="#08090B" fill-opacity=".6" font-size="14">③ one query: Hadamard test</text>
+    <rect x="824" y="40" width="130" height="72" rx="10" fill="none" stroke="#08090B" stroke-opacity=".5" stroke-width="1.5"/>
+    <text x="889" y="70" text-anchor="middle" fill="#08090B" font-size="13">|ψ⟩ = Σ a_g|g⟩</text>
+    <text x="889" y="92" text-anchor="middle" fill="#08090B" font-size="13">ctrl-U, S†, H</text>
+    <line x1="962" y1="76" x2="1000" y2="76" stroke="#FFC900" stroke-width="2" marker-end="url(#ah)"/>
+    <rect x="1004" y="46" width="108" height="60" rx="10" fill="#FFC900"/>
+    <text x="1058" y="72" text-anchor="middle" fill="#08090B" font-size="14" font-weight="700">rare /</text>
+    <text x="1058" y="92" text-anchor="middle" fill="#08090B" font-size="14" font-weight="700">common</text>
+    <rect x="16" y="160" width="1100" height="76" rx="12" fill="rgba(255,201,0,.07)" stroke="#FFC900" stroke-opacity=".5"/>
+    <text x="36" y="190" fill="#08090B" font-size="17" font-weight="700">Analogy: raindrops on a set of tuned drums.</text>
+    <text x="36" y="216" fill="#08090B" font-size="15">No drum stores the rain, but after a storm each drum is turned by how much fell on it. The register keeps the sum, never the drops.</text>
+  </svg>
+  <div class="row" style="flex:none;gap:22px;margin-top:8px">
+    <div class="col eq" style="flex:1.2;font-size:17px">φ_g = (τ/M) · Σ_t w_t · [g_t = g]<br>w_t = +p_t/π̂ (rare) &nbsp;or&nbsp; −p_t/(1−π̂) (common)<br>⟹ E[φ_g] ∝ μ₁,g − μ₀,g<br>⟨Z_anc⟩ = Σ_g a_g² sin φ_g &nbsp;=&nbsp; the classifier score</div>
+    <div class="col card" style="flex:.9"><p style="color:var(--ink)"><b>Our addition:</b> the ±1/π̂ importance weights make the sketch imbalance-aware. The mean is unbiased for any π; the price is in the variance (next slides).</p><p>Zhao, Zlokapa, Preskill &amp; Huang 2026, arXiv:2604.07639 · no QRAM · p = squared amplitude of the cell</p></div>
+  </div>
+</section>
+
+<!-- 4 · WHY IT FITS -->
+<section class="slide">
+  <div class="step"><span class="num">3</span>Why it fits this data · mechanistic claims, each with a measurement</div>
+  <h2>Memory is <span class="gold">log₂N qubits</span>; the price is samples: err² ≈ C·N/M</h2>
+  <div class="row">
+    <div class="col" style="flex:1.25"><svg id="e2plot" viewBox="0 0 620 330" width="100%"></svg></div>
+    <div class="col" style="gap:10px">
+      <table>
+        <tr><th>data property</th><th>mechanism</th><th>claim</th></tr>
+        <tr><td>N features</td><td>index register</td><td class="n">⌈log₂N⌉ qubits: 15 for all genes, 30 for gene pairs</td></tr>
+        <tr><td>sparsity</td><td>gate per record</td><td class="n">cost ∝ nonzeros streamed, zeros are free</td></tr>
+        <tr><td>stream</td><td>no storage</td><td class="n">M = Θ(NQ²/ε) samples (paper)</td></tr>
+        <tr><td>classical</td><td>lower bound</td><td class="n">M·S ≥ Ω(N·Q_C) (paper's tasks)</td></tr>
+      </table>
+      <p class="note">Left: measured sketch error (5 seeds) vs records M, dashed = closed-form prediction with <b>no fitted parameter</b>. Slope −½ in log-log: error² ∝ 1/M; the offset grows with N (err²·M/N ≈ <span id="t-cfit"></span> for N ≥ 256).</p>
+      <p class="note">Classifier at N = 1024 (10 qubits) reaches the M→∞ centroid (bal. acc <span id="t-exact"></span>) by M ≈ <span id="t-mconv"></span> records.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 5 · OUR TWIST -->
+<section class="slide">
+  <div class="step"><span class="num">3</span>Our twist · the cost of rare classes</div>
+  <h2>Rare classes cost <span class="gold">samples, not qubits</span>: M ∝ 1/(π(1−π))</h2>
+  <div class="row">
+    <div class="col" style="flex:1.2"><svg id="e3plot" viewBox="0 0 620 330" width="100%"></svg></div>
+    <div class="col" style="flex:.95"><svg id="e3bars" viewBox="0 0 480 240" width="100%"></svg>
+      <table style="margin-top:8px">
+        <tr><th>real class</th><th>π</th><th>1/(π(1−π))</th><th>M for 10 % error</th></tr>
+        <tbody id="e3real"></tbody>
+      </table>
+    </div>
+  </div>
+  <p class="note">Two-line derivation: the ±1/π weights leave the mean of the kick unchanged, Σ p·w → μ₁−μ₀, but square inside the variance: E[p²]/π + E[p²]/(1−π) = E[p²]/(π(1−π)). Same two expression profiles in the synthetic, only π changes. Dendritic cells (π = 0.014) pay ×72 in samples over a balanced class, and being rare <i>and</i> subtle is the expensive combination.</p>
+</section>
+
+<!-- 6 · IT RUNS -->
+<section class="slide">
+  <div class="step"><span class="num">4</span>Prototype · classical → simulator → real hardware</div>
+  <h2 id="hw-title">It runs on IQM Garnet: <span class="gold">8/8 cells right from 3 qubits</span></h2>
+  <div class="row">
+    <div class="col" style="flex:1.3"><svg id="hwplot" viewBox="0 0 640 330" width="100%"></svg></div>
+    <div class="col" style="gap:10px">
+      <table>
+        <tr><th>stage</th><th>N=4 · 3 qubits</th><th>N=16 · 5 qubits</th></tr>
+        <tr><td>formula = statevector</td><td class="n">1e-15</td><td class="n">1e-13</td></tr>
+        <tr><td>2,000-shot simulator</td><td class="n">±0.03</td><td class="n">±0.04</td></tr>
+        <tr><td>CZ gates · depth</td><td class="n" id="t-cz4"></td><td class="n" id="t-cz16"></td></tr>
+        <tr><td>calibration α (signal left)</td><td class="n gold" id="t-a4"></td><td class="n gold" id="t-a16"></td></tr>
+        <tr><td>sign agreement raw → cal.</td><td class="n gold" id="t-s4"></td><td class="n gold" id="t-s16"></td></tr>
+      </table>
+      <p class="note" id="hw-meta"></p>
+      <p class="note">Phases trained in simulation (100k records), frozen and hashed; the QPU runs <b>inference only</b>. Calibration: the same oracle on 4 training cells + the zero sketch. Depth breaks first: at 53 CZ raw signs fail and calibration rescues them.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 7 · REAL WORLD + REALISM -->
+<section class="slide">
+  <div class="step"><span class="num">5</span>Real world · and an honest ledger</div>
+  <h2>Where it matters, and <span class="gold">what it would really cost</span></h2>
+  <div class="row" style="gap:22px">
+    <div class="col" style="flex:1.15;justify-content:flex-start">
+      <table id="ledger" style="font-size:15px">
+        <tr><th>quantity</th><th>all genes · N = 2¹⁵</th><th>gene pairs · N = 2³⁰</th></tr>
+      </table>
+      <p class="note" style="font-size:12px">ε = 0.1 · one query · π = 0.014 (dendritic) · gates: one n-controlled phase per record ≈ 2n−1 · 1 MHz logical gates (fault-tolerant, optimistic)</p>
+    </div>
+    <div class="col" style="gap:12px">
+      <div class="card" style="padding:12px 18px"><h3 style="font-size:18px">Where this data lives</h3><p style="font-size:15px">Cell atlases (CZ CELLxGENE, 10⁷–10⁸ cells), mass cytometry, liquid biopsies: tumour cells at 1 in 10⁶–10⁷. Huge feature spaces, one-pass acquisition, rare but critical classes. Same shape: fraud (0.17 %), AML (0.1 %), QEC decoding (0.14 %).</p></div>
+      <div class="card gold" style="padding:12px 18px"><h3 style="font-size:18px">What we claim · what we don't</h3><p style="color:var(--ink);font-size:15px"><b>Claim:</b> log₂N-qubit memory, N/ε samples, a measured 1/(π(1−π)) rare-class cost, and the primitive runs on a QPU today.<br><b>Don't claim:</b> a wall-clock speed-up; that our centroid task inherits the paper's lower bound (open); beating classical on 2,638 cells.</p></div>
+      <div class="card" style="padding:12px 18px"><h3 style="font-size:18px">Next</h3><p style="font-size:15px">Gene-pair features (30 qubits) · classical-shadow readout (reusable classical model, as in the thesis) · noisy-simulator study of depth vs M.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- B1 · BASELINES -->
+<section class="slide">
+  <div class="step backup"><span class="num">B</span>Backup · classical baselines (E1)</div>
+  <h2>Classical is better and cheap at this scale — <span class="gold">and the rare classes prefer few genes</span></h2>
+  <table id="e1table"></table>
+  <p class="note">Balanced accuracy / AUPRC on a 30 % stratified test split; genes chosen on the training split only by |μ₁−μ₀| of the squared-amplitude features. Exact centroid = the M→∞ sketch (a linear score p·sin φ). Logistic regression with class-balanced weights. With 10–26 training positives, adding genes adds noise: p ≫ n in action. Abstain rate (all-zero cells) was 0 % for every task shown.</p>
+</section>
+
+<!-- B2 · Q&A -->
+<section class="slide">
+  <div class="step backup"><span class="num">B</span>Backup · likely questions</div>
+  <h2>Q&amp;A register</h2>
+  <table>
+    <tr><th>question</th><th>answer</th></tr>
+    <tr><td>"Classical does this with 14k floats."</td><td>Yes, and we show it. The claim is about the regime N ≫ memory (gene pairs, 10⁹ features), where the paper proves a memory–sample trade-off.</td></tr>
+    <tr><td>"Does your centroid task inherit the lower bound?"</td><td>Not proven. The paper's bound is for its task families (NOPE, forrelation-type). We say it is open.</td></tr>
+    <tr><td>"Loading data kills quantum advantages."</td><td>Sketching <i>is</i> the loading. Each record is one gate and is never stored, so there is no QRAM. The cost is samples ∝ N/ε, which we show.</td></tr>
+    <tr><td>"Hardware noise?"</td><td>Known-answer circuits of the same family measure the shrink factor α. We report raw and calibrated values; 11 CZ works raw, 53 CZ needs the calibration.</td></tr>
+    <tr><td>"Why not train on hardware?"</td><td>Against the rules, and unnecessary: the sketch accumulation is classical simulation; hardware runs inference with fixed phases.</td></tr>
+    <tr><td>"Is this just a linear model?"</td><td>Yes, on purpose. One query = one linear functional. Nonlinear models need more queries Q, at cost Q², the paper's optimal scaling.</td></tr>
+    <tr><td>"The labels come from clustering the same data."</td><td>True (Louvain). Fine for a feasibility prototype; stated on the limits slide; a held-out annotated atlas is the next step.</td></tr>
+  </table>
+</section>
+
+<!-- B3 · HARDWARE DETAILS -->
+<section class="slide">
+  <div class="step backup"><span class="num">B</span>Backup · hardware details and the calibration lesson</div>
+  <h2>Two runs on Garnet, one lesson</h2>
+  <div class="row">
+    <div class="col">
+      <table id="caltable"></table>
+      <p class="note">Fit z_hw = α·z_ideal + β over the calibration circuits; inverted on the test cells. Fail-loud rule: α &lt; 0.3 means the device is too noisy for a sign readout.</p>
+    </div>
+    <div class="col card" style="justify-content:flex-start;gap:10px">
+      <h3>Run 1 (random-phase calibration) over-corrected</h3>
+      <p id="run1-note"></p>
+      <h3 style="margin-top:8px">Run 2: same-oracle calibration</h3>
+      <p>Calibration circuits = the frozen oracle on 4 <i>training</i> cells (2 rare, 2 common) + the zero sketch. Same gate structure → same shrinkage → the fit transfers. Mean |error| vs ideal dropped from <span id="t-err-raw"></span> (raw) to <span id="t-err-cal"></span> (calibrated), shot noise 0.022.</p>
+      <p class="mono" style="font-size:13px">No training on hardware · inference with frozen parameters · all numbers from results/*.json</p>
+    </div>
+  </div>
+</section>
+
+<!-- B4 · ROUTE 2: CLASSICAL MEMORY (E7) -->
+<section class="slide">
+  <div class="step backup"><span class="num">B</span>Backup · Route 2: classical memory stress test (E7)</div>
+  <h2 id="e7-title" style="font-size:29px"></h2>
+  <div class="row">
+    <div class="col" style="flex:1.15"><svg id="e7plot" viewBox="0 0 640 330" width="100%"></svg></div>
+    <div class="col" style="gap:8px;justify-content:flex-start">
+      <style>#e7table th,#e7table td{padding:6px 8px}</style>
+      <table id="e7table" style="font-size:13px"></table>
+      <p class="note" id="e7-note"></p>
+    </div>
+  </div>
+</section>
+
+</div></div>
+<div id="progress"></div>
+<div id="hint">← → to navigate · F fullscreen · Ctrl+P to print</div>
+
+<script>
+const C={bg:"#F5F3EF",ink:"#08090B",gold:"#FFC900",dim:"rgba(8,9,11,.6)",faint:"rgba(8,9,11,.14)",red:"#FF5A4E",g1:"#C9C7C1",g2:"#8A8984",g3:"#4A4A48"};
+const NS="http://www.w3.org/2000/svg";
+function el(t,a,p,txt){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(txt!==undefined)e.textContent=txt;if(p)p.appendChild(e);return e;}
+const sci=v=>{if(v===0)return"0";const e=Math.floor(Math.log10(Math.abs(v)));const m=v/10**e;return (Math.abs(m-1)<.05?"":m.toFixed(1)+"×")+"10"+String(e).replace(/-/g,"⁻").replace(/\d/g,d=>"⁰¹²³⁴⁵⁶⁷⁸⁹"[d]);};
+const pct=v=>(v*100).toFixed(1)+" %";
+const R=RESULTS;
+if(!R){document.body.innerHTML='<p style="padding:40px;font:20px monospace">RESULTS missing — run scripts/08_slides.py</p>';throw new Error("no results");}
+function setText(id,v){const e=document.getElementById(id);if(e)e.textContent=v;}
+
+/* ---- log-log line chart ---- */
+function logChart(svg,W,H,series,opts){
+  const L=64,Rm=opts.right||20,T=24,B=50,pw=W-L-Rm,ph=H-T-B;
+  const xs=series.flatMap(s=>s.x),ys=series.flatMap(s=>s.y).filter(v=>v>0);
+  const lx0=Math.log10(Math.min(...xs)),lx1=Math.log10(Math.max(...xs));
+  const ly0=Math.floor(Math.log10(Math.min(...ys))),ly1=Math.ceil(Math.log10(Math.max(...ys)));
+  const X=v=>L+(Math.log10(v)-lx0)/(lx1-lx0)*pw, Y=v=>T+ph-(Math.log10(v)-ly0)/(ly1-ly0)*ph;
+  for(let e=ly0;e<=ly1;e++){el("line",{x1:L,x2:W-Rm,y1:Y(10**e),y2:Y(10**e),stroke:C.faint},svg);el("text",{x:L-8,y:Y(10**e)+4,"text-anchor":"end",fill:C.dim,"font-size":12,"font-family":"JetBrains Mono"},svg,sci(10**e));}
+  for(let e=Math.ceil(lx0);e<=Math.floor(lx1);e++) el("text",{x:X(10**e),y:H-B+20,"text-anchor":"middle",fill:C.dim,"font-size":12,"font-family":"JetBrains Mono"},svg,sci(10**e));
+  if(opts.hline){el("line",{x1:L,x2:W-Rm,y1:Y(opts.hline),y2:Y(opts.hline),stroke:C.red,"stroke-dasharray":"4 4","stroke-width":1.2},svg);el("text",{x:W-Rm,y:Y(opts.hline)-5,"text-anchor":"end",fill:C.red,"font-size":11},svg,opts.hlabel||"");}
+  el("text",{x:L+pw/2,y:H-6,"text-anchor":"middle",fill:C.dim,"font-size":13},svg,opts.xlabel);
+  el("text",{x:14,y:T+ph/2,"text-anchor":"middle",fill:C.dim,"font-size":13,transform:`rotate(-90 14 ${T+ph/2})`},svg,opts.ylabel);
+  series.forEach((s,i)=>{
+    let d="";s.x.forEach((x,k)=>{d+=(k?"L":"M")+X(x)+","+Y(s.y[k]);});
+    el("path",{d,fill:"none",stroke:s.col,"stroke-width":s.dash?2:3,"stroke-dasharray":s.dash||"",opacity:s.dash?.75:1},svg);
+    if(!s.dash) s.x.forEach((x,k)=>el("circle",{cx:X(x),cy:Y(s.y[k]),r:4,fill:s.col},svg));
+    if(s.name){const li=series.slice(0,i).filter(q=>q.name).length;const lx=opts.legend==="bl"?L+12:L+pw-150,ly=opts.legend==="bl"?T+ph-16-(series.filter(q=>q.name).length-1-li)*18:T+8+li*18;el("rect",{x:lx,y:ly,width:12,height:12,rx:2,fill:s.col},svg);el("text",{x:lx+18,y:ly+11,fill:C.ink,"font-size":12},svg,s.name);}
+  });
+  if(opts.title) el("text",{x:L,y:14,fill:C.dim,"font-size":12},svg,opts.title);
+}
+
+/* ---- slide 2: class bars ---- */
+(function(){
+  const svg=document.getElementById("classbars");const counts=R.dataset.class_counts;
+  const keys=Object.keys(counts);const x0=150,w=360,top=14,bh=28,gap=9,max=Math.log10(1300);
+  keys.forEach((k,i)=>{const v=counts[k],y=top+i*(bh+gap),len=Math.max(4,w*Math.log10(v)/max),rare=v<100;
+    el("text",{x:x0-10,y:y+bh/2+5,"text-anchor":"end",fill:C.ink,"font-size":14},svg,k);
+    el("rect",{x:x0,y,width:len,height:bh,rx:4,fill:rare?C.gold:C.ink,opacity:rare?1:.55},svg);
+    el("text",{x:x0+len+8,y:y+bh/2+5,fill:rare?C.ink:C.dim,"font-size":13,"font-family":"JetBrains Mono"},svg,v.toLocaleString()+(rare?"  ("+pct(v/R.dataset.n_cells)+")":""));});
+  setText("t-genes",R.dataset.genes_measured_in_10x_run.toLocaleString()+" ("+R.dataset.n_genes.toLocaleString()+" expressed)");
+  setText("t-cells",R.dataset.n_cells.toLocaleString());
+  setText("t-zeros",pct(R.dataset.fraction_zero));
+  setText("t-dc",counts["Dendritic cells"]+" ("+pct(counts["Dendritic cells"]/R.dataset.n_cells)+")");
+  setText("t-mk",counts["Megakaryocytes"]+" ("+pct(counts["Megakaryocytes"]/R.dataset.n_cells)+")");
+})();
+
+/* ---- slide 4: E2 ---- */
+(function(){
+  const svg=document.getElementById("e2plot");const cols=[C.g1,C.g2,C.g3,C.ink];const series=[];
+  R.e2.curves.forEach((c,i)=>{series.push({name:"N="+c.N,x:c.rows.map(r=>r.M),y:c.rows.map(r=>r.rel_error_mean),col:cols[i]});
+    series.push({x:c.rows.map(r=>r.M),y:c.rows.map(r=>r.rel_error_predicted),col:cols[i],dash:"5 4"});});
+  logChart(svg,620,330,series,{legend:"bl",xlabel:"records streamed M (uniform stream, B cells)",ylabel:"relative error of the sketch",title:"solid: measured, 5 seeds · dashed: closed-form prediction, no fit"});
+  const big=R.e2.curves.filter(c=>c.N>=256);setText("t-cfit",Math.round(big.reduce((a,c)=>a+c.C_fit,0)/big.length));
+  setText("t-exact",R.e2.classifier.exact_centroid.balanced_accuracy.toFixed(2));
+  const ex=R.e2.classifier.exact_centroid.balanced_accuracy;const conv=R.e2.classifier.rows.find(r=>r.balanced_accuracy_mean>=ex-0.01);
+  setText("t-mconv",conv?sci(conv.M):"n/a");
+})();
+
+/* ---- slide 5: E3 ---- */
+(function(){
+  const svg=document.getElementById("e3plot");const cols=[C.ink,C.g3,C.gold,C.red];const series=[];
+  R.e3.synthetic.forEach((s,i)=>{series.push({name:"π = "+s.pi,x:s.rows.map(r=>r.M),y:s.rows.map(r=>r.rel_error_mean),col:cols[i]});
+    series.push({x:s.rows.map(r=>r.M),y:s.rows.map(r=>r.rel_error_predicted),col:cols[i],dash:"5 4"});});
+  logChart(svg,620,330,series,{xlabel:"records streamed M (synthetic, N = "+R.e3.N+", only π changes)",ylabel:"relative error of the sketch",hline:0.1,hlabel:"10 % error",title:"solid: measured · dashed: predicted"});
+  const b=document.getElementById("e3bars");const W=480,H=240,L=60,T=28,B=40,pw=W-L-20,ph=H-T-B;
+  const vals=R.e3.synthetic.flatMap(s=>[s.cost_ratio_vs_balanced_measured,s.cost_ratio_vs_balanced_law]);const ymax=Math.log10(Math.max(...vals)*1.6);
+  const Y=v=>T+ph-Math.log10(Math.max(v,1))/ymax*ph;const gw=pw/R.e3.synthetic.length,bw=Math.min(40,(gw-30)/2);
+  [1,10,100].forEach(v=>{if(Math.log10(v)<=ymax){el("line",{x1:L,x2:W-20,y1:Y(v),y2:Y(v),stroke:C.faint},b);el("text",{x:L-8,y:Y(v)+4,"text-anchor":"end",fill:C.dim,"font-size":11,"font-family":"JetBrains Mono"},b,"×"+v);}});
+  R.e3.synthetic.forEach((s,i)=>{const gx=L+i*gw+(gw-2*bw-6)/2;
+    [[s.cost_ratio_vs_balanced_measured,C.ink,.6],[s.cost_ratio_vs_balanced_law,C.gold,1]].forEach(([v,col,op],j)=>{const x=gx+j*(bw+6);
+      el("rect",{x,y:Y(v),width:bw,height:ph-(Y(v)-T),rx:3,fill:col,opacity:op},b);el("text",{x:x+bw/2,y:Y(v)-5,"text-anchor":"middle",fill:C.ink,"font-size":11,"font-family":"JetBrains Mono"},b,"×"+v.toFixed(v<10?1:0));});
+    el("text",{x:L+i*gw+gw/2,y:H-B+18,"text-anchor":"middle",fill:C.ink,"font-size":13},b,"π = "+s.pi);});
+  el("rect",{x:L,y:6,width:12,height:12,rx:2,fill:C.ink,opacity:.6},b);el("text",{x:L+18,y:17,fill:C.ink,"font-size":12},b,"measured: M for 10 % error ÷ M at π = 0.5");
+  el("rect",{x:L+250,y:6,width:12,height:12,rx:2,fill:C.gold},b);el("text",{x:L+268,y:17,fill:C.ink,"font-size":12},b,"law: 1/(π(1−π)) ÷ 4");
+  const tb=document.getElementById("e3real");
+  R.e3.real.forEach(r=>{tb.innerHTML+=`<tr><td>${r.positive}</td><td class="n">${r.pi_hat.toFixed(3)}</td><td class="n gold">${r.law_factor.toFixed(0)}</td><td class="n">${sci(r.M_for_err_0p1)}</td></tr>`;});
+})();
+
+/* ---- slide 6: hardware ---- */
+(function(){
+  const d=R.e5.N4,d16=R.e5.N16;const svg=document.getElementById("hwplot");
+  const W=640,H=330,L=56,T=30,B=46,pw=W-L-20,ph=H-T-B;const ymin=-1.05,ymax=0.5;
+  const Y=v=>T+(ymax-v)/(ymax-ymin)*ph;const cells=d.cells;const gw=pw/cells.length,bw=Math.min(16,(gw-14)/3);
+  [-1,-.75,-.5,-.25,0,.25,.5].forEach(v=>{el("line",{x1:L,x2:W-20,y1:Y(v),y2:Y(v),stroke:v===0?C.line:C.faint},svg);el("text",{x:L-8,y:Y(v)+4,"text-anchor":"end",fill:C.dim,"font-size":11,"font-family":"JetBrains Mono"},svg,v.toFixed(2));});
+  el("line",{x1:L,x2:W-20,y1:Y(d.summary.threshold),y2:Y(d.summary.threshold),stroke:C.red,"stroke-width":1.5,"stroke-dasharray":"5 4"},svg);
+  el("text",{x:L+4,y:Y(d.summary.threshold)+13,fill:C.red,"font-size":11},svg,"decision threshold (set on training cells)");
+  cells.forEach((c,i)=>{const gx=L+i*gw+(gw-3*bw-8)/2;
+    const sim=(R.e4.find(b=>b.N===d.N).cells.find(q=>q.test_index===c.test_index)||{}).shots_ideal;
+    [[c.ideal,C.g1],[sim,C.g3],[c.raw,C.ink]].forEach(([v,col],j)=>{const x=gx+j*(bw+4);const y0=Y(0),y1=Y(v);
+      el("rect",{x,y:Math.min(y0,y1),width:bw,height:Math.abs(y1-y0),rx:2,fill:col},svg);});
+    el("text",{x:L+i*gw+gw/2,y:H-B+18,"text-anchor":"middle",fill:c.label?C.ink:C.dim,"font-size":12,"font-weight":c.label?700:400},svg,c.label?"rare (B)":"common");});
+  [["Classical (exact formula)",C.g1],["Quantum simulator (Qiskit)",C.g3],["Real IQM "+d.meta.alias.charAt(0).toUpperCase()+d.meta.alias.slice(1)+" (raw)",C.ink]].forEach(([n,col],i)=>{el("rect",{x:L+i*190,y:8,width:12,height:12,rx:2,fill:col},svg);el("text",{x:L+i*190+18,y:19,fill:C.ink,"font-size":12},svg,n);});
+  el("text",{x:14,y:T+ph/2,"text-anchor":"middle",fill:C.dim,"font-size":13,transform:`rotate(-90 14 ${T+ph/2})`},svg,"Hadamard-test score ⟨Z⟩");
+  el("text",{x:L+pw/2,y:H-4,"text-anchor":"middle",fill:C.dim,"font-size":12},svg,"same 8 held-out cells, same model · N = 4 genes · 3 qubits · 2,000 shots · all three: 8/8 correct");
+  const t4=d.meta.transpiled_test,t16=d16.meta.transpiled_test;
+  setText("t-cz4",t4.two_qubit+" · "+t4.depth);setText("t-cz16",t16.two_qubit+" · "+t16.depth);
+  setText("t-a4",d.summary.calibration.alpha.toFixed(2));setText("t-a16",d16.summary.calibration.alpha.toFixed(2));
+  setText("t-s4",Math.round(d.summary.sign_agreement_raw*8)+"/8 → "+Math.round(d.summary.sign_agreement_calibrated*8)+"/8");
+  setText("t-s16",Math.round(d16.summary.sign_agreement_raw*8)+"/8 → "+Math.round(d16.summary.sign_agreement_calibrated*8)+"/8");
+  setText("hw-meta",`IQM ${d.meta.alias} (20-qubit), ${d.meta.submitted_utc.slice(0,10)} · job ${d.meta.job_id} (N=4) · job ${d16.meta.job_id} (N=16) · ${d.meta.shots} shots/circuit · phases sha ${d.frozen_sha256}`);
+  setText("t-err-raw",d.summary.mean_abs_err_raw.toFixed(3));setText("t-err-cal",d.summary.mean_abs_err_calibrated.toFixed(3));
+  const ct=document.getElementById("caltable");
+  ct.innerHTML=`<tr><th>calibration circuit</th><th>ideal ⟨Z⟩</th><th>N=4 measured</th><th>N=16 ideal</th><th>N=16 measured</th></tr>`+
+    d.calibration_circuits.map((c,i)=>`<tr><td>${c.kind.replace("_"," ")}</td><td class="n">${c.ideal.toFixed(3)}</td><td class="n">${c.measured.toFixed(3)}</td><td class="n">${d16.calibration_circuits[i].ideal.toFixed(3)}</td><td class="n">${d16.calibration_circuits[i].measured.toFixed(3)}</td></tr>`).join("")+
+    `<tr><td><b>fit α · β</b></td><td></td><td class="n gold">${d.summary.calibration.alpha.toFixed(3)} · ${d.summary.calibration.beta.toFixed(3)}</td><td></td><td class="n gold">${d16.summary.calibration.alpha.toFixed(3)} · ${d16.summary.calibration.beta.toFixed(3)}</td></tr>`;
+  const r1=R.e5.run1;
+  if(r1) setText("run1-note",`Random-phase circuits on one cell gave ideal scores bunched near 0 (${r1.cal_ideals.map(v=>v.toFixed(2)).join(", ")}), so the fit was ill-conditioned: α = ${r1.alpha.toFixed(2)}, and the calibrated test scores overshot (mean |error| ${r1.err_cal.toFixed(3)} vs raw ${r1.err_raw.toFixed(3)}). Signs were still 8/8. Job ${r1.job_id}.`);
+})();
+
+/* ---- slide 7: ledger ---- */
+(function(){
+  const t=document.getElementById("ledger");const [a,b]=R.e6.ledger;
+  const rows=[["index qubits ⌈log₂N⌉",a.index_qubits,b.index_qubits],["logical qubits ≈ 2n",a.logical_qubits,b.logical_qubits],
+    ["samples M = NQ²/ε, balanced",sci(a.samples_balanced),sci(b.samples_balanced)],["× 1/(π(1−π)) at π = "+a.pi,sci(a.samples_rare),sci(b.samples_rare)],
+    ["gates per sketch ≈ M(2n−1)",sci(a.gates_per_sketch),sci(b.gates_per_sketch)],["time at 1 MHz logical gates",a.seconds_per_sketch<3600?Math.round(a.seconds_per_sketch)+" s":(a.years_per_sketch).toFixed(1)+" years",b.years_per_sketch<1?Math.round(b.seconds_per_sketch/86400)+" days":b.years_per_sketch.toFixed(1)+" years"],
+    ["classical memory, same sketch",(a.classical_bytes/1e3).toFixed(0)+" kB",(b.classical_bytes/1e9).toFixed(1)+" GB"]];
+  rows.forEach(([k,x,y],i)=>{t.innerHTML+=`<tr><td>${k}</td><td class="n${i<2?" gold":""}">${x}</td><td class="n${i<2?" gold":""}">${y}</td></tr>`;});
+  t.innerHTML+=`<tr><td><b>verdict</b></td><td>classical wins, easily</td><td>4 GB vs 60 qubits: size, not time; needs fault tolerance</td></tr>`;
+})();
+
+/* ---- B1: E1 table ---- */
+(function(){
+  const t=document.getElementById("e1table");const Ns=R.e1.tasks[0].by_N.map(r=>r.N);
+  t.innerHTML=`<tr><th>class (π)</th><th>all genes · logreg</th>${Ns.map(N=>`<th>N=${N} centroid</th><th>N=${N} logreg</th>`).join("")}</tr>`;
+  R.e1.tasks.forEach(tk=>{const f=e=>`${e.balanced_accuracy.toFixed(2)} / ${e.auprc.toFixed(2)}`;
+    t.innerHTML+=`<tr><td>${tk.positive} (${tk.base_rate.toFixed(3)})</td><td class="n">${f(tk.logreg_all_genes)}</td>${tk.by_N.map(r=>`<td class="n gold">${f(r.exact_centroid)}</td><td class="n">${f(r.logreg_p)}</td>`).join("")}</tr>`;});
+})();
+
+/* ---- B4: E7 route 2, classical memory ---- */
+(function(){
+  const e=R.e7; if(!e) return;
+  const blk=e.by_K[e.by_K.length-1];
+  const sup=n=>String(n).replace(/-/g,"⁻").replace(/\d/g,d=>"⁰¹²³⁴⁵⁶⁷⁸⁹"[d]);
+  const fmtS=v=>v==null?"never":(v>=64&&Number.isInteger(Math.log2(v))?"2"+sup(Math.log2(v)):v.toLocaleString());
+  const fmtR=v=>{if(v==null)return"—";if(v>=0.1)return v.toFixed(2);const e=Math.floor(Math.log10(v));const m=Math.round(v/10**e);return (m>=10?"1·10"+sup(e+1):m+"·10"+sup(e));};
+  const tasks=blk.real.concat(blk.synthetic?[blk.synthetic]:[]);
+  const show=["count_sketch","hashing","jl_sparse","heavy_hitters_mg","reservoir"];
+  const cols={count_sketch:C.ink,hashing:C.g3,jl_sparse:C.g2,heavy_hitters_mg:C.gold,reservoir:C.red};
+  const names={count_sketch:"count-sketch",hashing:"feature hashing",jl_sparse:"sparse JL",heavy_hitters_mg:"heavy hitters (MG)",reservoir:"reservoir"};
+  const onePass=k=>!["hashing_logreg","heavy_hitters_top","jl_dense"].includes(k);
+  const bestRatio=t=>Math.min(...Object.entries(t.methods).filter(([k])=>onePass(k)).map(([,m])=>m.S_star_cell_stable==null?1:m.S_star_cell_stable/t.N));
+  /* chart: B cells (the class with a real test set) and the no-structure control */
+  const svg=document.getElementById("e7plot");const W=640,H=330,T=34,B=54;
+  const bcell=blk.real.find(t=>t.positive==="B cells")||blk.real[0];
+  const panels=[[bcell.positive+" (real)",bcell]].concat(blk.synthetic?[["synthetic control: no structure",blk.synthetic]]:[]);
+  panels.forEach(([title,t],pi)=>{
+    const L=52+pi*320,pw=270,ph=H-T-B,N=t.N;
+    const lx0=3,lx1=Math.log2(N);const X=v=>L+(Math.log2(v)-lx0)/(lx1-lx0)*pw;const Y=v=>T+ph-(v-0.5)/0.5*ph;
+    [0.5,0.6,0.7,0.8,0.9,1].forEach(v=>{el("line",{x1:L,x2:L+pw,y1:Y(v),y2:Y(v),stroke:C.faint},svg);if(pi===0)el("text",{x:L-6,y:Y(v)+4,"text-anchor":"end",fill:C.dim,"font-size":11,"font-family":"JetBrains Mono"},svg,v.toFixed(1));});
+    for(let k=4;k<=lx1;k+=4) el("text",{x:X(2**k),y:H-B+14,"text-anchor":"middle",fill:C.dim,"font-size":10,"font-family":"JetBrains Mono"},svg,"2"+sup(k));
+    const ex=t.exact.balanced_accuracy,tol=t.tolerance_cell||0.01;
+    el("rect",{x:L,y:Y(Math.min(1,ex+tol)),width:pw,height:Y(ex-tol)-Y(Math.min(1,ex+tol)),fill:C.ink,opacity:.08},svg);
+    el("line",{x1:L,x2:L+pw,y1:Y(ex),y2:Y(ex),stroke:C.ink,"stroke-dasharray":"2 3"},svg);
+    el("text",{x:L+pw-2,y:ex>0.93?Y(ex)+13:Y(ex)-4,"text-anchor":"end",fill:C.ink,"font-size":10},svg,"exact centroid "+ex.toFixed(2)+" ± "+tol.toFixed(2));
+    const q=blk.quantum.index_qubits;
+    el("line",{x1:X(q),x2:X(q),y1:T,y2:T+ph,stroke:C.red,"stroke-dasharray":"4 3","stroke-width":1.2},svg);
+    el("text",{x:X(q)+4,y:T+ph-6,fill:C.red,"font-size":10},svg,"quantum: "+q+" index qubits");
+    el("text",{x:X(N)-2,y:T+ph-6,"text-anchor":"end",fill:C.dim,"font-size":10},svg,"S = N");
+    show.forEach(k=>{const m=t.methods[k];if(!m)return;let d="";m.rows.forEach((r,i)=>{d+=(i?"L":"M")+X(r.S)+","+Y(Math.max(0.5,r.ba));});
+      el("path",{d,fill:"none",stroke:cols[k],"stroke-width":2.2,opacity:.95},svg);m.rows.forEach(r=>el("circle",{cx:X(r.S),cy:Y(Math.max(0.5,r.ba)),r:2.4,fill:cols[k]},svg));});
+    el("text",{x:L,y:14,fill:C.ink,"font-size":12,"font-weight":700},svg,title);
+    el("text",{x:L,y:27,fill:C.dim,"font-size":10},svg,"N = "+N.toLocaleString()+" · M = "+t.M_run_over_N+"·N records · π̂ = "+t.pi_hat.toFixed(3)+" · test positives "+t.n_test_pos);
+  });
+  el("text",{x:52,y:H-24,fill:C.dim,"font-size":10},svg,"x: classical memory S (counters, log scale) · y: balanced accuracy on the test split, 5 seeds · band: exact centroid ± tol");
+  show.forEach((k,i)=>{const x=52+[0,105,225,310,445][i],y=H-12;el("rect",{x,y,width:10,height:10,rx:2,fill:cols[k]},svg);el("text",{x:x+14,y:y+9,fill:C.ink,"font-size":10},svg,names[k]);});
+  /* table */
+  const tb=document.getElementById("e7table");
+  const tshow=["count_sketch","hashing","heavy_hitters_mg","reservoir"];
+  tb.innerHTML=`<tr><th>K=${blk.K} · N=${sci(blk.N)}</th><th>exact<br>(tol)</th>`+tshow.map(k=>`<th>${names[k]}<br>S* (S*/N)</th>`).join("")+`</tr>`;
+  tasks.forEach(t=>{tb.innerHTML+=`<tr><td>${t.positive}</td><td class="n">${t.exact.balanced_accuracy.toFixed(2)}<br>(${(t.tolerance_cell||0.01).toFixed(2)})</td>`+tshow.map(k=>{const m=t.methods[k];if(!m)return"<td></td>";const s=m.S_star_cell_stable;return `<td class="n${s!=null&&s/t.N<=0.01?" gold":""}">${fmtS(s)}<br>(${fmtR(s==null?null:s/t.N)})</td>`;}).join("")+`</tr>`;});
+  /* title + note */
+  const worst=Math.max(...blk.real.map(bestRatio));
+  const synBest=blk.synthetic?bestRatio(blk.synthetic):null;
+  const synTxt=synBest==null||synBest>=0.5?"≈ N":"≈ "+fmtR(synBest)+"·N";
+  let title;
+  if(worst<=0.01) title=`No memory advantage on PBMC3k: <span class="gold">S ≈ ${fmtR(worst)}·N</span> classical counters match the exact centroid — the gap exists only without structure (control: S* ${synTxt})`;
+  else if(worst>=0.25) title=`Evidence for the claim on real data: every classical sketch needs <span class="gold">S ≳ ${fmtR(worst)}·N</span> to match the exact centroid on PBMC3k gene pairs`;
+  else title=`No exponential gap on PBMC3k: classical sketches need <span class="gold">S ≈ ${fmtR(worst)}·N</span>; the control with no structure needs S* ${synTxt}`;
+  document.getElementById("e7-title").innerHTML=title;
+  const lr=blk.real.map(t=>t.logreg_full?`${t.positive.split(" ")[0]} ${t.logreg_full.balanced_accuracy.toFixed(2)}`:null).filter(Boolean).join(", ");
+  setText("e7-note",`S* = smallest S that stays within tol = max(0.01, one test positive) of the exact centroid for all larger S (5 seeds; strict 0.01 and AUPRC variants in the JSON). Same records, ±1/π̂ weights and split for all methods. Quantum sketch at this N: ${blk.quantum.index_qubits} index qubits (≈${blk.quantum.logical_qubits} logical), classical simulation, no hardware. Logreg on all N features: ${lr}. Limits: Louvain labels are circular; DC/Mk test sets = 11/5 cells; one split. ${e.partial?"PARTIAL RESULTS. ":""}All numbers from results/e7_route2.json.`);
+})();
+
+/* ---- navigation ---- */
+const slides=[...document.querySelectorAll(".slide")];let cur=0;
+slides.forEach((s,i)=>{const f=document.createElement("div");f.className="footer";f.innerHTML=`<span>Streaming cells into qubits · QSIP 2026 · all numbers from results/*.json</span><span>${String(i+1).padStart(2,"0")} / ${String(slides.length).padStart(2,"0")}</span>`;s.appendChild(f);});
+function show(i){cur=Math.max(0,Math.min(slides.length-1,i));slides.forEach((s,j)=>s.classList.toggle("active",j===cur));document.getElementById("progress").style.width=((cur+1)/slides.length*100)+"%";try{history.replaceState(null,"","#"+(cur+1));}catch(e){}}
+document.addEventListener("keydown",e=>{if(["ArrowRight","PageDown"," ","Enter"].includes(e.key)){e.preventDefault();show(cur+1);}if(["ArrowLeft","PageUp","Backspace"].includes(e.key)){e.preventDefault();show(cur-1);}if(e.key==="Home")show(0);if(e.key==="End")show(slides.length-1);if(e.key==="f"||e.key==="F"){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen().catch(()=>{});}});
+document.addEventListener("click",e=>{if(e.clientX>innerWidth/2)show(cur+1);else show(cur-1);});
+function fit(){const s=Math.min(innerWidth/1280,innerHeight/720);document.getElementById("stage").style.transform=`scale(${s})`;}
+addEventListener("resize",fit);fit();show((parseInt(location.hash.slice(1))||1)-1);
+</script>
+</body>
+</html>

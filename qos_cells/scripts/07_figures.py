@@ -14,6 +14,7 @@ from qos_cells.io import load_json
 FIG = ROOT / "figures"
 FIG.mkdir(exist_ok=True)
 INK, GOLD, DIM, RED = "#08090B", "#D9A800", "#8A8984", "#D94F3D"
+IBM_BLUE, IBM_LIGHT = "#2F5FD0", "#9DB4EA"
 plt.rcParams.update({"font.size": 11, "axes.spines.top": False, "axes.spines.right": False, "figure.dpi": 150})
 
 
@@ -105,31 +106,43 @@ if __name__ == "__main__":
 
 
 def compare():
-    """Same 8 test cells, same frozen phases: classical formula vs quantum simulators vs real IQM Garnet."""
+    """Same 8 test cells, same frozen phases: classical formula vs quantum simulators vs real IQM Garnet (vs IBM, if run)."""
     e4 = load_json("e4_sim_circuits.json")
     hw = {4: load_json("e5_hardware.json"), 16: load_json("e5_hardware_N16.json")}
-    fig, axes = plt.subplots(1, 2, figsize=(13, 4.6), sharey=True)
-    series = [("classical (formula Σa²sinφ)", "formula", "#C9C7C1"),
-              ("simulator: 2,000 shots, noiseless", "shots_ideal", "#8A8984"),
-              ("simulator: IQM noise model", "shots_fake_noisy", "#4A4A48"),
-              ("IQM Garnet raw", "raw", INK),
-              ("IQM Garnet calibrated", "calibrated", GOLD)]
+    ibm = {N: load_json(f"e5_ibm_N{N}.json") for N in (4, 16) if (ROOT / "results" / f"e5_ibm_N{N}.json").exists()}
+    fig, axes = plt.subplots(1, 2, figsize=(13, 4.6 + (0.4 if ibm else 0)), sharey=True)
+    series = [("classical (formula Σa²sinφ)", "formula", "#C9C7C1", None),
+              ("simulator: 2,000 shots, noiseless", "shots_ideal", "#8A8984", None),
+              ("simulator: IQM noise model", "shots_fake_noisy", "#4A4A48", None),
+              ("IQM Garnet raw", "raw", INK, "iqm"),
+              ("IQM Garnet calibrated", "calibrated", GOLD, "iqm")]
+    if ibm:
+        bname = next(iter(ibm.values()))["meta"]["backend"]
+        series += [(f"IBM {bname} raw", "raw", IBM_BLUE, "ibm"), (f"IBM {bname} calibrated", "calibrated", IBM_LIGHT, "ibm")]
     for ax, b in zip(axes, e4["by_N"]):
-        h = hw[b["N"]]
-        hcell = {c["test_index"]: c for c in h["cells"]}
-        x = np.arange(len(b["cells"])); w = 0.16
-        for k, (name, key, col) in enumerate(series):
-            vals = [(hcell[c["test_index"]][key] if key in ("raw", "calibrated") else c[key]) for c in b["cells"]]
-            ax.bar(x + (k - 2) * w, vals, w, color=col, label=name)
+        h = hw[b["N"]]; hi = ibm.get(b["N"])
+        src = {"iqm": {c["test_index"]: c for c in h["cells"]}, "ibm": ({c["test_index"]: c for c in hi["cells"]} if hi else {})}
+        x = np.arange(len(b["cells"])); w = 0.8 / len(series)
+        for k, (name, key, col, dev) in enumerate(series):
+            if dev == "ibm" and not hi:
+                continue
+            vals = [(src[dev][c["test_index"]][key] if dev else c[key]) for c in b["cells"]]
+            ax.bar(x + (k - (len(series) - 1) / 2) * w, vals, w, color=col, label=name)
         ax.axhline(h["summary"]["threshold"], color=RED, ls="--", lw=1.2, label="decision threshold")
         ax.axhline(0, color=DIM, lw=.6)
         ax.set_xticks(x); ax.set_xticklabels([("rare" if c["label"] else "common") for c in b["cells"]], fontsize=9)
         t, s = h["meta"]["transpiled_test"], h["summary"]
-        ax.set_title(f"N={b['N']} genes · {b['n_qubits']} qubits · {t['two_qubit']} CZ · hardware signal α={s['calibration']['alpha']:.2f}\n"
-                     f"correct on hardware: raw {round(s['sign_agreement_raw']*8)}/8 → calibrated {round(s['sign_agreement_calibrated']*8)}/8", fontsize=9, loc="left")
+        title = (f"N={b['N']} genes · {b['n_qubits']} qubits · IQM {t['two_qubit']} CZ, α={s['calibration']['alpha']:.2f}, "
+                 f"correct raw {round(s['sign_agreement_raw']*8)}/8 → cal {round(s['sign_agreement_calibrated']*8)}/8")
+        if hi:
+            ti, si = hi["meta"]["transpiled_test"], hi["summary"]
+            title += (f"\nIBM {hi['meta']['backend']}: {ti['two_qubit']} 2q gates, α={si['calibration']['alpha']:.2f}, "
+                      f"correct raw {si['cells_correct_raw']}/8 → cal {si['cells_correct_calibrated']}/8")
+        ax.set_title(title, fontsize=9, loc="left")
     axes[0].set_ylabel("classifier score ⟨Z⟩ (above threshold = rare)")
     axes[0].legend(fontsize=8, loc="lower left")
-    fig.suptitle("Same 8 held-out cells, same frozen sketch: classical vs simulator vs real IQM hardware", fontsize=11, x=0.01, ha="left")
+    dev = "real IQM and IBM hardware" if ibm else "real IQM hardware"
+    fig.suptitle(f"Same 8 held-out cells, same frozen sketch: classical vs simulator vs {dev}", fontsize=11, x=0.01, ha="left")
     fig.tight_layout(); fig.savefig(FIG / "fig_compare_classical_sim_hw.png", dpi=200); plt.close(fig)
     print("[figures] compare done")
 
@@ -139,25 +152,32 @@ if __name__ == "__main__":
 
 
 def three_way():
-    """One graph: classical vs quantum simulator vs real IQM hardware, 8 held-out cells, N=4 (3 qubits)."""
+    """One graph: classical vs quantum simulator vs real IQM hardware (vs real IBM hardware, if run), 8 held-out cells, N=4."""
     e4 = load_json("e4_sim_circuits.json")["by_N"][0]
     h = load_json("e5_hardware.json")
     hc = {c["test_index"]: c for c in h["cells"]}
+    hb = load_json("e5_ibm_N4.json") if (ROOT / "results" / "e5_ibm_N4.json").exists() else None
     cells = e4["cells"]
-    x = np.arange(len(cells)); w = 0.26
-    fig, ax = plt.subplots(figsize=(10, 4.8))
     vals = [("Classical computer (exact formula)", [c["formula"] for c in cells], "#C9C7C1"),
             ("Quantum simulator (Qiskit, 2,000 shots)", [c["shots_ideal"] for c in cells], "#6B6A66"),
             (f"Real IQM {h['meta']['alias'].capitalize()} (2,000 shots, raw)", [hc[c["test_index"]]["raw"] for c in cells], INK)]
+    if hb:
+        bc = {c["test_index"]: c for c in hb["cells"]}
+        vals.append((f"Real IBM {hb['meta']['backend']} (2,000 shots, raw)", [bc[c["test_index"]]["raw"] for c in cells], IBM_BLUE))
+    x = np.arange(len(cells)); w = 0.8 / len(vals)
+    fig, ax = plt.subplots(figsize=(10, 4.8))
     for k, (name, v, col) in enumerate(vals):
-        ax.bar(x + (k - 1) * w, v, w, color=col, label=name)
+        ax.bar(x + (k - (len(vals) - 1) / 2) * w, v, w, color=col, label=name)
     ax.axhline(h["summary"]["threshold"], color=RED, ls="--", lw=1.3, label="decision threshold")
     ax.axhline(0, color=DIM, lw=.6)
     ax.set_xticks(x); ax.set_xticklabels([("rare (B cell)" if c["label"] else "common") for c in cells], fontsize=9)
     ax.set_ylabel("classifier score  (above threshold = rare)")
     s = h["summary"]
-    ax.set_title(f"Same 8 test cells, same model · 3 qubits, {h['meta']['transpiled_test']['two_qubit']} CZ · "
-                 f"correct: classical {round(s['balanced_accuracy_ideal']*8)}/8 · simulator 8/8 · IQM hardware {round(s['balanced_accuracy_raw']*8)}/8", fontsize=10, loc="left")
+    ttl = (f"Same 8 test cells, same model · 3 qubits · correct: classical {round(s['balanced_accuracy_ideal']*8)}/8 · simulator 8/8 · "
+           f"IQM {round(s['balanced_accuracy_raw']*8)}/8 ({h['meta']['transpiled_test']['two_qubit']} CZ)")
+    if hb:
+        ttl += f" · IBM {hb['summary']['cells_correct_raw']}/8 ({hb['meta']['transpiled_test']['two_qubit']} 2q)"
+    ax.set_title(ttl, fontsize=10, loc="left")
     ax.legend(fontsize=9, loc="lower left")
     fig.tight_layout(); fig.savefig(FIG / "fig_three_way.png", dpi=200); plt.close(fig)
     print("[figures] three_way done")

@@ -1,0 +1,723 @@
+{
+ "schema_version": 1,
+ "experiment": "e5_ibm_N4",
+ "created_utc": "2026-11-05T21:03:14+00:00",
+ "config": {
+  "schema_version": 1,
+  "seed": 7,
+  "data": {
+   "dataset": "pbmc3k_processed",
+   "path": "data/pbmc3k_processed.h5ad",
+   "test_frac": 0.3,
+   "min_cells_per_gene": 3
+  },
+  "tasks": {
+   "positives": [
+    "B cells",
+    "Dendritic cells",
+    "Megakaryocytes"
+   ],
+   "gene_counts": [
+    4,
+    16,
+    256,
+    1024
+   ]
+  },
+  "sketch": {
+   "stream_mode": "uniform",
+   "tau_per_gene": 1.0,
+   "phase_limit": 1.5707963267948966,
+   "M_grid": [
+    1000,
+    3000,
+    10000,
+    30000,
+    100000,
+    300000,
+    1000000
+   ],
+   "repeats": 5
+  },
+  "scaling": {
+   "gene_counts": [
+    16,
+    64,
+    256,
+    1024
+   ],
+   "positive": "B cells",
+   "classifier_N": 1024
+  },
+  "imbalance": {
+   "pis": [
+    0.5,
+    0.1,
+    0.02,
+    0.005
+   ],
+   "N": 64,
+   "synthetic_cells_per_class": 4000,
+   "M_grid": [
+    3000,
+    10000,
+    30000,
+    100000,
+    300000,
+    1000000
+   ],
+   "repeats": 5
+  },
+  "circuits": {
+   "positive": "B cells",
+   "gene_counts": [
+    4,
+    16
+   ],
+   "cells_per_class": 4,
+   "shots": 2000,
+   "mock_alias": "garnet:mock"
+  },
+  "hardware": {
+   "N": 4,
+   "positive": "B cells",
+   "cells_per_class": 4,
+   "shots": 2000,
+   "n_calibration": 4,
+   "alpha_min": 0.3,
+   "preferred": [
+    "garnet",
+    "sirius"
+   ]
+  },
+  "resources": {
+   "feature_spaces": {
+    "all genes": 32768,
+    "gene pairs": 1073741824
+   },
+   "epsilon": 0.1,
+   "queries": 1,
+   "pi_rare": 0.014,
+   "logical_gate_rate_hz": 1000000.0
+  }
+ },
+ "meta": {
+  "alias": "ibm_kingston",
+  "backend": "ibm_kingston",
+  "provider": "ibm_quantum_platform",
+  "instance_plan": "open",
+  "job_id": "dbmetst8mdtc73d7roj0",
+  "submitted_utc": "2026-11-05T21:02:43+00:00",
+  "shots": 2000,
+  "n_circuits": 13,
+  "n_qubits": 3,
+  "transpiled_test": {
+   "ops": {
+    "sx": 28,
+    "rz": 25,
+    "cz": 11,
+    "x": 1,
+    "measure": 1
+   },
+   "depth": 44,
+   "two_qubit": 11,
+   "depth_2q": 11,
+   "n_qubits": 3,
+   "physical_qubits": [
+    151,
+    152,
+    153
+   ],
+   "device_qubits": 156
+  },
+  "transpiled_calibration": [
+   {
+    "ops": {
+     "rz": 7,
+     "sx": 7,
+     "cz": 1,
+     "measure": 1
+    },
+    "depth": 8,
+    "two_qubit": 1,
+    "depth_2q": 1,
+    "n_qubits": 3,
+    "physical_qubits": [
+     61,
+     152,
+     153
+    ],
+    "device_qubits": 156
+   },
+   {
+    "ops": {
+     "sx": 28,
+     "rz": 25,
+     "cz": 11,
+     "x": 1,
+     "measure": 1
+    },
+    "depth": 44,
+    "two_qubit": 11,
+    "depth_2q": 11,
+    "n_qubits": 3,
+    "physical_qubits": [
+     151,
+     152,
+     153
+    ],
+    "device_qubits": 156
+   },
+   {
+    "ops": {
+     "sx": 28,
+     "rz": 25,
+     "cz": 11,
+     "x": 1,
+     "measure": 1
+    },
+    "depth": 44,
+    "two_qubit": 11,
+    "depth_2q": 11,
+    "n_qubits": 3,
+    "physical_qubits": [
+     151,
+     152,
+     153
+    ],
+    "device_qubits": 156
+   },
+   {
+    "ops": {
+     "sx": 26,
+     "rz": 22,
+     "cz": 11,
+     "x": 1,
+     "measure": 1
+    },
+    "depth": 41,
+    "two_qubit": 11,
+    "depth_2q": 11,
+    "n_qubits": 3,
+    "physical_qubits": [
+     151,
+     152,
+     153
+    ],
+    "device_qubits": 156
+   },
+   {
+    "ops": {
+     "sx": 28,
+     "rz": 23,
+     "cz": 11,
+     "x": 1,
+     "measure": 1
+    },
+    "depth": 42,
+    "two_qubit": 11,
+    "depth_2q": 11,
+    "n_qubits": 3,
+    "physical_qubits": [
+     151,
+     152,
+     153
+    ],
+    "device_qubits": 156
+   }
+  ],
+  "transpiled_all": [
+   {
+    "ops": {
+     "sx": 28,
+     "rz": 25,
+     "cz": 11,
+     "x": 1,
+     "measure": 1
+    },
+    "depth": 44,
+    "two_qubit": 11,
+    "depth_2q": 11,
+    "n_qubits": 3,
+    "physical_qubits": [
+     151,
+     152,
+     153
+    ],
+    "device_qubits": 156
+   },
+   {
+    "ops": {
+     "sx": 28,
+     "rz": 25,
+     "cz": 11,
+     "x": 1,
+     "measure": 1
+    },
+    "depth": 43,
+    "two_qubit": 11,
+    "depth_2q": 11,
+    "n_qubits": 3,
+    "physical_qubits": [
+     151,
+     152,
+     153
+    ],
+    "device_qubits": 156
+   },
+   {
+    "ops": {
+     "sx": 28,
+     "rz": 25,
+     "cz": 11,
+     "x": 1,
+     "measure": 1
+    },
+    "depth": 43,
+    "two_qubit": 11,
+    "depth_2q": 11,
+    "n_qubits": 3,
+    "physical_qubits": [
+     151,
+     152,
+     153
+    ],
+    "device_qubits": 156
+   },
+   {
+    "ops": {
+     "sx": 28,
+     "rz": 25,
+     "cz": 11,
+     "x": 1,
+     "measure": 1
+    },
+    "depth": 44,
+    "two_qubit": 11,
+    "depth_2q": 11,
+    "n_qubits": 3,
+    "physical_qubits": [
+     151,
+     152,
+     153
+    ],
+    "device_qubits": 156
+   },
+   {
+    "ops": {
+     "sx": 28,
+     "rz": 23,
+     "cz": 11,
+     "x": 1,
+     "measure": 1
+    },
+    "depth": 42,
+    "two_qubit": 11,
+    "depth_2q": 11,
+    "n_qubits": 3,
+    "physical_qubits": [
+     151,
+     152,
+     153
+    ],
+    "device_qubits": 156
+   },
+   {
+    "ops": {
+     "sx": 28,
+     "rz": 23,
+     "cz": 11,
+     "x": 1,
+     "measure": 1
+    },
+    "depth": 42,
+    "two_qubit": 11,
+    "depth_2q": 11,
+    "n_qubits": 3,
+    "physical_qubits": [
+     151,
+     152,
+     153
+    ],
+    "device_qubits": 156
+   },
+   {
+    "ops": {
+     "sx": 26,
+     "rz": 23,
+     "cz": 11,
+     "x": 1,
+     "measure": 1
+    },
+    "depth": 43,
+    "two_qubit": 11,
+    "depth_2q": 11,
+    "n_qubits": 3,
+    "physical_qubits": [
+     151,
+     152,
+     153
+    ],
+    "device_qubits": 156
+   },
+   {
+    "ops": {
+     "sx": 28,
+     "rz": 25,
+     "cz": 11,
+     "x": 1,
+     "measure": 1
+    },
+    "depth": 43,
+    "two_qubit": 11,
+    "depth_2q": 11,
+    "n_qubits": 3,
+    "physical_qubits": [
+     151,
+     152,
+     153
+    ],
+    "device_qubits": 156
+   },
+   {
+    "ops": {
+     "rz": 7,
+     "sx": 7,
+     "cz": 1,
+     "measure": 1
+    },
+    "depth": 8,
+    "two_qubit": 1,
+    "depth_2q": 1,
+    "n_qubits": 3,
+    "physical_qubits": [
+     61,
+     152,
+     153
+    ],
+    "device_qubits": 156
+   },
+   {
+    "ops": {
+     "sx": 28,
+     "rz": 25,
+     "cz": 11,
+     "x": 1,
+     "measure": 1
+    },
+    "depth": 44,
+    "two_qubit": 11,
+    "depth_2q": 11,
+    "n_qubits": 3,
+    "physical_qubits": [
+     151,
+     152,
+     153
+    ],
+    "device_qubits": 156
+   },
+   {
+    "ops": {
+     "sx": 28,
+     "rz": 25,
+     "cz": 11,
+     "x": 1,
+     "measure": 1
+    },
+    "depth": 44,
+    "two_qubit": 11,
+    "depth_2q": 11,
+    "n_qubits": 3,
+    "physical_qubits": [
+     151,
+     152,
+     153
+    ],
+    "device_qubits": 156
+   },
+   {
+    "ops": {
+     "sx": 26,
+     "rz": 22,
+     "cz": 11,
+     "x": 1,
+     "measure": 1
+    },
+    "depth": 41,
+    "two_qubit": 11,
+    "depth_2q": 11,
+    "n_qubits": 3,
+    "physical_qubits": [
+     151,
+     152,
+     153
+    ],
+    "device_qubits": 156
+   },
+   {
+    "ops": {
+     "sx": 28,
+     "rz": 23,
+     "cz": 11,
+     "x": 1,
+     "measure": 1
+    },
+    "depth": 42,
+    "two_qubit": 11,
+    "depth_2q": 11,
+    "n_qubits": 3,
+    "physical_qubits": [
+     151,
+     152,
+     153
+    ],
+    "device_qubits": 156
+   }
+  ],
+  "mock": false,
+  "frozen_sha256": "ba9392464723329c",
+  "machine_state": {
+   "backend": "ibm_kingston",
+   "why": "requested with --backend",
+   "num_qubits": 156,
+   "median_2q_error": 0.0017871553291459452,
+   "two_qubit_gate": "cz",
+   "pending_jobs": 8,
+   "status_msg": "active",
+   "all_queues": {
+    "ibm_fez": {
+     "pending_jobs": 38392,
+     "status_msg": "active"
+    },
+    "ibm_kingston": {
+     "pending_jobs": 8,
+     "status_msg": "active"
+    },
+    "ibm_marrakesh": {
+     "pending_jobs": 0,
+     "status_msg": "active"
+    }
+   }
+  },
+  "pub_range": [
+   0,
+   13
+  ],
+  "creg": "c",
+  "optimization_level": 3,
+  "sampler": "SamplerV2",
+  "one_job_for_N4_and_N16": true,
+  "collected_utc": "2026-11-05T21:03:14+00:00",
+  "usage": {
+   "quantum_seconds": 16
+  }
+ },
+ "frozen_sha256": "ba9392464723329c",
+ "N": 4,
+ "genes": [
+  "CD74",
+  "HLA-DRA",
+  "HLA-DPB1",
+  "TMSB4X"
+ ],
+ "inference_only": true,
+ "cells": [
+  {
+   "test_index": 5,
+   "label": 1,
+   "ideal": 0.20013752508869964,
+   "raw": 0.262,
+   "calibrated": 0.2731120671868892,
+   "err_raw": 0.06186247491130037,
+   "err_calibrated": 0.07297454209818954,
+   "pred_raw": 1,
+   "pred_cal": 1,
+   "pred_ideal": 1
+  },
+  {
+   "test_index": 6,
+   "label": 1,
+   "ideal": 0.10427940293349541,
+   "raw": 0.133,
+   "calibrated": 0.12846130908434505,
+   "err_raw": 0.028720597066504594,
+   "err_calibrated": 0.02418190615084964,
+   "pred_raw": 1,
+   "pred_cal": 1,
+   "pred_ideal": 1
+  },
+  {
+   "test_index": 7,
+   "label": 1,
+   "ideal": 0.21296515500541718,
+   "raw": 0.206,
+   "calibrated": 0.2103179396384979,
+   "err_raw": 0.006965155005417195,
+   "err_calibrated": 0.002647215366919281,
+   "pred_raw": 1,
+   "pred_cal": 1,
+   "pred_ideal": 1
+  },
+  {
+   "test_index": 9,
+   "label": 1,
+   "ideal": 0.21657339034572345,
+   "raw": 0.243,
+   "calibrated": 0.251806916768685,
+   "err_raw": 0.02642660965427654,
+   "err_calibrated": 0.03523352642296154,
+   "pred_raw": 1,
+   "pred_cal": 1,
+   "pred_ideal": 1
+  },
+  {
+   "test_index": 0,
+   "label": 0,
+   "ideal": -0.9036262366006692,
+   "raw": -0.805,
+   "calibrated": -0.9233403273512085,
+   "err_raw": 0.09862623660066916,
+   "err_calibrated": 0.019714090750539315,
+   "pred_raw": 0,
+   "pred_cal": 0,
+   "pred_ideal": 0
+  },
+  {
+   "test_index": 1,
+   "label": 0,
+   "ideal": -0.8134526332185369,
+   "raw": -0.729,
+   "calibrated": -0.8381197256783918,
+   "err_raw": 0.08445263321853691,
+   "err_calibrated": 0.024667092459854878,
+   "pred_raw": 0,
+   "pred_cal": 0,
+   "pred_ideal": 0
+  },
+  {
+   "test_index": 2,
+   "label": 0,
+   "ideal": -0.9028532308947242,
+   "raw": -0.812,
+   "calibrated": -0.9311895932947574,
+   "err_raw": 0.09085323089472419,
+   "err_calibrated": 0.02833636240003312,
+   "pred_raw": 0,
+   "pred_cal": 0,
+   "pred_ideal": 0
+  },
+  {
+   "test_index": 3,
+   "label": 0,
+   "ideal": -0.4878995836923321,
+   "raw": -0.415,
+   "calibrated": -0.48602408192491214,
+   "err_raw": 0.07289958369233213,
+   "err_calibrated": 0.0018755017674199626,
+   "pred_raw": 0,
+   "pred_cal": 0,
+   "pred_ideal": 0
+  }
+ ],
+ "calibration_circuits": [
+  {
+   "kind": "zero",
+   "ideal": 0.0,
+   "measured": -0.025
+  },
+  {
+   "kind": "train_rare",
+   "ideal": 0.04597890269284788,
+   "measured": 0.085
+  },
+  {
+   "kind": "train_rare",
+   "ideal": 0.004574645939639799,
+   "measured": 0.023
+  },
+  {
+   "kind": "train_common",
+   "ideal": -0.9161580142337193,
+   "measured": -0.803
+  },
+  {
+   "kind": "train_common",
+   "ideal": -0.2391113232697854,
+   "measured": -0.173
+  }
+ ],
+ "summary": {
+  "calibration": {
+   "alpha": 0.8918031380696313,
+   "beta": 0.018437801438048254,
+   "rms_residual": 0.024637540424742605,
+   "n": 5
+  },
+  "threshold": -0.14405464887446162,
+  "shot_sigma": 0.022360679774997897,
+  "mean_abs_err_raw": 0.058850815130470135,
+  "mean_abs_err_calibrated": 0.02620377967709591,
+  "sign_agreement_raw": 1.0,
+  "sign_agreement_calibrated": 1.0,
+  "balanced_accuracy_raw": 1.0,
+  "balanced_accuracy_calibrated": 1.0,
+  "balanced_accuracy_ideal": 1.0,
+  "cells_correct_raw": 8,
+  "cells_correct_calibrated": 8,
+  "n_cells": 8
+ },
+ "raw_counts": [
+  {
+   "1": 738,
+   "0": 1262
+  },
+  {
+   "1": 867,
+   "0": 1133
+  },
+  {
+   "0": 1206,
+   "1": 794
+  },
+  {
+   "0": 1243,
+   "1": 757
+  },
+  {
+   "1": 1805,
+   "0": 195
+  },
+  {
+   "1": 1729,
+   "0": 271
+  },
+  {
+   "1": 1812,
+   "0": 188
+  },
+  {
+   "1": 1415,
+   "0": 585
+  },
+  {
+   "0": 975,
+   "1": 1025
+  },
+  {
+   "0": 1085,
+   "1": 915
+  },
+  {
+   "0": 1023,
+   "1": 977
+  },
+  {
+   "1": 1803,
+   "0": 197
+  },
+  {
+   "1": 1173,
+   "0": 827
+  }
+ ]
+}

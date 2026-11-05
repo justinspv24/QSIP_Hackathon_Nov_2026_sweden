@@ -1,7 +1,7 @@
 # QSIP Hackathon – Plan 3 results and talk notes
 
 **Status:** executed Thu 5 Nov 2026, 14:55–16:30. All gates G0–G5 passed on Thursday (the plan expected G5 on Friday morning).
-**Code:** `qos_cells` repo (zip in chat; local copy in `C:\Users\justi\Projects\QSIP\qos_cells`). Deck: `presentation/plan3.html` (11 slides: 7 talk + 4 backup; slide 11 = Route 2).
+**Code:** `qos_cells` repo (zip in chat; local copy in `C:\Users\justi\Projects\QSIP\qos_cells`). Deck: `presentation/plan3.html` (12 slides: 7 talk + 5 backup; slide 11 = Route 2 on PBMC3k, slide 12 = Route 2 on 1000 Genomes).
 **Rule kept:** every number on the slides is read from `results/*.json` by `scripts/08_slides.py`; nothing is typed by hand.
 
 ## Gate log
@@ -100,3 +100,45 @@ Simulated quantum readout p·sin(c·φ) at M_run: B 0.95, Dendritic 0.92, Megaka
 - The big feature space is not where the signal is: the exact centroid gets worse with gene pairs than with 16 genes (E1: B 0.97 → 0.95, DC 0.98 → 0.92, Mk 1.00 → 0.80 at N = 2.1·10⁶); logistic regression recovers B cells (0.99) but not megakaryocytes (0.80). The sketch also needs M ≈ 100·N ≈ 2·10⁸ records before its own classification converges at this N.
 - So Route 2 confirms the earlier framing: claim level stays *evidence for the mechanism*, not a demonstrated advantage. An advantage on real data would need a task whose decision direction is dense over an N ≫ memory feature space — rare-cell markers are the opposite of that.
 - Limits: Louvain labels are circular; DC/Mk test sets are 11/5 cells (one cell = 0.045/0.10 balanced accuracy, hence the per-class tolerance; the strict-0.01 S* for these classes is in the JSON and is noise-dominated); one split (config seed) with 5 stream/hash seeds; the stream is Poissonised (independent Poisson counts per (cell, feature) entry) instead of record by record; the synthetic control at N = 2.1·10⁶ has only 160 training / 80 test cells (memory); the quantum column is a classical simulation at this N; a finite experiment is evidence, not proof.
+
+## E8: Route 2 on a dense-signal dataset (1000 Genomes genotypes)
+
+**Why.** PBMC3k signal is sparse (marker genes), so classical sketches won (E7). Close human populations differ by small allele-frequency shifts spread over many SNPs (density screen: `results/e7b_g1k_density_screen.json`). Data: 1000 Genomes phase 3 (20130502), EUR + EAS, chromosomes 17,18,19,20,21,22; 791,251 SNPs (biallelic SNP, MAF >= 0.05, no missing call, over all 1,007 EUR+EAS people (label-free)); dosage 0/1/2, amplitude p = x^2/||x||^2, no supervised selection. Same stream, weights, seeds and S* rule as E7, plus a **random SNP subset** baseline (S exact counters on S random SNPs), which is the fair classical baseline when the signal is dense but redundant. Scaling test: nested random SNP subsets N/8 → N. Script `scripts/10_route2_genotypes.py`, figure `figures/fig_e8_genotype_memory.png`.
+
+**Best one-pass classical S* (stable, tol = max(0.01, one test positive)) vs N, and log–log slope** (1 = memory grows like N, 0 = flat):
+
+| task | exact centroid at full N | N = 98,906 | N = 197,813 | N = 395,626 | N = 791,251 | slope |
+|---|---|---|---|---|---|---|
+| JPT vs CHB (104 vs 103) | 1.00 / AUPRC 1.00 | 8,192 (0.083, hashing) | 8,192 (0.041, sparse JL) | 8,192 (0.021, sparse JL) | 8,192 (0.01, count-sketch) | 0.00 |
+| JPT vs rest of East Asia (104 vs 400) | 0.98 / AUPRC 1.00 | 98,906 (1, sparse JL) | 16,384 (0.083, hashing) | 32,768 (0.083, count-sketch) | 16,384 (0.021, sparse JL) | -0.68 |
+| FIN vs rest of Europe (99 vs 404) | 0.97 / AUPRC 1.00 | 8,192 (0.083, hashing) | 8,192 (0.041, hashing) | 16,384 (0.041, hashing) | 16,384 (0.021, hashing) | 0.40 |
+
+**Per method at full N** (stable S*, S*/N in brackets; quantum = classical simulation of the sketch, same records):
+
+| task | count-sketch | hashing | sparse JL | Misra–Gries | reservoir | random SNP subset | oracle top-S | hashing+logreg | sketch p·sin(cφ) | logreg, all N |
+|---|---|---|---|---|---|---|---|---|---|---|
+| JPT vs CHB | 8,192 (0.01) | 16,384 (0.021) | 16,384 (0.021) | 65,536 (0.083) | 524,288 (0.66) | 32,768 (0.041) | 4,096 (0.0052) | 4,096 (0.0052) | 1.00 | 1.00 |
+| JPT vs rest of East Asia | 65,536 (0.083) | 32,768 (0.041) | 16,384 (0.021) | 524,288 (0.66) | never | 16,384 (0.021) | 65,536 (0.083) | never | 0.98 | 0.98 |
+| FIN vs rest of Europe | 262,144 (0.33) | 16,384 (0.021) | 16,384 (0.021) | 262,144 (0.33) | 791,251 (1) | 262,144 (0.33) | 8,192 (0.01) | 4,096 (0.0052) | 0.96 | 0.97 |
+
+Per-method slopes (S* vs N): JPT vs CHB: count-sketch -0.60, hashing 0.30, sparse JL -0.00, Misra–Gries 0.30, random SNP subset 0.30; JPT vs rest of East Asia: sparse JL -1.04, Misra–Gries 0.82, random SNP subset -0.68; FIN vs rest of Europe: count-sketch 1.46, hashing 0.40, sparse JL 0.10, Misra–Gries 1.00, random SNP subset 0.80.
+Quantum register over the same N range: 17 → 18 → 19 → 20 index qubits (≈2× logical).
+
+**Verdict: no memory advantage here either.** The signal is dense (top 1 % of SNPs hold only 12–15 % of ‖Δ‖²), but it is *compressible*: the best one-pass classical sketch needs 8,192–16,384 counters at N = 791,251 (S*/N = 0.01–0.021), and its memory barely grows with N (log–log slopes -0.68 to 0.40; 1 would mean ∝ N). Population differences are a few shared directions spread over many correlated SNPs, so random projections and hashing keep them. Dense is not the same as hard: the paper's worst cases need dense *and* incompressible signals.
+
+- Same records for all methods: M = 100·N at every N (fixed after a first pass where the automatic M choice varied with N; first pass kept as `results/e8_route2_genotypes_autoM.json`, same conclusion). The paper's bound is on the product M·S.
+- S* can fall as N grows (JPT vs rest of East Asia): more SNPs with the same per-SNP signal give a larger total margin, so a fixed-size sketch has more slack. More redundant features help the classical side too.
+- Not a claim about accuracy: the quantum sketch at M → ∞ equals the exact centroid, which classical also computes with N floats; logistic regression on stored data is as good or better. The question is only memory in one pass.
+- Limits: 1000 Genomes population labels are self-reported ancestry of the sampled groups, not clusters of the data (no circularity); test sets are small: ~31 positives per task; one test positive = 0.016 balanced accuracy; one split, 5 stream/hash seeds; Poissonised stream; the quantum column is a classical simulation; 6 chromosomes only (17–22); nested random SNP subsets, so N/8 ... N have the same per-SNP signal; close populations: logistic regression or PCA on stored data also work; the question is only one-pass memory; a finite experiment is evidence, not proof.
+
+## E5-IBM: same circuits on IBM Kingston (Thu 5 Nov 2026, 21:02 UTC)
+
+Same frozen sketch (sha ba9392464723329c / 21688fe9828a7de2), same 8 test cells, same 5 calibration circuits, 2,000 shots, N=4 and N=16 in ONE SamplerV2 job `dbmetst8mdtc73d7roj0` on ibm_kingston (Open Plan, 16 QPU s used). Script `scripts/05b_ibm_hw_run.py`, results `results/e5_ibm_N4.json`, `results/e5_ibm_N16.json`.
+
+1. IQM Garnet vs IBM ibm_kingston (median CZ error 1.8e-3), transpiled at optimization_level=3.
+2. 2-qubit gates · depth (test circuit 0): N=4 IQM 11 CZ · 24 vs IBM 11 · 44; N=16 IQM 53 CZ · 108 vs IBM 64 · 248 (IBM depth counts rz/sx; 2q-depth 11 and 63).
+3. Calibration α: N=4 IQM 0.78 vs IBM 0.89; N=16 IQM 0.43 vs IBM 0.74.
+4. Cells correct raw → calibrated: N=4 IQM 8/8 → 8/8 vs IBM 8/8 → 8/8; N=16 IQM 5/8 → 8/8 vs IBM 8/8 → 8/8.
+5. Mean |error| raw → calibrated: N=4 IQM 0.127 → 0.046 vs IBM 0.059 → 0.026; N=16 IQM 0.258 → 0.094 vs IBM 0.069 → 0.055.
+
+Caveats: one run per device, ~7 h apart; IBM N=16 needed 21 % more 2q gates (heavy-hex routing) and still kept more signal.

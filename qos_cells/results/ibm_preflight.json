@@ -1,0 +1,604 @@
+{
+ "created_utc": "2026-11-05T21:02:25+00:00",
+ "backend": "ibm_kingston",
+ "machine_state": {
+  "backend": "ibm_kingston",
+  "why": "requested with --backend",
+  "num_qubits": 156,
+  "median_2q_error": 0.0017871553291459452,
+  "two_qubit_gate": "cz",
+  "pending_jobs": 8,
+  "status_msg": "active",
+  "all_queues": {
+   "ibm_fez": {
+    "pending_jobs": 38392,
+    "status_msg": "active"
+   },
+   "ibm_kingston": {
+    "pending_jobs": 8,
+    "status_msg": "active"
+   },
+   "ibm_marrakesh": {
+    "pending_jobs": 0,
+    "status_msg": "active"
+   }
+  }
+ },
+ "instance_plan": "open",
+ "n_circuits": 26,
+ "shots": 2000,
+ "total_shots": 52000,
+ "est_qpu_seconds": 15.598472000000001,
+ "est_detail": {
+  "rep_delay_s": 0.00025,
+  "median_2q_duration_s": 6.8e-08,
+  "measure_duration_s": 2.18e-06
+ },
+ "remaining": {
+  "usage_consumed_seconds": 0,
+  "usage_consumed_ru": 0,
+  "usage_period": {
+   "start_time": "2026-10-08T21:02:25.373Z",
+   "end_time": "2026-11-05T21:02:25.373Z"
+  },
+  "usage_limit_seconds": 600,
+  "usage_limit_ru": 10.0002,
+  "usage_limit_reached": false,
+  "usage_remaining_seconds": 600
+ },
+ "transpiled": [
+  {
+   "N": 4,
+   "stats": [
+    {
+     "ops": {
+      "sx": 28,
+      "rz": 25,
+      "cz": 11,
+      "x": 1,
+      "measure": 1
+     },
+     "depth": 44,
+     "two_qubit": 11,
+     "depth_2q": 11,
+     "n_qubits": 3,
+     "physical_qubits": [
+      151,
+      152,
+      153
+     ],
+     "device_qubits": 156
+    },
+    {
+     "ops": {
+      "sx": 28,
+      "rz": 25,
+      "cz": 11,
+      "x": 1,
+      "measure": 1
+     },
+     "depth": 43,
+     "two_qubit": 11,
+     "depth_2q": 11,
+     "n_qubits": 3,
+     "physical_qubits": [
+      151,
+      152,
+      153
+     ],
+     "device_qubits": 156
+    },
+    {
+     "ops": {
+      "sx": 28,
+      "rz": 25,
+      "cz": 11,
+      "x": 1,
+      "measure": 1
+     },
+     "depth": 43,
+     "two_qubit": 11,
+     "depth_2q": 11,
+     "n_qubits": 3,
+     "physical_qubits": [
+      151,
+      152,
+      153
+     ],
+     "device_qubits": 156
+    },
+    {
+     "ops": {
+      "sx": 28,
+      "rz": 25,
+      "cz": 11,
+      "x": 1,
+      "measure": 1
+     },
+     "depth": 44,
+     "two_qubit": 11,
+     "depth_2q": 11,
+     "n_qubits": 3,
+     "physical_qubits": [
+      151,
+      152,
+      153
+     ],
+     "device_qubits": 156
+    },
+    {
+     "ops": {
+      "sx": 28,
+      "rz": 23,
+      "cz": 11,
+      "x": 1,
+      "measure": 1
+     },
+     "depth": 42,
+     "two_qubit": 11,
+     "depth_2q": 11,
+     "n_qubits": 3,
+     "physical_qubits": [
+      151,
+      152,
+      153
+     ],
+     "device_qubits": 156
+    },
+    {
+     "ops": {
+      "sx": 28,
+      "rz": 23,
+      "cz": 11,
+      "x": 1,
+      "measure": 1
+     },
+     "depth": 42,
+     "two_qubit": 11,
+     "depth_2q": 11,
+     "n_qubits": 3,
+     "physical_qubits": [
+      151,
+      152,
+      153
+     ],
+     "device_qubits": 156
+    },
+    {
+     "ops": {
+      "sx": 26,
+      "rz": 23,
+      "cz": 11,
+      "x": 1,
+      "measure": 1
+     },
+     "depth": 43,
+     "two_qubit": 11,
+     "depth_2q": 11,
+     "n_qubits": 3,
+     "physical_qubits": [
+      151,
+      152,
+      153
+     ],
+     "device_qubits": 156
+    },
+    {
+     "ops": {
+      "sx": 28,
+      "rz": 25,
+      "cz": 11,
+      "x": 1,
+      "measure": 1
+     },
+     "depth": 43,
+     "two_qubit": 11,
+     "depth_2q": 11,
+     "n_qubits": 3,
+     "physical_qubits": [
+      151,
+      152,
+      153
+     ],
+     "device_qubits": 156
+    },
+    {
+     "ops": {
+      "rz": 7,
+      "sx": 7,
+      "cz": 1,
+      "measure": 1
+     },
+     "depth": 8,
+     "two_qubit": 1,
+     "depth_2q": 1,
+     "n_qubits": 3,
+     "physical_qubits": [
+      61,
+      152,
+      153
+     ],
+     "device_qubits": 156
+    },
+    {
+     "ops": {
+      "sx": 28,
+      "rz": 25,
+      "cz": 11,
+      "x": 1,
+      "measure": 1
+     },
+     "depth": 44,
+     "two_qubit": 11,
+     "depth_2q": 11,
+     "n_qubits": 3,
+     "physical_qubits": [
+      151,
+      152,
+      153
+     ],
+     "device_qubits": 156
+    },
+    {
+     "ops": {
+      "sx": 28,
+      "rz": 25,
+      "cz": 11,
+      "x": 1,
+      "measure": 1
+     },
+     "depth": 44,
+     "two_qubit": 11,
+     "depth_2q": 11,
+     "n_qubits": 3,
+     "physical_qubits": [
+      151,
+      152,
+      153
+     ],
+     "device_qubits": 156
+    },
+    {
+     "ops": {
+      "sx": 26,
+      "rz": 22,
+      "cz": 11,
+      "x": 1,
+      "measure": 1
+     },
+     "depth": 41,
+     "two_qubit": 11,
+     "depth_2q": 11,
+     "n_qubits": 3,
+     "physical_qubits": [
+      151,
+      152,
+      153
+     ],
+     "device_qubits": 156
+    },
+    {
+     "ops": {
+      "sx": 28,
+      "rz": 23,
+      "cz": 11,
+      "x": 1,
+      "measure": 1
+     },
+     "depth": 42,
+     "two_qubit": 11,
+     "depth_2q": 11,
+     "n_qubits": 3,
+     "physical_qubits": [
+      151,
+      152,
+      153
+     ],
+     "device_qubits": 156
+    }
+   ],
+   "kinds": [
+    "test cell 5",
+    "test cell 6",
+    "test cell 7",
+    "test cell 9",
+    "test cell 0",
+    "test cell 1",
+    "test cell 2",
+    "test cell 3",
+    "zero",
+    "train_rare",
+    "train_rare",
+    "train_common",
+    "train_common"
+   ]
+  },
+  {
+   "N": 16,
+   "stats": [
+    {
+     "ops": {
+      "sx": 153,
+      "rz": 121,
+      "cz": 64,
+      "measure": 1
+     },
+     "depth": 248,
+     "two_qubit": 64,
+     "depth_2q": 63,
+     "n_qubits": 5,
+     "physical_qubits": [
+      136,
+      141,
+      142,
+      143,
+      144
+     ],
+     "device_qubits": 156
+    },
+    {
+     "ops": {
+      "sx": 153,
+      "rz": 122,
+      "cz": 64,
+      "measure": 1
+     },
+     "depth": 250,
+     "two_qubit": 64,
+     "depth_2q": 63,
+     "n_qubits": 5,
+     "physical_qubits": [
+      136,
+      141,
+      142,
+      143,
+      144
+     ],
+     "device_qubits": 156
+    },
+    {
+     "ops": {
+      "sx": 153,
+      "rz": 124,
+      "cz": 64,
+      "measure": 1
+     },
+     "depth": 251,
+     "two_qubit": 64,
+     "depth_2q": 63,
+     "n_qubits": 5,
+     "physical_qubits": [
+      136,
+      141,
+      142,
+      143,
+      144
+     ],
+     "device_qubits": 156
+    },
+    {
+     "ops": {
+      "sx": 153,
+      "rz": 121,
+      "cz": 64,
+      "x": 1,
+      "measure": 1
+     },
+     "depth": 249,
+     "two_qubit": 64,
+     "depth_2q": 63,
+     "n_qubits": 5,
+     "physical_qubits": [
+      136,
+      141,
+      142,
+      143,
+      144
+     ],
+     "device_qubits": 156
+    },
+    {
+     "ops": {
+      "sx": 152,
+      "rz": 119,
+      "cz": 64,
+      "x": 1,
+      "measure": 1
+     },
+     "depth": 246,
+     "two_qubit": 64,
+     "depth_2q": 63,
+     "n_qubits": 5,
+     "physical_qubits": [
+      136,
+      141,
+      142,
+      143,
+      144
+     ],
+     "device_qubits": 156
+    },
+    {
+     "ops": {
+      "sx": 151,
+      "rz": 121,
+      "cz": 64,
+      "measure": 1
+     },
+     "depth": 245,
+     "two_qubit": 64,
+     "depth_2q": 63,
+     "n_qubits": 5,
+     "physical_qubits": [
+      136,
+      141,
+      142,
+      143,
+      144
+     ],
+     "device_qubits": 156
+    },
+    {
+     "ops": {
+      "sx": 153,
+      "rz": 121,
+      "cz": 64,
+      "measure": 1
+     },
+     "depth": 249,
+     "two_qubit": 64,
+     "depth_2q": 63,
+     "n_qubits": 5,
+     "physical_qubits": [
+      136,
+      141,
+      142,
+      143,
+      144
+     ],
+     "device_qubits": 156
+    },
+    {
+     "ops": {
+      "sx": 153,
+      "rz": 121,
+      "cz": 64,
+      "measure": 1
+     },
+     "depth": 248,
+     "two_qubit": 64,
+     "depth_2q": 63,
+     "n_qubits": 5,
+     "physical_qubits": [
+      136,
+      141,
+      142,
+      143,
+      144
+     ],
+     "device_qubits": 156
+    },
+    {
+     "ops": {
+      "sx": 37,
+      "rz": 29,
+      "cz": 16,
+      "measure": 1
+     },
+     "depth": 60,
+     "two_qubit": 16,
+     "depth_2q": 16,
+     "n_qubits": 5,
+     "physical_qubits": [
+      61,
+      136,
+      142,
+      143,
+      144
+     ],
+     "device_qubits": 156
+    },
+    {
+     "ops": {
+      "sx": 153,
+      "rz": 122,
+      "cz": 64,
+      "measure": 1
+     },
+     "depth": 248,
+     "two_qubit": 64,
+     "depth_2q": 63,
+     "n_qubits": 5,
+     "physical_qubits": [
+      136,
+      141,
+      142,
+      143,
+      144
+     ],
+     "device_qubits": 156
+    },
+    {
+     "ops": {
+      "sx": 153,
+      "rz": 125,
+      "cz": 64,
+      "x": 1,
+      "measure": 1
+     },
+     "depth": 251,
+     "two_qubit": 64,
+     "depth_2q": 63,
+     "n_qubits": 5,
+     "physical_qubits": [
+      136,
+      141,
+      142,
+      143,
+      144
+     ],
+     "device_qubits": 156
+    },
+    {
+     "ops": {
+      "sx": 153,
+      "rz": 121,
+      "cz": 64,
+      "measure": 1
+     },
+     "depth": 249,
+     "two_qubit": 64,
+     "depth_2q": 63,
+     "n_qubits": 5,
+     "physical_qubits": [
+      136,
+      141,
+      142,
+      143,
+      144
+     ],
+     "device_qubits": 156
+    },
+    {
+     "ops": {
+      "sx": 153,
+      "rz": 123,
+      "cz": 64,
+      "measure": 1
+     },
+     "depth": 250,
+     "two_qubit": 64,
+     "depth_2q": 63,
+     "n_qubits": 5,
+     "physical_qubits": [
+      136,
+      141,
+      142,
+      143,
+      144
+     ],
+     "device_qubits": 156
+    }
+   ],
+   "kinds": [
+    "test cell 5",
+    "test cell 6",
+    "test cell 7",
+    "test cell 9",
+    "test cell 0",
+    "test cell 1",
+    "test cell 2",
+    "test cell 3",
+    "zero",
+    "train_rare",
+    "train_rare",
+    "train_common",
+    "train_common"
+   ]
+  }
+ ],
+ "frozen_sha256": {
+  "4": "ba9392464723329c",
+  "16": "21688fe9828a7de2"
+ }
+}

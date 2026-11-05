@@ -31,13 +31,61 @@ def compact_e7():
                 S_star_rule=e7["config"]["route2"]["S_star_rule"])
 
 
+ONE_PASS = ["count_sketch", "hashing", "jl_sparse", "heavy_hitters_mg", "reservoir", "random_subset"]
+
+
+def compact_e8():
+    """E8 (Route 2 on 1000 Genomes): per task and N, exact centroid and each one-pass method's stable S*."""
+    p = ROOT / "results" / "e8_route2_genotypes.json"
+    if not p.exists():
+        return None
+    e8 = load_json("e8_route2_genotypes.json")
+    tasks = []
+    for t in e8["tasks"]:
+        rows = []
+        for b in t["by_N"]:
+            tk = b["real"][0]
+            ss = {k: tk["methods"][k].get("S_star_cell_stable") for k in ONE_PASS if k in tk["methods"]}
+            fin = [v if v else b["N"] for v in ss.values()]
+            best_k = min(ss, key=lambda k: ss[k] if ss[k] else b["N"] + 1)
+            rows.append(dict(N=b["N"], qubits=b["quantum"]["index_qubits"], exact=tk["exact_centroid"]["balanced_accuracy"],
+                             tol=tk["tolerance_cell"], logreg=(tk.get("logreg_full") or {}).get("balanced_accuracy"),
+                             M_over_N=tk["M_run_over_N"], S_star=ss, best_method=best_k, best_S=min(fin),
+                             n_test_pos=tk["n_test_pos"], pi_hat=tk["pi_hat"],
+                             stream_ok=tk["stream_full"]["balanced_accuracy"] >= tk["exact_centroid"]["balanced_accuracy"] - tk["tolerance_cell"]))
+        Ns = [r["N"] for r in rows]
+        import math
+        slope = None
+        if len(rows) >= 2:
+            xs = [math.log2(r["N"]) for r in rows]; ys = [math.log2(r["best_S"]) for r in rows]
+            mx, my = sum(xs) / len(xs), sum(ys) / len(ys)
+            slope = sum((a - mx) * (b - my) for a, b in zip(xs, ys)) / sum((a - mx) ** 2 for a in xs)
+        tasks.append(dict(task=t["task"], n_pos=t["n_pos"], n_neg=t["n_neg"], rows=rows, best_slope=slope))
+    return dict(tasks=tasks, n_snps=e8["config"]["route2_genotypes"]["n_snps_total"], chromosomes=e8["chromosomes"],
+                partial=e8.get("partial", False), limits=e8.get("limits", []))
+
+
+def compact_e5_ibm():
+    """IBM mirror of E5 (scripts/05b_ibm_hw_run.py): None until both result files exist."""
+    if not all((ROOT / "results" / f"e5_ibm_N{N}.json").exists() for N in (4, 16)):
+        return None
+    def slim(h):
+        ms = h["meta"].get("machine_state", {})
+        return dict(N=h["N"], meta={**{k: h["meta"][k] for k in ("alias", "backend", "job_id", "submitted_utc", "shots", "transpiled_test", "n_qubits")},
+                                    "median_2q_error": ms.get("median_2q_error"), "two_qubit_gate": ms.get("two_qubit_gate"), "device_qubits": ms.get("num_qubits")},
+                    summary=h["summary"], cells=h["cells"], calibration_circuits=h["calibration_circuits"], frozen_sha256=h["frozen_sha256"])
+    return dict(N4=slim(load_json("e5_ibm_N4.json")), N16=slim(load_json("e5_ibm_N16.json")))
+
+
 def compact():
     if not all((ROOT / "results" / f).exists() for f in ("e1_baselines.json", "e2_scaling.json", "e3_imbalance.json", "e4_sim_circuits.json",
                                                          "e5_hardware.json", "e5_hardware_N16.json", "e6_resources.json")):
         # E1–E6 result files absent (e.g. a rebuild away from the laptop): reuse the compact data of the previous build
         prev = json.loads((ROOT / "results" / "slides_data.json").read_text())
         prev["e7"] = compact_e7()
-        prev["generated_from"] = sorted(set(prev.get("generated_from", [])) | {"e7_route2.json"})
+        prev["e8"] = compact_e8()
+        prev["e5_ibm"] = compact_e5_ibm()
+        prev["generated_from"] = sorted(set(prev.get("generated_from", [])) | {"e7_route2.json"} | ({"e8_route2_genotypes.json"} if prev["e8"] else set()))
         return prev
     e1, e2, e3, e4, e6 = (load_json(f) for f in ("e1_baselines.json", "e2_scaling.json", "e3_imbalance.json", "e4_sim_circuits.json", "e6_resources.json"))
     h4, h16 = load_json("e5_hardware.json"), load_json("e5_hardware_N16.json")
@@ -50,7 +98,7 @@ def compact():
         run1 = dict(job_id=r["meta"]["job_id"], alpha=r["summary"]["calibration"]["alpha"], err_raw=r["summary"]["mean_abs_err_raw"],
                     err_cal=r["summary"]["mean_abs_err_calibrated"], cal_ideals=[c["ideal"] for c in r["calibration_circuits"]])
     return dict(
-        generated_from=[f.name for f in sorted((ROOT / "results").glob("e*.json"))],
+        generated_from=[f.name for f in sorted((ROOT / "results").glob("e*.json")) if "_K" not in f.name and "screen" not in f.name and "autoM" not in f.name],
         dataset=e1["dataset"],
         e1=dict(tasks=[dict(positive=t["positive"], base_rate=t["base_rate"], logreg_all_genes=t["logreg_all_genes"],
                             by_N=[dict(N=r["N"], exact_centroid=r["exact_centroid"], logreg_p=r["logreg_p"], abstain_rate_test=r["abstain_rate_test"]) for r in t["by_N"]]) for t in e1["tasks"]]),
@@ -59,8 +107,10 @@ def compact():
         e4=[dict(N=b["N"], n_qubits=b["n_qubits"], transpiled=b["transpiled"], sketch_rel_error=b["sketch_rel_error"], test_eval_full=b["test_eval_full"],
                  cells=[dict(test_index=c["test_index"], formula=c["formula"], shots_ideal=c["shots_ideal"]) for c in b["cells"]]) for b in e4["by_N"]],
         e5=dict(N4=slim(h4), N16=slim(h16), run1=run1),
+        e5_ibm=compact_e5_ibm(),
         e6=dict(ledger=e6["ledger"], assumptions=e6["assumptions"]),
         e7=compact_e7(),
+        e8=compact_e8(),
     )
 
 

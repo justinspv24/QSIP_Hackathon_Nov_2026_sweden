@@ -270,6 +270,19 @@ def sk_heavy_hitters_mg(phi_pos, phi_neg, S):
     return f, ledger(floats=2 * k, ints=2 * k)
 
 
+def sk_random_subset(phi, S, seed):
+    """Keep exact counters for S features chosen uniformly at random before the stream starts (the index set is
+    regenerated from one seed, so it costs S floats + 1 seed). The fair baseline when the signal is dense but
+    redundant: no hash collisions, just fewer features."""
+    N = len(phi)
+    if S >= N:
+        return phi.copy(), ledger(floats=N)
+    keep = np.random.default_rng(int(seed)).choice(N, S, replace=False)
+    out = np.zeros(N)
+    out[keep] = phi[keep]
+    return out, ledger(floats=S, seeds=1)
+
+
 def sk_heavy_hitters_top(phi, S):
     N = len(phi)
     if S >= N:
@@ -374,7 +387,7 @@ def s_star_stable(rows, target, key="balanced_accuracy_mean", tol=0.01):
 # ===================================================================================================================
 def run_task(name, P_train, y_train, P_test, y_test, pi_hat, N, S_grid, M_over_N_grid, n_seeds, base_seed,
              abstain_train=None, abstain_test=None, do_logreg=True, do_jl_dense=False, hash_logreg_max_S=16384,
-             logreg_max_iter=300, quick=False, P_thr=None, y_thr=None):
+             logreg_max_iter=300, quick=False, P_thr=None, y_thr=None, extra_methods=()):
     """P_thr/y_thr: the set the decision threshold is chosen on. Default = the training split (as in E1/E2).
     The synthetic control passes a fresh validation set: with N >> n and no structure the training scores of a
     centroid fitted on the same cells are self-inflated, so a train threshold does not transfer (AUPRC stays
@@ -482,6 +495,8 @@ def run_task(name, P_train, y_train, P_test, y_test, pi_hat, N, S_grid, M_over_N
              ("heavy_hitters_top", "heavy hitters: oracle top-S |Δ|"), ("reservoir", "reservoir: S nonzero records")]
     if do_jl_dense:
         specs.append(("jl_dense", "dense Gaussian JL projection"))
+    if "random_subset" in extra_methods:
+        specs.append(("random_subset", "random feature subset (S exact counters)"))
     if do_logreg:
         specs.append(("hashing_logreg", "feature hashing + logistic regression"))
     for key, label in specs:
@@ -523,6 +538,8 @@ def run_task(name, P_train, y_train, P_test, y_test, pi_hat, N, S_grid, M_over_N
                     d, m = sk_heavy_hitters_mg(ppos, pneg, S)
                 elif key == "heavy_hitters_top":
                     d, m = sk_heavy_hitters_top(phi, S)
+                elif key == "random_subset":
+                    d, m = sk_random_subset(phi, S, seeds[0])
                 elif key == "reservoir":
                     d, m = draw_reservoir(P_train, w_cell, S, rng), ledger(floats=S, ints=S)
                 cols.append(d)
