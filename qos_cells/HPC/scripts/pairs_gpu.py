@@ -314,8 +314,10 @@ def fit_logreg(forward, backward, n_w, y, C=1.0, max_iter=300, tol=1e-4):
         g[-1] = float(r.sum())
         return loss, g
 
+    # scipy's L-BFGS-B workspace is ~(2m+5) n doubles indexed with int32: m = 10 overflows (segfault) at n > ~8e7.
+    maxcor = 10 if n_w < 5e7 else 5
     res = minimize(f, np.zeros(n_w + 1), jac=True, method="L-BFGS-B",
-                   options=dict(maxiter=max_iter, maxls=50, gtol=tol, ftol=64 * np.finfo(float).eps))
+                   options=dict(maxiter=max_iter, maxls=50, gtol=tol, ftol=64 * np.finfo(float).eps, maxcor=maxcor))
     return res.x[:-1], float(res.x[-1]), int(res.nit), bool(res.nit < max_iter)
 
 

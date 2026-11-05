@@ -1,7 +1,7 @@
 {
  "schema_version": 1,
  "experiment": "e11_advantage_map",
- "created_utc": "2026-11-05T18:52:16+00:00",
+ "created_utc": "2026-11-05T19:16:58+00:00",
  "partial": false,
  "config": {
   "schema_version": 1,
@@ -144,7 +144,7 @@
    "upper_bound_reference": "heavy_hitters_top (oracle top-S, not one-pass)"
   }
  },
- "git_commit": "60624661f5332a8559ae4eb4b2df415855558915-dirty",
+ "git_commit": "f6e49db51c8bf1292e09ed4230dbd6644e0a3481-dirty",
  "hostname": "quant1",
  "hardware": {
   "hostname": "quant1",
@@ -166,8 +166,8 @@
   "CUDA_VISIBLE_DEVICES": null
  },
  "resources": {
-  "wall_seconds": 57.0,
-  "peak_ram_gb": 0.276,
+  "wall_seconds": 1.6,
+  "peak_ram_gb": 0.281,
   "peak_vram_gb": 0.0
  },
  "synthetic": [
@@ -26517,8 +26517,158 @@
    }
   }
  ],
- "real_points": [],
- "caption": "Synthetic: one-pass sketches need S*/N >= 0.25 (or never reach the exact centroid) at alpha in [0.75, 1.0]; S*/N <= 1e-2 at alpha in [0.0, 0.25, 0.5] for some N (best = Misra-Gries, S* ~ d_eff). Linear sketches (count-sketch, hashing, sparse JL) never reach the exact centroid at any S <= N here: dense noise collides into the signal. Real-task points: not yet available (E9/E10 deff_points missing).",
+ "real_points": [
+  {
+   "label": "PBMC3k B cells K=512",
+   "dataset": "PBMC3k (E7/E9)",
+   "task": "B cells",
+   "K": 512,
+   "N": 131328,
+   "d_eff": 365.0592507592089,
+   "best_S_star_over_N": 0.0009746588693957114,
+   "source_file": "e9_fullpairs.json",
+   "y": 0.5006222099608749,
+   "log2N": 17.002815015607055
+  },
+  {
+   "label": "PBMC3k Dendritic cells K=512",
+   "dataset": "PBMC3k (E7/E9)",
+   "task": "Dendritic cells",
+   "K": 512,
+   "N": 131328,
+   "d_eff": 414.87946587866804,
+   "best_S_star_over_N": 0.00024366471734892786,
+   "source_file": "e9_fullpairs.json",
+   "y": 0.5114769781211151,
+   "log2N": 17.002815015607055
+  },
+  {
+   "label": "PBMC3k Megakaryocytes K=512",
+   "dataset": "PBMC3k (E7/E9)",
+   "task": "Megakaryocytes",
+   "K": 512,
+   "N": 131328,
+   "d_eff": 90.81492683908998,
+   "best_S_star_over_N": 0.00012183235867446393,
+   "source_file": "e9_fullpairs.json",
+   "y": 0.3825753285668528,
+   "log2N": 17.002815015607055
+  },
+  {
+   "label": "PBMC3k B cells K=2048",
+   "dataset": "PBMC3k (E7/E9)",
+   "task": "B cells",
+   "K": 2048,
+   "N": 2098176,
+   "d_eff": 400.81876136320477,
+   "best_S_star_over_N": 0.00012201073694485115,
+   "source_file": "e9_fullpairs.json",
+   "y": 0.4117388692405057,
+   "log2N": 21.000704269011248
+  },
+  {
+   "label": "PBMC3k Dendritic cells K=2048",
+   "dataset": "PBMC3k (E7/E9)",
+   "task": "Dendritic cells",
+   "K": 2048,
+   "N": 2098176,
+   "d_eff": 459.8985586556185,
+   "best_S_star_over_N": 1.5251342118106394e-05,
+   "source_file": "e9_fullpairs.json",
+   "y": 0.42118453518130017,
+   "log2N": 21.000704269011248
+  },
+  {
+   "label": "PBMC3k Megakaryocytes K=2048",
+   "dataset": "PBMC3k (E7/E9)",
+   "task": "Megakaryocytes",
+   "K": 2048,
+   "N": 2098176,
+   "d_eff": 84.59072479631601,
+   "best_S_star_over_N": 3.8128355295265984e-06,
+   "source_file": "e9_fullpairs.json",
+   "y": 0.30486727950966624,
+   "log2N": 21.000704269011248
+  },
+  {
+   "label": "PBMC3k B cells K=8192",
+   "dataset": "PBMC3k (E7/E9)",
+   "task": "B cells",
+   "K": 8192,
+   "N": 33558528,
+   "d_eff": 405.01637308538574,
+   "best_S_star_over_N": 1.5256926644696692e-05,
+   "source_file": "e9_fullpairs.json",
+   "y": 0.3464710163037261,
+   "log2N": 25.000176099486442
+  },
+  {
+   "label": "PBMC3k Dendritic cells K=8192",
+   "dataset": "PBMC3k (E7/E9)",
+   "task": "Dendritic cells",
+   "K": 8192,
+   "N": 33558528,
+   "d_eff": 482.70360111593453,
+   "best_S_star_over_N": 4.7677895764677163e-07,
+   "source_file": "e9_fullpairs.json",
+   "y": 0.3565972393180497,
+   "log2N": 25.000176099486442
+  },
+  {
+   "label": "PBMC3k Megakaryocytes K=8192",
+   "dataset": "PBMC3k (E7/E9)",
+   "task": "Megakaryocytes",
+   "K": 8192,
+   "N": 33558528,
+   "d_eff": 67.89076804083975,
+   "best_S_star_over_N": 2.3838947882338582e-07,
+   "source_file": "e9_fullpairs.json",
+   "y": 0.24340402552132365,
+   "log2N": 25.000176099486442
+  },
+  {
+   "label": "PBMC3k B cells K=13714",
+   "dataset": "PBMC3k (E7/E9)",
+   "task": "B cells",
+   "K": 13714,
+   "N": 94043755,
+   "d_eff": 406.57266297089166,
+   "best_S_star_over_N": 1.0888548633558922e-05,
+   "source_file": "e9_fullpairs.json",
+   "y": 0.3272331870035778,
+   "log2N": 26.486828808601505
+  },
+  {
+   "label": "PBMC3k Dendritic cells K=13714",
+   "dataset": "PBMC3k (E7/E9)",
+   "task": "Dendritic cells",
+   "K": 13714,
+   "N": 94043755,
+   "d_eff": 489.4885530287716,
+   "best_S_star_over_N": 8.506678619967908e-08,
+   "source_file": "e9_fullpairs.json",
+   "y": 0.3373424344723204,
+   "log2N": 26.486828808601505
+  },
+  {
+   "label": "PBMC3k Megakaryocytes K=13714",
+   "dataset": "PBMC3k (E7/E9)",
+   "task": "Megakaryocytes",
+   "K": 13714,
+   "N": 94043755,
+   "d_eff": 66.7268750058166,
+   "best_S_star_over_N": 8.506678619967908e-08,
+   "source_file": "e9_fullpairs.json",
+   "y": 0.22880036258504405,
+   "log2N": 26.486828808601505
+  }
+ ],
+ "caption": "Synthetic: one-pass sketches need S*/N >= 0.25 (or never reach the exact centroid) at alpha in [0.75, 1.0]; S*/N <= 1e-2 at alpha in [0.0, 0.25, 0.5] for some N (best = Misra-Gries, S* ~ d_eff). Linear sketches (count-sketch, hashing, sparse JL) never reach the exact centroid at any S <= N here: dense noise collides into the signal. Real tasks (12): log d_eff / log N = 0.23\u20130.51, i.e. the signal is concentrated in few features; measured best S*/N = 8.5e-08\u20139.7e-04. Real data sit in the region where small classical sketches suffice.",
+ "run_resources": {
+  "wall_seconds": 54.8,
+  "peak_ram_gb": 0.447,
+  "peak_vram_gb": 5.838
+ },
  "notes": [
   "no quantum advantage is claimed; the quantum sketch would use ceil(log2 N) qubits but this map only measures CLASSICAL memory needs",
   "d_eff of the synthetic Delta equals k exactly (equal magnitudes)"

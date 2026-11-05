@@ -41,7 +41,7 @@ SRC = dict(name="AIDA Phase 1 Data Freeze v2 (Asian Immune Diversity Atlas), PBM
            labels="obs.cell_type (author annotation mapped to Cell Ontology by the submitters; curated, not re-clustered here)")
 TASKS = ["CD1c-positive myeloid dendritic cell", "plasma cell", "hematopoietic stem cell", "CD14-positive monocyte"]
 TASK_KIND = ["rare (pi ~ 1e-2)", "rare (pi ~ 1e-3)", "rare (pi ~ 1e-4)", "common (pi ~ 0.16)"]
-PREP = hc.DATA / "e10"
+PREP = Path(__import__("os").environ.get("E10_PREP", str(hc.DATA / "e10")))
 M_GRID = [33, 100, 300, 900, 2700, 8100, 24300, 72900, 218700, 656100]
 
 
@@ -205,7 +205,8 @@ def run(args):
     E7 = e9.e7mod()
     tracker = hc.Tracker()
     meta = json.loads((PREP / f"task{args.task}.json").read_text())
-    summary = json.loads((PREP / "summary.json").read_text())
+    sp_ = PREP / "summary.json"
+    summary = json.loads(sp_.read_text()) if sp_.exists() else dict(source=SRC, note="prep summary written after this run started; see e10_atlas.json dataset")
     y = np.asarray(meta["y"])
     ntr = meta["ntr"]
     ytr, yte = y[:ntr], y[ntr:]

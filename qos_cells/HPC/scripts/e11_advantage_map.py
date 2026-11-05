@@ -232,9 +232,10 @@ def _caption(syn, pts):
     return s
 
 
-def _save(results, tr, partial):
+def _save(results, tr, partial, run_resources=None):
     pts = _real_points()
-    write_json(NAME, CFG, dict(synthetic=results, real_points=pts, caption=_caption(results, pts),
+    extra = {} if run_resources is None else dict(run_resources=run_resources)
+    write_json(NAME, CFG, dict(synthetic=results, real_points=pts, caption=_caption(results, pts), **extra,
                                notes=["no quantum advantage is claimed; the quantum sketch would use ceil(log2 N) qubits "
                                       "but this map only measures CLASSICAL memory needs",
                                       "d_eff of the synthetic Delta equals k exactly (equal magnitudes)"]),
@@ -244,8 +245,14 @@ def _save(results, tr, partial):
 def collect(args):
     d = json.loads((RESULTS / NAME).read_text())
     tr = Tracker()
-    tr.t0 -= d["resources"]["wall_seconds"]
-    _save(d["synthetic"], tr, d.get("partial", False))
+    # keep the GPU run's wall time / peak RAM / peak VRAM (collect itself runs on CPU only)
+    run_res = d.get("run_resources") or d["resources"]
+    if run_res.get("peak_vram_gb", 0) == 0:              # first collect overwrote it once: restore from the run log
+        import re
+        m = re.findall(r"run done: (\{.*\})", (RESULTS.parent / "logs" / "e11.log").read_text())
+        if m:
+            run_res = eval(m[-1])
+    _save(d["synthetic"], tr, d.get("partial", False), run_resources=run_res)
     log(TAG, f"collected {len(_real_points())} real points")
 
 
