@@ -1,0 +1,50 @@
+{
+ "schema_version": 1,
+ "experiment": "e13_data",
+ "dataset": "PBMC68k fresh donor A (Zheng et al. 2017)",
+ "sources": {
+  "matrix": {
+   "url": "https://cf.10xgenomics.com/samples/cell-exp/1.1.0/fresh_68k_pbmc_donor_a/fresh_68k_pbmc_donor_a_filtered_gene_bc_matrices.tar.gz",
+   "sha256": "3f35f37ff344bc9b32f97cd003ac986ebb9b5d7f31006c53dff4cb38da267931",
+   "version": "10x Cell Ranger 1.1.0 sample, hg19 filtered matrices"
+  },
+  "annotation": {
+   "url": "https://raw.githubusercontent.com/10XGenomics/single-cell-3prime-paper/master/pbmc68k_analysis/68k_pbmc_barcodes_annotation.tsv",
+   "sha256": "98dc85c047b56cb209ece200b7bebeb2ad53634ff3d5f42143987f59510624b3",
+   "version": "10XGenomics/single-cell-3prime-paper@master"
+  }
+ },
+ "n_cells": 68579,
+ "n_genes": 32738,
+ "nnz": 37323295,
+ "median_genes_per_cell": 525.0,
+ "median_umi_per_cell": 1292.0,
+ "class_counts": {
+  "CD8+ Cytotoxic T": 20773,
+  "CD8+/CD45RA+ Naive Cytotoxic": 16666,
+  "CD56+ NK": 8776,
+  "CD4+/CD25 T Reg": 6187,
+  "CD19+ B": 5908,
+  "CD4+/CD45RO+ Memory": 3061,
+  "CD14+ Monocyte": 2862,
+  "Dendritic": 2099,
+  "CD4+/CD45RA+/CD25- Naive T": 1873,
+  "CD34+": 277,
+  "CD4+ T Helper2": 97
+ },
+ "class_prevalence": {
+  "CD8+ Cytotoxic T": 0.30290613744732353,
+  "CD8+/CD45RA+ Naive Cytotoxic": 0.2430189999854183,
+  "CD56+ NK": 0.12796920340045786,
+  "CD4+/CD25 T Reg": 0.09021712185946135,
+  "CD19+ B": 0.08614882106767378,
+  "CD4+/CD45RO+ Memory": 0.04463465492351886,
+  "CD14+ Monocyte": 0.04173289199317575,
+  "Dendritic": 0.030607037139649164,
+  "CD4+/CD45RA+/CD25- Naive T": 0.027311567681068547,
+  "CD34+": 0.004039137345251462,
+  "CD4+ T Helper2": 0.0014144271570014145
+ },
+ "label_source": "per-cell annotation from the paper (correlation to 11 purified reference populations)",
+ "normalisation": "per cell to 1e4 counts, then log1p (at load time)"
+}

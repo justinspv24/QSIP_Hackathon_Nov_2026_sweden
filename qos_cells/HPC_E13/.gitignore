@@ -1,0 +1,4 @@
+.venv
+data/
+logs/*.out
+logs/parts*/

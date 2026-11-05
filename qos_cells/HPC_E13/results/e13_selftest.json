@@ -1,0 +1,18 @@
+{
+ "schema_version": 1,
+ "experiment": "e13_selftest",
+ "n": 300,
+ "N": 64,
+ "M": 2560,
+ "reps": 20000,
+ "max_rel_mean_err_e7": 0.02147423922179343,
+ "max_rel_mean_err_e13": 0.023980087735158757,
+ "var_ratio_e7_median": 0.9964354242787818,
+ "var_ratio_e13_median": 1.005391787478612,
+ "var_ratio_e13_over_e7_median": 1.0050662042588652,
+ "z_mean_rms_e7": 0.8160847040983613,
+ "z_mean_rms_e13": 1.0379725189766775,
+ "z_mean_max_e13": 2.6551959333894377,
+ "pass_rule": "rms of standardised mean errors in [0.7, 1.3] (expected 1 for an unbiased sampler) and median variance ratio within 5 %",
+ "pass": true
+}
