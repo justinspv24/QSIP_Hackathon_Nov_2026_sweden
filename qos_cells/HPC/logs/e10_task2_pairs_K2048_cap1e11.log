@@ -5,3 +5,17 @@
 [e10 19:49:26] M/N=8100 stream bal.acc 0.8967±0.0105 auprc 0.465 rel.err 2.353 (pred 2.326) records 2.88e+09
 [e10 19:50:35] M/N=24300 stream bal.acc 0.9080±0.0031 auprc 0.485 rel.err 1.342 (pred 1.343) records 8.63e+09
 [e10 19:53:54] M/N=72900 stream bal.acc 0.9074±0.0016 auprc 0.495 rel.err 0.779 (pred 0.775) records 2.59e+10
+[e10 20:03:40] M/N=218700 stream bal.acc 0.9070±0.0020 auprc 0.478 rel.err 0.449 (pred 0.448) records 7.77e+10
+[e10 20:04:29] count_sketch       S* = 64 [48.5 s]
+[e10 20:05:17] hashing            S* = 512 [48.3 s]
+[e10 20:06:06] jl_sparse          S* = 64 [49.2 s]
+[e10 20:06:55] heavy_hitters_mg   S* = 524288 [48.1 s]
+[e10 20:07:42] heavy_hitters_top  S* = 131072 [47.1 s]
+[e10 20:08:31] reservoir          S* = None [48.5 s]
+[e10 20:08:31]   count_sketch       S*_stable 64  S*_cell_stable 64
+[e10 20:08:31]   hashing            S*_stable 512  S*_cell_stable 128
+[e10 20:08:31]   jl_sparse          S*_stable 512  S*_cell_stable 64
+[e10 20:08:31]   heavy_hitters_mg   S*_stable 524288  S*_cell_stable 524288
+[e10 20:08:31]   heavy_hitters_top  S*_stable 131072  S*_cell_stable 131072
+[e10 20:08:31]   reservoir          S*_stable None  S*_cell_stable None
+[e10 20:08:31] done {'wall_seconds': 1388.0, 'peak_ram_gb': 84.53, 'peak_vram_gb': 31.823}

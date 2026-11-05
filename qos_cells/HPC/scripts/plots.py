@@ -196,8 +196,13 @@ def e10():
         if r == 0:
             cell.set_text_props(weight="bold")
     ds = d["dataset"]
-    fig.suptitle(f"E10 · AIDA atlas ({ds['n_cells']:,} PBMCs, {ds['n_donors']} donors, curated labels, split by donor): small classical sketches\n"
-                 "(32–512 counters of N = 131,328) match the exact centroid for every task, π from 0.16 down to 1.2·10⁻⁴",
+    def srange(K):
+        v = [t["best_one_pass"]["S_star"] for t in tasks if t["space"] == "pairs" and t["K"] == K and (t.get("best_one_pass") or {}).get("S_star")]
+        return f"{min(v):,}–{max(v):,}" if v else "?"
+    pis = [t["pi_hat"] for t in pairs]
+    fig.suptitle(f"E10 · AIDA atlas ({ds['n_cells']:,} PBMCs, {ds['n_donors']} donors, curated labels, split by donor): small classical sketches —\n"
+                 f"{srange(512)} counters of N = 131,328 (K=512), {srange(2048)} of N = 2.1 M (K=2048) — match the exact centroid for every task, "
+                 f"π = {max(pis):.2g} … {min(pis):.1e}",
                  x=0.01, y=0.995, ha="left", fontsize=13.5)
     fig.subplots_adjust(left=0.05, right=0.985, top=0.83, bottom=0.08)
     out = hc.FIGURES / "fig_e10_atlas.png"

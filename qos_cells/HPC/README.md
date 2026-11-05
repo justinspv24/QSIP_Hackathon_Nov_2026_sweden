@@ -4,8 +4,8 @@
 - **Verdict:** at every scale we tried, small one-pass classical sketches match the exact class centroid, so there is **no memory advantage** for the quantum oracle sketch on this data. The quantum column is a classical simulation, and no quantum advantage is claimed.
 - **E8:** the GPU statevector circuit equals the sketch formula to **3.1·10⁻¹⁶** up to **30 index qubits** (+1 ancilla). This checks correctness and scaling only; the circuit is diagonal and classically easy.
 - **E9:** on PBMC3k gene pairs up to **N = 9.4·10⁷** (27 qubits), the best one-pass sketch needs **S\* = 8–1,024 counters** (S\*/N down to 8.5·10⁻⁸). S\* does not grow with N.
-- **E10:** AIDA atlas (**1.27 M cells, 625 donors, curated labels**, donor split), 4 tasks with π from 0.16 to **1.2·10⁻⁴**. Best one-pass S\* is **E10_SSTAR_RANGE** of N = 131,328 (K = 512) and 2.1 M (K = 2048). The rare-class cost is in **records**: measured M₁₀ matches the closed form (ratio **E10_RATIO_RANGE**) and follows the 1/(π(1−π)) law.
-- **E11:** in a synthetic Gaussian model, sketches fail once the signal spreads over ≳ N^0.75 features. Real tasks have log d_eff / log N = **E11_Y_RANGE**, yet are still solved with S\*/N ≤ **E11_S_MAX**. That Gaussian model is pessimistic.
+- **E10:** AIDA atlas (**1.27 M cells, 625 donors, curated labels**, donor split), 4 tasks with π from 0.16 to **1.2·10⁻⁴**. Best one-pass S\* is **16–512 counters** of N = 131,328 (K = 512) and 2.1 M (K = 2048). The rare-class cost is in **records**: measured M₁₀ matches the closed form (ratio **0.93–1.04**) and follows the 1/(π(1−π)) law.
+- **E11:** in a synthetic Gaussian model, sketches fail once the signal spreads over ≳ N^0.75 features. Real tasks have log d_eff / log N = **0.23–0.74**, yet are still solved with S\*/N ≤ **4·10⁻³**. That Gaussian model is pessimistic.
 
 All numbers are in `results/*.json`, and every figure is built from those files only. Node: quant1 (8× RTX A6000 48 GB, 128 cores, 2 TB RAM); see `ENV.md`. Run log and decisions: `PROGRESS.md`.
 
@@ -15,7 +15,7 @@ All numbers are in `results/*.json`, and every figure is built from those files 
 |---|---|---|---|---|---|
 | E8 | circuit = formula at scale? | done | 50 s | 9.6 GB / 40.8 GB | yes, to 3.1e-16 up to n = 30; correctness check only |
 | E9 | S\* vs N up to all genes | done | K=13714: 6.6 min (+ 5.8 min logreg) | 21 GB / 41 GB | S\* flat (8–1,024) while N grows 700×; no memory advantage |
-| E10 | curated labels, big test sets | done | E10_WALL | E10_RES | E10_VERDICT |
+| E10 | curated labels, big test sets | done | 72 min incl. 12 min download + 12 min prep; longest run 23 min | 188 GB (prep) / 41 GB | 16–512 counters suffice for every task, π down to 1.1e-4; rare classes cost records (1/(π(1−π)) law confirmed), not memory |
 | E11 | where do sketches fail? | done | 55 s | 0.4 GB / 5.8 GB | only when the signal spreads over ≳ N^0.75 features (synthetic); real tasks are solved anyway |
 
 ## How to rerun
@@ -127,7 +127,74 @@ Figure: `figures/fig_e9_sstar_vs_N.png` · JSON: `results/e9_fullpairs.json` (me
 
 ## E10 · AIDA atlas with curated labels
 
-E10_SECTION
+**Dataset**
+- **Source:** AIDA Phase 1 Data Freeze v2 (Asian Immune Diversity Atlas), blood PBMCs, 10x 5′ v2.
+- **Version:** CELLxGENE Census 2025-11-08, dataset `c838aec3-03ef-4398-b882-0e3912abfff0`, source h5ad 14,244,724,636 B, sha256 `a5bce74985df8cbe8cf1f18877a1607ed556d99061dc08e7bdbc4dbae732c593`.
+- **Size:** 1,265,624 cells, 35,477 genes, 625 donors.
+- **Labels:** `obs.cell_type`, the authors' expert annotation mapped to the Cell Ontology. We did no re-clustering.
+- **Preprocessing:** raw counts, normalised to 10⁴ per cell, then log1p (same as PBMC3k `.raw`).
+- **Split:** by donor, with 30 % of donors in test (GroupShuffleSplit, seed 7): train 892,135 cells from 437 donors, test 373,489 cells from 188 donors.
+- **No subsampling:** every cell is used, so each π is the true atlas prevalence.
+- **Pipeline:** gene selection is train-only (E7 rule), followed by the E7 pipeline for genes (N = 512) and pairs (K = 512 → N = 131,328, and K = 2,048 → N = 2,098,176), with 3 stream/hash seeds.
+
+**Tasks (one-vs-rest)**
+
+| task | cells in atlas | π | train + / test + | donors with positives (train/test) |
+|---|---|---|---|---|
+| hematopoietic stem cell | 135 | 1.1e-4 | 103 / 32 | 76 / 19 |
+| plasma cell | 1,672 | 1.3e-3 | 1,252 / 420 | 321 / 138 |
+| CD1c+ myeloid DC | 13,207 | 1.0e-2 | 9,232 / 3,975 | 410 / 181 |
+| CD14+ monocyte (common) | 202,124 | 0.16 | 142,654 / 59,470 | 414 / 181 |
+
+**Results** (balanced accuracy on test; "best one-pass" = E7 verdict rule)
+
+| task | space | N | exact | logreg (all N) | stream (M/N) | quantum-sim | best one-pass (S\*) | S\*/N | d_eff |
+|---|---|---|---|---|---|---|---|---|---|
+| HSC | genes | 512 | 0.951 | 0.969 | 0.944 (218,700) | 0.957 | hashing (256) | 5.0e-01 | 95 |
+| HSC | pairs K=512 | 131,328 | 0.945 | 0.859 | 0.951 (218,700) | 0.952 | sparse JL (16) | 1.2e-04 | 6,091 |
+| HSC | pairs K=2048 | 2,098,176 | 0.904 | 0.828 | 0.907 (218,700) | 0.907 | count-sketch (64) | 3.1e-05 | 7,933 |
+| plasma cell | genes | 512 | 0.988 | 0.983 | 0.988 (24,300) | 0.988 | count-sketch (64) | 1.2e-01 | 25 |
+| plasma cell | pairs K=512 | 131,328 | 0.988 | 0.981 | 0.988 (24,300) | 0.988 | hashing (64) | 4.9e-04 | 1,131 |
+| plasma cell | pairs K=2048 | 2,098,176 | 0.988 | 0.986 | 0.987 (24,300) | 0.987 | hashing (128) | 6.1e-05 | 937 |
+| CD1c+ DC | genes | 512 | 0.956 | 0.991 | 0.956 (2,700) | 0.951 | hashing (256) | 5.0e-01 | 37 |
+| CD1c+ DC | pairs K=512 | 131,328 | 0.957 | 0.972 | 0.956 (900) | 0.955 | count-sketch (512) | 3.9e-03 | 2,136 |
+| CD1c+ DC | pairs K=2048 | 2,098,176 | 0.969 | 0.941 | 0.970 (2,700) | 0.969 | hashing (512) | 2.4e-04 | 2,974 |
+| CD14+ mono | genes | 512 | 0.961 | 0.986 | 0.960 (100) | 0.958 | hashing (16) | 3.1e-02 | 63 |
+| CD14+ mono | pairs K=512 | 131,328 | 0.962 | 0.987 | 0.963 (100) | 0.962 | hashing (32) | 2.4e-04 | 4,466 |
+| CD14+ mono | pairs K=2048 | 2,098,176 | 0.963 | 0.987 | 0.963 (100) | 0.962 | sparse JL (64) | 3.1e-05 | 6,351 |
+
+AUPRC for every row is in the JSON.
+
+**Rare-class sample cost**
+
+M₁₀ is the number of records needed for 10 % relative L2 error of the streamed Δ. The measured value comes from a c/√M fit over the M grid, mean of 3 seeds. The closed form is M₁₀ = 100·N·(q₁/π + q₀/(1−π))/‖Δ‖², which is the 1/(π(1−π)) law times a task constant.
+
+| task | space | π | M₁₀ measured | M₁₀ closed form | ratio | fitted slope | M₁₀·π(1−π)/N |
+|---|---|---|---|---|---|---|---|
+| HSC | genes | 1.2e-04 | 3.98e+09 | 3.80e+09 | 1.04 | −0.50 | 896 |
+| HSC | pairs K=512 | 1.2e-04 | 5.93e+11 | 5.90e+11 | 1.01 | −0.50 | 522 |
+| HSC | pairs K=2048 | 1.2e-04 | 9.20e+12 | 9.20e+12 | 1.00 | −0.50 | 506 |
+| plasma cell | genes | 1.4e-03 | 1.96e+08 | 1.92e+08 | 1.02 | −0.48 | 536 |
+| plasma cell | pairs K=512 | 1.4e-03 | 5.64e+10 | 5.80e+10 | 0.97 | −0.51 | 602 |
+| plasma cell | pairs K=2048 | 1.4e-03 | 1.27e+12 | 1.26e+12 | 1.01 | −0.52 | 850 |
+| CD1c+ DC | genes | 1.0e-02 | 2.49e+07 | 2.44e+07 | 1.02 | −0.51 | 498 |
+| CD1c+ DC | pairs K=512 | 1.0e-02 | 3.28e+09 | 3.29e+09 | 1.00 | −0.50 | 256 |
+| CD1c+ DC | pairs K=2048 | 1.0e-02 | 7.70e+10 | 7.73e+10 | 1.00 | −0.50 | 376 |
+| CD14+ mono | genes | 1.6e-01 | 1.19e+06 | 1.28e+06 | 0.93 | −0.50 | 313 |
+| CD14+ mono | pairs K=512 | 1.6e-01 | 1.86e+08 | 1.86e+08 | 1.00 | −0.50 | 190 |
+| CD14+ mono | pairs K=2048 | 1.6e-01 | 3.81e+09 | 3.79e+09 | 1.01 | −0.50 | 244 |
+
+**Reading**
+- **Sketches:** in every task and both pair spaces, a one-pass classical sketch with **16–512 counters** reaches the exact centroid (S\*/N = 3·10⁻⁵ … 4·10⁻³). The same holds for the rarest type (HSC, π = 1.1·10⁻⁴, 32 test cells from 19 unseen donors). The curated labels and large test sets do not change the E7 verdict.
+- **Sample cost:** the rare-class cost is in **records**, as predicted. Measured M₁₀ equals the closed form within 7 %, with a slope of −0.50. M₁₀·π(1−π)/N stays at 190–900 while π varies 1,400×. For HSC with gene pairs at K = 2,048 that is 9.2·10¹² records, which the quantum and classical sketches pay alike.
+- **K = 2,048 does not help:** it is not better than K = 512 except for CD1c+ DC (0.969 vs 0.957), and HSC drops (0.904 vs 0.945).
+- **Logreg is not a reliable baseline here:** class-balanced logistic regression on all N (C = 1, untuned, as in E7) is below the centroid for HSC pairs (0.86 / 0.83; 103 positives in 1.3·10⁵–2·10⁶ features) and for CD1c+ DC at K = 2,048 (0.94; hit 300 iterations). It is a reference, not a tuned competitor.
+- **Gene-only space (N = 512):** S\*/N is large there only because N is tiny (S\* = 16–256 counters).
+
+**Cuts and decisions**
+- **hashing + logreg:** at K = 512 only, S ∈ {64, 256, 1024}, 1 seed; it is off at K = 2,048 (it would hash ~10¹¹ pair entries per seed).
+- **Records cap:** first 4·10⁹ per seed, then rerun with 10¹¹ for the three runs that hit it (D17). Superseded results are in `logs/superseded/`.
+- **Convergence rule:** E7's rule plus "rel. error < 1" (D14).
 
 Figure: `figures/fig_e10_atlas.png` · JSON: `results/e10_atlas.json` (merged), `results/e10_part_*.json` (per run)
 
@@ -156,7 +223,7 @@ Figure: `figures/fig_e10_atlas.png` · JSON: `results/e10_atlas.json` (merged), 
 - **Who wins:** Misra–Gries is best in every cell. For α ≤ 0.5 it needs S\* = 8–32 counters.
 - **Where it breaks:** once k > √N, the per-feature signal falls below the training noise, and every sketch needs S ≥ N/4.
 - **Linear sketches never reach the target here:** count-sketch, hashing and sparse JL fail at every S ≤ N, because isotropic noise on all N features collides into the signal buckets. On real data (E7, E9, E10) these same sketches win, so this model is **pessimistic** for them.
-- **Real tasks:** d_eff of the exact centroid for every gene-pair task in E7/E9 (PBMC3k, K = 512…13,714) and E10 (AIDA, K = 512 and 2,048) gives y = **E11_Y_RANGE**, and measured best S\*/N is **E11_S_RANGE**. E11_TOP_SENTENCE So d_eff alone does not predict where classical sketches fail. No real task falls in the failure region.
+- **Real tasks:** d_eff of the exact centroid for every gene-pair task in E7/E9 (PBMC3k, K = 512…13,714) and E10 (AIDA, K = 512 and 2,048) gives y = **0.23–0.74**, and measured best S\*/N is **8.5·10⁻⁸ … 3.9·10⁻³**. The most spread task (AIDA HSC, pairs K = 512, y = 0.74) sits next to the synthetic failure edge (y ≈ 0.75) but needs only 16 counters (S\*/N = 1.2·10⁻⁴). So d_eff alone does not predict where classical sketches fail. No real task falls in the failure region.
 - **Not on the map:** gene-only spaces (N = 512) are outside it.
 
 Figure: `figures/fig_e11_advantage_map.png` · JSON: `results/e11_advantage_map.json` (`synthetic`, `real_points`, `caption`; the GPU run's resources are in `run_resources`)

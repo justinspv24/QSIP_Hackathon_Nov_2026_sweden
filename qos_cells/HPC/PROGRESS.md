@@ -59,3 +59,26 @@ Decisions:
 
 ## 19:46 — decisions
 - D17. E10 K=2048 done for all 4 tasks, but HSC (K=2048) hit the 4·10⁹ records/seed cap before its stream converged (rel. error 2.35). The GPU sampler does ~3·10⁸ records/s, so the cap was too cautious. Rerunning the three capped runs (HSC K=512 and K=2048, plasma cell K=2048) with cap 10¹¹ and time cap 60 min. The capped results are kept in logs/superseded/. ETA 20:10.
+
+## 20:07 — status 3 (T+85 min)
+
+| exp | state | key numbers | ETA |
+|---|---|---|---|
+| E8 | **done** | — | — |
+| E9 | **done** | — | — |
+| E10 | 11 of 12 runs final; HSC K=2048 rerun finishing (last 2 methods) | reruns with cap 10¹¹: HSC K=512 converged at M/N 218,700 (rel. err 0.46), best S* 16–64; plasma K=2048 converged at M/N 24,300 (0.49), best S* 128; HSC K=2048 converged at M/N 72,900 (0.78), run at 218,700 | 20:12 |
+| E11 | **done** (real points re-collected after E10) | 16 real gene-pair tasks: log d_eff / log N 0.23–0.74, best S*/N ≤ 4e-3 | 20:15 |
+| write-up | README, slide notes, figures drafted | | 20:30 |
+| whole run | | | ~20:35 (target 22:12) |
+
+## 20:16 — final status (T+94 min)
+
+| exp | state | headline |
+|---|---|---|
+| E8 | **done** | circuit = formula ≤ 3.1e-16 up to 30 index qubits; correctness check only |
+| E9 | **done** | best one-pass S* = 8–1,024 counters for N up to 9.4·10⁷; S* flat in N |
+| E10 | **done** (12/12 runs final, incl. optional K=2048) | AIDA 1.27 M cells: 16–512 counters suffice for all 4 tasks (π 0.16 → 1.1e-4); sample cost matches closed form (0.93–1.04) and the 1/(π(1−π)) law |
+| E11 | **done** | synthetic failure only for signal spread ≳ N^0.75; 20 real tasks at y = 0.23–0.74, all solved with S*/N ≤ 4e-3 |
+
+Not done / cut (all logged above): qiskit cross-check in E8; reservoir at K=13714 (E9); hashing+logreg at E10 K=2048; E10 hashing+logreg only S ∈ {64,256,1024}, 1 seed.
+Push to origin/hpc: **failed** (no GitHub credentials on quant1). All work is committed locally on branch `hpc`.
