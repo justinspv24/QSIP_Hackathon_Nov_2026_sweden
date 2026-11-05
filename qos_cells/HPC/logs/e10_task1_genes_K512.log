@@ -1,0 +1,21 @@
+[e10 19:21:42] plasma cell genes K=512: N=512, n=1,265,624 built in 29 s
+[e10 19:21:45] exact bal.acc 0.9877 auprc 0.9768 d_eff 25.0 pi 1.40e-03 test pos 420 M10 closed form 1.916e+08 (M/N 3.74e+05)
+[e10 19:21:45] logreg_full bal.acc 0.9833 auprc 0.9809 iters 35 [1 s]
+[e10 19:21:48] M/N=300 stream bal.acc 0.9737±0.0053 auprc 0.653 rel.err 3.598 (pred 3.532) records 8.29e+04
+[e10 19:21:51] M/N=900 stream bal.acc 0.9835±0.0007 auprc 0.861 rel.err 1.796 (pred 2.039) records 2.49e+05
+[e10 19:21:54] M/N=2700 stream bal.acc 0.9878±0.0019 auprc 0.973 rel.err 1.278 (pred 1.177) records 7.48e+05
+[e10 19:21:56] M/N=8100 stream bal.acc 0.9881±0.0000 auprc 0.977 rel.err 0.716 (pred 0.680) records 2.24e+06
+[e10 19:21:59] M/N=24300 stream bal.acc 0.9878±0.0002 auprc 0.976 rel.err 0.403 (pred 0.392) records 6.74e+06
+[e10 19:22:06] count_sketch       S* = 64 [6.8 s]
+[e10 19:22:14] hashing            S* = 64 [8.2 s]
+[e10 19:22:22] jl_sparse          S* = 64 [6.9 s]
+[e10 19:22:28] heavy_hitters_mg   S* = 64 [6.4 s]
+[e10 19:22:35] heavy_hitters_top  S* = 8 [6.3 s]
+[e10 19:22:42] reservoir          S* = None [6.8 s]
+[e10 19:22:42]   count_sketch       S*_stable 64  S*_cell_stable 64
+[e10 19:22:42]   hashing            S*_stable 64  S*_cell_stable 64
+[e10 19:22:42]   jl_sparse          S*_stable 64  S*_cell_stable 64
+[e10 19:22:42]   heavy_hitters_mg   S*_stable 64  S*_cell_stable 64
+[e10 19:22:42]   heavy_hitters_top  S*_stable 8  S*_cell_stable 8
+[e10 19:22:42]   reservoir          S*_stable None  S*_cell_stable None
+[e10 19:22:42] done {'wall_seconds': 111.2, 'peak_ram_gb': 24.775, 'peak_vram_gb': 12.766}

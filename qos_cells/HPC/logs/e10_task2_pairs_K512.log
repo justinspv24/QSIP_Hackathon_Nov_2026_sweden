@@ -1,0 +1,23 @@
+[e10 19:22:35] hematopoietic stem cell pairs K=512: N=131,328, n=1,265,624 built in 39 s
+[e10 19:22:36] exact bal.acc 0.9450 auprc 0.6607 d_eff 6090.9 pi 1.15e-04 test pos 32 M10 closed form 5.898e+11 (M/N 4.49e+06)
+[e10 19:22:40] logreg_full bal.acc 0.8594 auprc 0.7555 iters 26 [3 s]
+[e10 19:22:43] M/N=2700 stream bal.acc 0.9563±0.0078 auprc 0.622 rel.err 4.045 (pred 4.078) records 1.46e+08
+[e10 19:22:49] M/N=8100 stream bal.acc 0.9469±0.0010 auprc 0.652 rel.err 2.380 (pred 2.355) records 4.37e+08
+[e10 19:23:00] M/N=24300 stream bal.acc 0.9478±0.0021 auprc 0.658 rel.err 1.370 (pred 1.359) records 1.31e+09
+[e10 19:23:31] M/N=72900 stream bal.acc 0.9461±0.0008 auprc 0.655 rel.err 0.782 (pred 0.785) records 3.93e+09
+[e10 19:23:31] M/N=218700: 1.18e+10 records/seed > cap 4.0e+09; stop (cut logged)
+[e10 19:23:49] count_sketch       S* = 32 [17.8 s]
+[e10 19:24:10] hashing            S* = 128 [20.7 s]
+[e10 19:24:27] jl_sparse          S* = 512 [17.0 s]
+[e10 19:24:45] heavy_hitters_mg   S* = 65536 [17.4 s]
+[e10 19:25:02] heavy_hitters_top  S* = 16384 [17.0 s]
+[e10 19:25:20] reservoir          S* = None [17.8 s]
+[e10 19:29:11] hashing_logreg     S* = 64 [230.6 s]
+[e10 19:29:11]   count_sketch       S*_stable 256  S*_cell_stable 256
+[e10 19:29:11]   hashing            S*_stable 128  S*_cell_stable 128
+[e10 19:29:11]   jl_sparse          S*_stable 4096  S*_cell_stable 256
+[e10 19:29:11]   heavy_hitters_mg   S*_stable 65536  S*_cell_stable 65536
+[e10 19:29:11]   heavy_hitters_top  S*_stable 16384  S*_cell_stable 16384
+[e10 19:29:11]   reservoir          S*_stable None  S*_cell_stable None
+[e10 19:29:11]   hashing_logreg     S*_stable 1024  S*_cell_stable 1024
+[e10 19:29:11] done {'wall_seconds': 458.5, 'peak_ram_gb': 27.145, 'peak_vram_gb': 27.023}

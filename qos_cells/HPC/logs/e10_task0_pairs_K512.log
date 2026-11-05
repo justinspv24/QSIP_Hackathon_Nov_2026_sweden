@@ -1,0 +1,22 @@
+[e10 19:21:45] CD1c-positive myeloid dendritic cell pairs K=512: N=131,328, n=1,265,624 built in 35 s
+[e10 19:21:47] exact bal.acc 0.9573 auprc 0.6226 d_eff 2136.0 pi 1.03e-02 test pos 3975 M10 closed form 3.289e+09 (M/N 2.5e+04)
+[e10 19:22:17] logreg_full bal.acc 0.9723 auprc 0.9621 iters 300 [30 s]
+[e10 19:22:19] M/N=33 stream bal.acc 0.9504±0.0070 auprc 0.571 rel.err 2.754 (pred 2.755) records 1.48e+06
+[e10 19:22:22] M/N=100 stream bal.acc 0.9566±0.0027 auprc 0.620 rel.err 1.580 (pred 1.582) records 4.48e+06
+[e10 19:22:24] M/N=300 stream bal.acc 0.9565±0.0010 auprc 0.613 rel.err 0.913 (pred 0.914) records 1.34e+07
+[e10 19:22:27] M/N=900 stream bal.acc 0.9557±0.0005 auprc 0.614 rel.err 0.528 (pred 0.527) records 4.03e+07
+[e10 19:22:43] count_sketch       S* = 512 [16.3 s]
+[e10 19:23:02] hashing            S* = 1024 [16.1 s]
+[e10 19:23:18] jl_sparse          S* = 1024 [16.3 s]
+[e10 19:23:35] heavy_hitters_mg   S* = 32768 [16.9 s]
+[e10 19:23:52] heavy_hitters_top  S* = 32 [17.0 s]
+[e10 19:24:11] reservoir          S* = None [18.6 s]
+[e10 19:27:24] hashing_logreg     S* = 64 [192.8 s]
+[e10 19:27:24]   count_sketch       S*_stable 512  S*_cell_stable 512
+[e10 19:27:24]   hashing            S*_stable 1024  S*_cell_stable 1024
+[e10 19:27:24]   jl_sparse          S*_stable 1024  S*_cell_stable 1024
+[e10 19:27:24]   heavy_hitters_mg   S*_stable 32768  S*_cell_stable 32768
+[e10 19:27:24]   heavy_hitters_top  S*_stable 32  S*_cell_stable 32
+[e10 19:27:24]   reservoir          S*_stable None  S*_cell_stable None
+[e10 19:27:24]   hashing_logreg     S*_stable 64  S*_cell_stable 64
+[e10 19:27:25] done {'wall_seconds': 397.6, 'peak_ram_gb': 25.686, 'peak_vram_gb': 40.769}

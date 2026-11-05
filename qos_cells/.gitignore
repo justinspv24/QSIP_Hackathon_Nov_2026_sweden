@@ -6,3 +6,9 @@ __pycache__/
 .pytest_cache/
 dashboard/node_modules/
 dashboard/dist/
+HPC/.venv/
+HPC/data/
+HPC/logs/*.npy
+*.h5ad
+*.npz
+data/

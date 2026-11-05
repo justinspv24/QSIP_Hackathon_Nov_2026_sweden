@@ -1,0 +1,237 @@
+{
+ "schema_version": 1,
+ "experiment": "e9_part_K512_logreg",
+ "created_utc": "2026-11-05T19:31:10+00:00",
+ "partial": false,
+ "config": {
+  "schema_version": 1,
+  "seed": 7,
+  "data": {
+   "dataset": "pbmc3k_processed",
+   "path": "data/pbmc3k_processed.h5ad",
+   "test_frac": 0.3,
+   "min_cells_per_gene": 3
+  },
+  "tasks": {
+   "positives": [
+    "B cells",
+    "Dendritic cells",
+    "Megakaryocytes"
+   ],
+   "gene_counts": [
+    4,
+    16,
+    256,
+    1024
+   ]
+  },
+  "sketch": {
+   "stream_mode": "uniform",
+   "tau_per_gene": 1.0,
+   "phase_limit": 1.5707963267948966,
+   "M_grid": [
+    1000,
+    3000,
+    10000,
+    30000,
+    100000,
+    300000,
+    1000000
+   ],
+   "repeats": 5
+  },
+  "scaling": {
+   "gene_counts": [
+    16,
+    64,
+    256,
+    1024
+   ],
+   "positive": "B cells",
+   "classifier_N": 1024
+  },
+  "imbalance": {
+   "pis": [
+    0.5,
+    0.1,
+    0.02,
+    0.005
+   ],
+   "N": 64,
+   "synthetic_cells_per_class": 4000,
+   "M_grid": [
+    3000,
+    10000,
+    30000,
+    100000,
+    300000,
+    1000000
+   ],
+   "repeats": 5
+  },
+  "circuits": {
+   "positive": "B cells",
+   "gene_counts": [
+    4,
+    16
+   ],
+   "cells_per_class": 4,
+   "shots": 2000,
+   "mock_alias": "garnet:mock"
+  },
+  "hardware": {
+   "N": 4,
+   "positive": "B cells",
+   "cells_per_class": 4,
+   "shots": 2000,
+   "n_calibration": 4,
+   "alpha_min": 0.3,
+   "preferred": [
+    "garnet",
+    "sirius"
+   ]
+  },
+  "resources": {
+   "feature_spaces": {
+    "all genes": 32768,
+    "gene pairs": 1073741824
+   },
+   "epsilon": 0.1,
+   "queries": 1,
+   "pi_rare": 0.014,
+   "logical_gate_rate_hz": 1000000.0
+  },
+  "experiment": {
+   "K": 512,
+   "part": "logreg",
+   "seeds": 5,
+   "hashing_logreg_seeds": 3,
+   "M_over_N_grid": [
+    33,
+    100,
+    300,
+    900,
+    2700,
+    8100
+   ],
+   "reservoir": true,
+   "logreg_max_iter": 300,
+   "positives": [
+    "B cells",
+    "Dendritic cells",
+    "Megakaryocytes"
+   ],
+   "split_seed": 7,
+   "test_frac": 0.3,
+   "S_grid": "powers of 2 from 8 to min(2^22, N), plus N; hashing+logreg S <= 2^16",
+   "stream": "E7 Poissonised uniform stream, simulated by Poisson splitting (total records ~ Poisson(lambda E), uniform nonzero entry)",
+   "dataset": {
+    "file": "/mnt/clarsa-fs/home/lu_jpvarkey/oracle_sketching/QSIP_Hackathon_Nov_2026_sweden/qos_cells/data/pbmc3k_processed.h5ad",
+    "sha256": "0db367b991dd9580",
+    "n_cells": 2638,
+    "n_genes": 13714,
+    "nnz": 2238732,
+    "fraction_zero": 0.9381181668224355,
+    "genes_measured_in_10x_run": 32738,
+    "class_counts": {
+     "CD4 T cells": 1144,
+     "CD14+ Monocytes": 480,
+     "B cells": 342,
+     "CD8 T cells": 316,
+     "NK cells": 154,
+     "FCGR3A+ Monocytes": 150,
+     "Dendritic cells": 37,
+     "Megakaryocytes": 15
+    }
+   }
+  }
+ },
+ "git_commit": "0999e9f5fdca4c0ff4317569853534e631262a1b-dirty",
+ "hostname": "quant1",
+ "hardware": {
+  "hostname": "quant1",
+  "cpu_count": 128,
+  "platform": "Linux-6.8.0-142-generic-x86_64-with-glibc2.39",
+  "python": "3.12.3",
+  "cpu_model": "AMD EPYC 7542 32-Core Processor",
+  "ram_gb": 2003.9,
+  "gpus_on_node": [
+   "0, NVIDIA RTX A6000, 49140 MiB, 575.57.08",
+   "1, NVIDIA RTX A6000, 49140 MiB, 575.57.08",
+   "2, NVIDIA RTX A6000, 49140 MiB, 575.57.08",
+   "3, NVIDIA RTX A6000, 49140 MiB, 575.57.08",
+   "4, NVIDIA RTX A6000, 49140 MiB, 575.57.08",
+   "5, NVIDIA RTX A6000, 49140 MiB, 575.57.08",
+   "6, NVIDIA RTX A6000, 49140 MiB, 575.57.08",
+   "7, NVIDIA RTX A6000, 49140 MiB, 575.57.08"
+  ],
+  "CUDA_VISIBLE_DEVICES": "1"
+ },
+ "resources": {
+  "wall_seconds": 12.6,
+  "peak_ram_gb": 0.806,
+  "peak_vram_gb": 0.034
+ },
+ "tasks": [
+  {
+   "task": "K=512 B cells",
+   "positive": "B cells",
+   "K": 512,
+   "N": 131328,
+   "logreg_full": {
+    "balanced_accuracy": 0.9944199416630265,
+    "auprc": 0.9935000516838741,
+    "floats": 131329,
+    "ints": 0,
+    "seeds": 0,
+    "bytes": 1050632,
+    "feature_scale": 31690.406283856988,
+    "n_iter": 19,
+    "converged": true,
+    "max_iter": 300,
+    "seconds": 4.5,
+    "method": "class-balanced L2 logistic regression (C=1) on all N pair features, solved in K x K form on GPU (L-BFGS)"
+   }
+  },
+  {
+   "task": "K=512 Dendritic cells",
+   "positive": "Dendritic cells",
+   "K": 512,
+   "N": 131328,
+   "logreg_full": {
+    "balanced_accuracy": 0.9545454545454546,
+    "auprc": 0.9757575757575757,
+    "floats": 131329,
+    "ints": 0,
+    "seeds": 0,
+    "bytes": 1050632,
+    "feature_scale": 32189.226977248105,
+    "n_iter": 26,
+    "converged": true,
+    "max_iter": 300,
+    "seconds": 0.5,
+    "method": "class-balanced L2 logistic regression (C=1) on all N pair features, solved in K x K form on GPU (L-BFGS)"
+   }
+  },
+  {
+   "task": "K=512 Megakaryocytes",
+   "positive": "Megakaryocytes",
+   "K": 512,
+   "N": 131328,
+   "logreg_full": {
+    "balanced_accuracy": 0.8,
+    "auprc": 0.7933333333333333,
+    "floats": 131329,
+    "ints": 0,
+    "seeds": 0,
+    "bytes": 1050632,
+    "feature_scale": 29684.641928494042,
+    "n_iter": 13,
+    "converged": true,
+    "max_iter": 300,
+    "seconds": 0.3,
+    "method": "class-balanced L2 logistic regression (C=1) on all N pair features, solved in K x K form on GPU (L-BFGS)"
+   }
+  }
+ ]
+}

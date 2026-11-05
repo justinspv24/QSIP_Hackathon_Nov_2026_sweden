@@ -1,0 +1,4 @@
+[e9 18:54:40] K=512 B cells: logreg_full bal.acc 0.9944 auprc 0.9935 iters 19 [8 s]
+[e9 18:54:41] K=512 Dendritic cells: logreg_full bal.acc 0.9545 auprc 0.9758 iters 26 [1 s]
+[e9 18:54:41] K=512 Megakaryocytes: logreg_full bal.acc 0.8000 auprc 0.7933 iters 13 [0 s]
+[e9 18:54:42] done: {'wall_seconds': 19.6, 'peak_ram_gb': 0.748, 'peak_vram_gb': 0.033}

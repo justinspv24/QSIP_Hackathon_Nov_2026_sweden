@@ -1,0 +1,31 @@
+[e9 18:54:47] K=8192 B cells: N=33,558,528 exact bal.acc 0.9469 auprc 0.9171 d_eff 405.0 (build 16 s, train nnz 602,798,495)
+[e9 18:54:49] K=8192 B cells: M/N=33 stream_full bal.acc 0.9468±0.0039 rel.err 1.476 (pred 1.484) records 1.08e+07
+[e9 18:54:51] K=8192 B cells: M/N=100 stream_full bal.acc 0.9469±0.0025 rel.err 0.866 (pred 0.853) records 3.27e+07
+[e9 18:55:06] K=8192 B cells: count_sketch       S* = 512  [14.5 s, 5 seeds]
+[e9 18:55:12] K=8192 B cells: hashing            S* = 512  [5.9 s, 5 seeds]
+[e9 18:55:40] K=8192 B cells: jl_sparse          S* = 1024  [28.3 s, 5 seeds]
+[e9 18:55:43] K=8192 B cells: heavy_hitters_mg   S* = 512  [3.0 s, 5 seeds]
+[e9 18:55:46] K=8192 B cells: heavy_hitters_top  S* = 16  [2.5 s, 5 seeds]
+[e9 18:55:50] K=8192 B cells: reservoir          S* = 1048576  [3.6 s, 5 seeds]
+[e9 18:56:12] K=8192 B cells: hashing_logreg     S* = 64  [22.3 s, 3 seeds]
+[e9 18:56:13] K=8192 Dendritic cells: N=33,558,528 exact bal.acc 0.8924 auprc 0.3435 d_eff 482.7 (build 0 s, train nnz 585,294,033)
+[e9 18:56:15] K=8192 Dendritic cells: M/N=33 stream_full bal.acc 0.9046±0.0153 rel.err 2.328 (pred 2.341) records 1.05e+07
+[e9 18:56:17] K=8192 Dendritic cells: M/N=100 stream_full bal.acc 0.8981±0.0125 rel.err 1.363 (pred 1.345) records 3.17e+07
+[e9 18:56:31] K=8192 Dendritic cells: count_sketch       S* = 256  [14.6 s, 5 seeds]
+[e9 18:56:37] K=8192 Dendritic cells: hashing            S* = 128  [6.0 s, 5 seeds]
+[e9 18:57:06] K=8192 Dendritic cells: jl_sparse          S* = 128  [28.1 s, 5 seeds]
+[e9 18:57:09] K=8192 Dendritic cells: heavy_hitters_mg   S* = 256  [2.9 s, 5 seeds]
+[e9 18:57:11] K=8192 Dendritic cells: heavy_hitters_top  S* = 16  [2.5 s, 5 seeds]
+[e9 18:57:15] K=8192 Dendritic cells: reservoir          S* = 524288  [3.6 s, 5 seeds]
+[e9 18:57:36] K=8192 Dendritic cells: hashing_logreg     S* = 16  [21.2 s, 3 seeds]
+[e9 18:57:38] K=8192 Megakaryocytes: N=33,558,528 exact bal.acc 0.7975 auprc 0.7089 d_eff 67.9 (build 1 s, train nnz 664,535,078)
+[e9 18:57:39] K=8192 Megakaryocytes: M/N=33 stream_full bal.acc 0.8935±0.0569 rel.err 2.995 (pred 3.439) records 1.19e+07
+[e9 18:57:41] K=8192 Megakaryocytes: M/N=100 stream_full bal.acc 0.8406±0.0543 rel.err 1.888 (pred 1.975) records 3.60e+07
+[e9 18:57:55] K=8192 Megakaryocytes: count_sketch       S* = 256  [14.5 s, 5 seeds]
+[e9 18:58:01] K=8192 Megakaryocytes: hashing            S* = 256  [5.9 s, 5 seeds]
+[e9 18:58:30] K=8192 Megakaryocytes: jl_sparse          S* = 128  [28.0 s, 5 seeds]
+[e9 18:58:33] K=8192 Megakaryocytes: heavy_hitters_mg   S* = 8  [2.9 s, 5 seeds]
+[e9 18:58:35] K=8192 Megakaryocytes: heavy_hitters_top  S* = 8  [2.5 s, 5 seeds]
+[e9 18:58:39] K=8192 Megakaryocytes: reservoir          S* = 128  [3.6 s, 5 seeds]
+[e9 18:59:01] K=8192 Megakaryocytes: hashing_logreg     S* = 32  [22.1 s, 3 seeds]
+[e9 18:59:02] done: {'wall_seconds': 280.0, 'peak_ram_gb': 2.603, 'peak_vram_gb': 40.222}

@@ -1,0 +1,4 @@
+[e9 18:54:47] K=2048 B cells: N=2,098,176 exact bal.acc 0.9483 auprc 0.9351 d_eff 400.8 (build 15 s, train nnz 237,337,822)
+[e9 18:54:47] K=2048 Dendritic cells: N=2,098,176 exact bal.acc 0.9206 auprc 0.3991 d_eff 459.9 (build 0 s, train nnz 230,000,761)
+[e9 18:54:48] K=2048 Megakaryocytes: N=2,098,176 exact bal.acc 0.7962 auprc 0.6896 d_eff 84.6 (build 0 s, train nnz 239,008,338)
+[e9 18:54:48] done: {'wall_seconds': 25.8, 'peak_ram_gb': 0.882, 'peak_vram_gb': 0.224}

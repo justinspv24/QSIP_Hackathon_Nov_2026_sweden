@@ -1,0 +1,67 @@
+[e11 18:50:53] N=2^14 alpha=0.0: exact BA 0.949  best one-pass {'method': 'heavy_hitters_mg', 'S_star': 8, 'S_star_over_N': 0.00048828125}  top-S S*/N 0.00048828125
+[e11 18:50:53] N=2^14 alpha=0.25: exact BA 0.951  best one-pass {'method': 'heavy_hitters_mg', 'S_star': 8, 'S_star_over_N': 0.00048828125}  top-S S*/N 0.00048828125
+[e11 18:50:53] N=2^14 alpha=0.5: exact BA 0.947  best one-pass {'method': 'heavy_hitters_mg', 'S_star': 32, 'S_star_over_N': 0.001953125}  top-S S*/N 0.0009765625
+[e11 18:50:53] N=2^14 alpha=0.75: exact BA 0.952  best one-pass {'method': 'heavy_hitters_mg', 'S_star': 4096, 'S_star_over_N': 0.25}  top-S S*/N 0.25
+[e11 18:50:53] N=2^14 alpha=1.0: exact BA 0.954  best one-pass {'method': 'heavy_hitters_mg', 'S_star': 16384, 'S_star_over_N': 1.0}  top-S S*/N 0.5
+[e11 18:50:53] N=2^14 done in 1.5 s
+[e11 18:50:54] N=2^15 alpha=0.0: exact BA 0.951  best one-pass {'method': 'heavy_hitters_mg', 'S_star': 8, 'S_star_over_N': 0.000244140625}  top-S S*/N 0.000244140625
+[e11 18:50:54] N=2^15 alpha=0.25: exact BA 0.949  best one-pass {'method': 'heavy_hitters_mg', 'S_star': 8, 'S_star_over_N': 0.000244140625}  top-S S*/N 0.000244140625
+[e11 18:50:54] N=2^15 alpha=0.5: exact BA 0.950  best one-pass {'method': 'heavy_hitters_mg', 'S_star': 32, 'S_star_over_N': 0.0009765625}  top-S S*/N 0.00048828125
+[e11 18:50:54] N=2^15 alpha=0.75: exact BA 0.950  best one-pass {'method': 'heavy_hitters_mg', 'S_star': 8192, 'S_star_over_N': 0.25}  top-S S*/N 0.25
+[e11 18:50:54] N=2^15 alpha=1.0: exact BA 0.949  best one-pass {'method': 'heavy_hitters_mg', 'S_star': 32768, 'S_star_over_N': 1.0}  top-S S*/N 0.5
+[e11 18:50:54] N=2^15 done in 0.7 s
+[e11 18:50:55] N=2^16 alpha=0.0: exact BA 0.951  best one-pass {'method': 'heavy_hitters_mg', 'S_star': 8, 'S_star_over_N': 0.0001220703125}  top-S S*/N 0.0001220703125
+[e11 18:50:55] N=2^16 alpha=0.25: exact BA 0.951  best one-pass {'method': 'heavy_hitters_mg', 'S_star': 8, 'S_star_over_N': 0.0001220703125}  top-S S*/N 0.0001220703125
+[e11 18:50:55] N=2^16 alpha=0.5: exact BA 0.949  best one-pass {'method': 'heavy_hitters_mg', 'S_star': 32, 'S_star_over_N': 0.00048828125}  top-S S*/N 0.000244140625
+[e11 18:50:55] N=2^16 alpha=0.75: exact BA 0.952  best one-pass {'method': 'heavy_hitters_mg', 'S_star': 32768, 'S_star_over_N': 0.5}  top-S S*/N 0.5
+[e11 18:50:55] N=2^16 alpha=1.0: exact BA 0.949  best one-pass {'method': 'heavy_hitters_mg', 'S_star': 65536, 'S_star_over_N': 1.0}  top-S S*/N 0.5
+[e11 18:50:55] N=2^16 done in 0.7 s
+[e11 18:50:56] N=2^17 alpha=0.0: exact BA 0.949  best one-pass {'method': 'heavy_hitters_mg', 'S_star': 8, 'S_star_over_N': 6.103515625e-05}  top-S S*/N 6.103515625e-05
+[e11 18:50:56] N=2^17 alpha=0.25: exact BA 0.950  best one-pass {'method': 'heavy_hitters_mg', 'S_star': 8, 'S_star_over_N': 6.103515625e-05}  top-S S*/N 6.103515625e-05
+[e11 18:50:56] N=2^17 alpha=0.5: exact BA 0.951  best one-pass {'method': 'heavy_hitters_mg', 'S_star': 32, 'S_star_over_N': 0.000244140625}  top-S S*/N 0.0001220703125
+[e11 18:50:56] N=2^17 alpha=0.75: exact BA 0.950  best one-pass {'method': 'heavy_hitters_mg', 'S_star': 65536, 'S_star_over_N': 0.5}  top-S S*/N 0.5
+[e11 18:50:56] N=2^17 alpha=1.0: exact BA 0.951  best one-pass {'method': 'heavy_hitters_mg', 'S_star': 131072, 'S_star_over_N': 1.0}  top-S S*/N 0.5
+[e11 18:50:56] N=2^17 done in 0.8 s
+[e11 18:50:57] N=2^18 alpha=0.0: exact BA 0.950  best one-pass {'method': 'heavy_hitters_mg', 'S_star': 8, 'S_star_over_N': 3.0517578125e-05}  top-S S*/N 3.0517578125e-05
+[e11 18:50:57] N=2^18 alpha=0.25: exact BA 0.950  best one-pass {'method': 'heavy_hitters_mg', 'S_star': 8, 'S_star_over_N': 3.0517578125e-05}  top-S S*/N 3.0517578125e-05
+[e11 18:50:57] N=2^18 alpha=0.5: exact BA 0.949  best one-pass {'method': 'heavy_hitters_mg', 'S_star': 32, 'S_star_over_N': 0.0001220703125}  top-S S*/N 6.103515625e-05
+[e11 18:50:57] N=2^18 alpha=0.75: exact BA 0.951  best one-pass {'method': 'heavy_hitters_mg', 'S_star': 131072, 'S_star_over_N': 0.5}  top-S S*/N 0.5
+[e11 18:50:57] N=2^18 alpha=1.0: exact BA 0.950  best one-pass {'method': 'heavy_hitters_mg', 'S_star': 262144, 'S_star_over_N': 1.0}  top-S S*/N 0.5
+[e11 18:50:57] N=2^18 done in 0.9 s
+[e11 18:50:59] N=2^19 alpha=0.0: exact BA 0.950  best one-pass {'method': 'heavy_hitters_mg', 'S_star': 8, 'S_star_over_N': 1.52587890625e-05}  top-S S*/N 1.52587890625e-05
+[e11 18:50:59] N=2^19 alpha=0.25: exact BA 0.950  best one-pass {'method': 'heavy_hitters_mg', 'S_star': 8, 'S_star_over_N': 1.52587890625e-05}  top-S S*/N 1.52587890625e-05
+[e11 18:50:59] N=2^19 alpha=0.5: exact BA 0.951  best one-pass {'method': 'heavy_hitters_mg', 'S_star': 32, 'S_star_over_N': 6.103515625e-05}  top-S S*/N 3.0517578125e-05
+[e11 18:50:59] N=2^19 alpha=0.75: exact BA 0.950  best one-pass {'method': 'heavy_hitters_mg', 'S_star': 262144, 'S_star_over_N': 0.5}  top-S S*/N 0.5
+[e11 18:50:59] N=2^19 alpha=1.0: exact BA 0.949  best one-pass {'method': 'heavy_hitters_mg', 'S_star': 524288, 'S_star_over_N': 1.0}  top-S S*/N 0.5
+[e11 18:50:59] N=2^19 done in 1.1 s
+[e11 18:51:00] N=2^20 alpha=0.0: exact BA 0.949  best one-pass {'method': 'heavy_hitters_mg', 'S_star': 8, 'S_star_over_N': 7.62939453125e-06}  top-S S*/N 7.62939453125e-06
+[e11 18:51:00] N=2^20 alpha=0.25: exact BA 0.950  best one-pass {'method': 'heavy_hitters_mg', 'S_star': 8, 'S_star_over_N': 7.62939453125e-06}  top-S S*/N 7.62939453125e-06
+[e11 18:51:00] N=2^20 alpha=0.5: exact BA 0.950  best one-pass {'method': 'heavy_hitters_mg', 'S_star': 32, 'S_star_over_N': 3.0517578125e-05}  top-S S*/N 1.52587890625e-05
+[e11 18:51:00] N=2^20 alpha=0.75: exact BA 0.949  best one-pass {'method': 'heavy_hitters_mg', 'S_star': 524288, 'S_star_over_N': 0.5}  top-S S*/N 0.5
+[e11 18:51:00] N=2^20 alpha=1.0: exact BA 0.949  best one-pass {'method': 'heavy_hitters_mg', 'S_star': 1048576, 'S_star_over_N': 1.0}  top-S S*/N 0.5
+[e11 18:51:00] N=2^20 done in 1.6 s
+[e11 18:51:03] N=2^21 alpha=0.0: exact BA 0.950  best one-pass {'method': 'heavy_hitters_mg', 'S_star': 8, 'S_star_over_N': 3.814697265625e-06}  top-S S*/N 3.814697265625e-06
+[e11 18:51:03] N=2^21 alpha=0.25: exact BA 0.951  best one-pass {'method': 'heavy_hitters_mg', 'S_star': 8, 'S_star_over_N': 3.814697265625e-06}  top-S S*/N 3.814697265625e-06
+[e11 18:51:03] N=2^21 alpha=0.5: exact BA 0.950  best one-pass {'method': 'heavy_hitters_mg', 'S_star': 32, 'S_star_over_N': 1.52587890625e-05}  top-S S*/N 7.62939453125e-06
+[e11 18:51:03] N=2^21 alpha=0.75: exact BA 0.950  best one-pass {'method': 'heavy_hitters_mg', 'S_star': 1048576, 'S_star_over_N': 0.5}  top-S S*/N 0.5
+[e11 18:51:03] N=2^21 alpha=1.0: exact BA 0.949  best one-pass {'method': 'heavy_hitters_mg', 'S_star': 2097152, 'S_star_over_N': 1.0}  top-S S*/N 0.5
+[e11 18:51:03] N=2^21 done in 2.9 s
+[e11 18:51:09] N=2^22 alpha=0.0: exact BA 0.950  best one-pass {'method': 'heavy_hitters_mg', 'S_star': 8, 'S_star_over_N': 1.9073486328125e-06}  top-S S*/N 1.9073486328125e-06
+[e11 18:51:09] N=2^22 alpha=0.25: exact BA 0.950  best one-pass {'method': 'heavy_hitters_mg', 'S_star': 8, 'S_star_over_N': 1.9073486328125e-06}  top-S S*/N 1.9073486328125e-06
+[e11 18:51:09] N=2^22 alpha=0.5: exact BA 0.949  best one-pass {'method': 'heavy_hitters_mg', 'S_star': 32, 'S_star_over_N': 7.62939453125e-06}  top-S S*/N 3.814697265625e-06
+[e11 18:51:09] N=2^22 alpha=0.75: exact BA 0.950  best one-pass {'method': 'heavy_hitters_mg', 'S_star': 2097152, 'S_star_over_N': 0.5}  top-S S*/N 0.5
+[e11 18:51:09] N=2^22 alpha=1.0: exact BA 0.950  best one-pass {'method': 'heavy_hitters_mg', 'S_star': 4194304, 'S_star_over_N': 1.0}  top-S S*/N 0.5
+[e11 18:51:09] N=2^22 done in 5.7 s
+[e11 18:51:21] N=2^23 alpha=0.0: exact BA 0.950  best one-pass {'method': 'heavy_hitters_mg', 'S_star': 8, 'S_star_over_N': 9.5367431640625e-07}  top-S S*/N 9.5367431640625e-07
+[e11 18:51:21] N=2^23 alpha=0.25: exact BA 0.950  best one-pass {'method': 'heavy_hitters_mg', 'S_star': 8, 'S_star_over_N': 9.5367431640625e-07}  top-S S*/N 9.5367431640625e-07
+[e11 18:51:21] N=2^23 alpha=0.5: exact BA 0.950  best one-pass {'method': 'heavy_hitters_mg', 'S_star': 32, 'S_star_over_N': 3.814697265625e-06}  top-S S*/N 1.9073486328125e-06
+[e11 18:51:21] N=2^23 alpha=0.75: exact BA 0.950  best one-pass {'method': 'heavy_hitters_mg', 'S_star': 4194304, 'S_star_over_N': 0.5}  top-S S*/N 0.5
+[e11 18:51:21] N=2^23 alpha=1.0: exact BA 0.950  best one-pass {'method': 'heavy_hitters_mg', 'S_star': 8388608, 'S_star_over_N': 1.0}  top-S S*/N 0.5
+[e11 18:51:21] N=2^23 done in 11.6 s
+[e11 18:51:45] N=2^24 alpha=0.0: exact BA 0.950  best one-pass {'method': 'heavy_hitters_mg', 'S_star': 8, 'S_star_over_N': 4.76837158203125e-07}  top-S S*/N 4.76837158203125e-07
+[e11 18:51:45] N=2^24 alpha=0.25: exact BA 0.950  best one-pass {'method': 'heavy_hitters_mg', 'S_star': 8, 'S_star_over_N': 4.76837158203125e-07}  top-S S*/N 4.76837158203125e-07
+[e11 18:51:45] N=2^24 alpha=0.5: exact BA 0.950  best one-pass {'method': 'heavy_hitters_mg', 'S_star': 32, 'S_star_over_N': 1.9073486328125e-06}  top-S S*/N 9.5367431640625e-07
+[e11 18:51:45] N=2^24 alpha=0.75: exact BA 0.950  best one-pass {'method': 'heavy_hitters_mg', 'S_star': 8388608, 'S_star_over_N': 0.5}  top-S S*/N 0.5
+[e11 18:51:45] N=2^24 alpha=1.0: exact BA 0.950  best one-pass {'method': 'heavy_hitters_mg', 'S_star': 16777216, 'S_star_over_N': 1.0}  top-S S*/N 0.5
+[e11 18:51:45] N=2^24 done in 24.0 s
+[e11 18:51:46] run done: {'wall_seconds': 54.8, 'peak_ram_gb': 0.447, 'peak_vram_gb': 5.838}
