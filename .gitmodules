@@ -1,0 +1,6 @@
+[submodule "ExtremeData4QMLHackathon"]
+	path = ExtremeData4QMLHackathon
+	url = https://github.com/Ilmosal/ExtremeData4QMLHackathon.git
+[submodule "quantum-oracle-sketching"]
+	path = quantum-oracle-sketching
+	url = https://github.com/justinspv24/quantum-oracle-sketching.git
