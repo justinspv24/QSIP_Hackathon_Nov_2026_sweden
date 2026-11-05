@@ -208,8 +208,16 @@ def _real_points():
             if q.get("d_eff") and q.get("N"):
                 q["y"] = math.log(q["d_eff"]) / math.log(q["N"])
                 q["log2N"] = math.log2(q["N"])
+            # the map covers N = 2^14 ... 2^27: gene-only spaces (N = 512) are outside it and are not placed;
+            # points whose run has not finished (no S* yet) are kept out instead of being drawn as "never"
+            if q["N"] < 2**14 or q.get("best_S_star_over_N") is None:
+                continue
             pts.append(q)
     return pts
+
+
+SHORTLAB = {"B cells": "B", "Dendritic cells": "DC", "Megakaryocytes": "Mk", "hematopoietic stem cell": "HSC",
+            "plasma cell": "PC", "CD1c-positive myeloid dendritic cell": "cDC", "CD14-positive monocyte": "Mono"}
 
 
 def _caption(syn, pts):
@@ -221,12 +229,14 @@ def _caption(syn, pts):
     if lin_never:
         s += "Linear sketches (count-sketch, hashing, sparse JL) never reach the exact centroid at any S <= N here: dense noise collides into the signal. "
     if pts:
-        ys = [q["y"] for q in pts if q.get("y") is not None]
-        s += (f"Real tasks ({len(ys)}): log d_eff / log N = {min(ys):.2f}–{max(ys):.2f}, i.e. the signal is concentrated "
-              f"in few features; measured best S*/N = "
-              f"{min(q['best_S_star_over_N'] for q in pts if q.get('best_S_star_over_N')):.1e}–"
-              f"{max(q['best_S_star_over_N'] for q in pts if q.get('best_S_star_over_N')):.1e}. "
-              "Real data sit in the region where small classical sketches suffice.")
+        ys = [q["y"] for q in pts]
+        ss = [q["best_S_star_over_N"] for q in pts]
+        top = max(pts, key=lambda q: q["y"])
+        s += (f"Real gene-pair tasks ({len(ys)}; PBMC3k K = 512…13,714, AIDA K = 512/2,048): log d_eff / log N = {min(ys):.2f}–{max(ys):.2f}; "
+              f"measured best one-pass S*/N = {min(ss):.1e}–{max(ss):.1e} (all <= 1e-2). "
+              f"The most spread real task ({top['label']}, y = {top['y']:.2f}) sits next to the synthetic failure edge (y ~ 0.75) "
+              f"but still needs only S*/N = {top['best_S_star_over_N']:.0e}: the isotropic-noise model is pessimistic, so d_eff alone "
+              "does not predict failure. No real task falls where classical sketches fail.")
     else:
         s += "Real-task points: not yet available (E9/E10 deff_points missing)."
     return s
@@ -300,17 +310,16 @@ def figure(args):
         ds = q.get("dataset", "?")
         mk = markers.setdefault(ds, shapes[len(markers) % len(shapes)])
         v = q.get("best_S_star_over_N")
-        ax.scatter([q["log2N"]], [q["y"]], marker=mk, s=140, c=[v if v else 1.0], cmap=cmap, norm=norm,
+        ax.scatter([q["log2N"]], [q["y"]], marker=mk, s=150, c=[v], cmap=cmap, norm=norm,
                    edgecolors="black", linewidths=1.8, zorder=5, label=ds)
-        left = q["log2N"] > Ls[-1]
-        ax.annotate(q.get("label", ""), (q["log2N"], q["y"]), xytext=(-10 if left else 8, 8), textcoords="offset points",
-                    fontsize=11, ha="right" if left else "left",
-                    zorder=6, bbox=dict(boxstyle="round,pad=0.15", fc="white", ec="none", alpha=0.75))
+        ax.annotate(SHORTLAB.get(q.get("task"), q.get("task", "")), (q["log2N"], q["y"]), xytext=(9, -16 if q.get("task") == "B cells" else -4),
+                    textcoords="offset points", fontsize=10.5, ha="left", zorder=6,
+                    bbox=dict(boxstyle="round,pad=0.1", fc="white", ec="none", alpha=0.7))
     h, l = ax.get_legend_handles_labels()
     if h:
         u = dict(zip(l, h))
-        ax.legend(u.values(), [f"real: {k}" for k in u], loc="lower right", bbox_to_anchor=(1.0, 1.0), ncol=len(u),
-                  fontsize=12, framealpha=0.9)
+        fig.legend(u.values(), [f"real: {k}" for k in u] , loc="lower right", bbox_to_anchor=(0.93, 0.155), ncol=len(u),
+                   fontsize=11.5, frameon=False)
     xmax = max(xe[-1], max([q.get("log2N", 0) for q in pts] + [0]) + 0.8)
     ticks = list(range(Ls[0], int(math.floor(xmax)) + 1))
     ax.set_xticks(ticks)
@@ -320,11 +329,12 @@ def figure(args):
     ax.set_yticks(als)
     ax.set_xlabel("log2 N  (= index qubits of the quantum sketch)")
     ax.set_ylabel("log d_eff / log N   (signal spread; 1 = all N features)")
-    ax.set_title("E11 · where do memory-limited classical sketches fail?\nsynthetic Gaussian family · exact BA 0.95 · red = never",
-                 loc="left", fontsize=15)
+    ax.set_title("E11 · in the synthetic model, one-pass sketches fail once the signal spreads over ≳ N^0.75 features; "
+                 "real tasks reach y = 0.74\nbut are still solved with S*/N ≤ 4e-3.\ncells: synthetic Gaussian family (exact BA 0.95), colour = best S*/N; "
+                 "points: real gene-pair tasks, colour = measured S*/N", loc="left", fontsize=12.5)
     import textwrap
-    fig.text(0.01, 0.01, "\n".join(textwrap.wrap(d["caption"], 150)), fontsize=12, va="bottom")
-    fig.tight_layout(rect=(0, 0.12, 1, 1))
+    fig.text(0.01, 0.01, "\n".join(textwrap.wrap(d["caption"], 165)), fontsize=11, va="bottom")
+    fig.tight_layout(rect=(0, 0.17, 1, 1))
     out = FIGURES / "fig_e11_advantage_map.png"
     fig.savefig(out)
     plt.close(fig)

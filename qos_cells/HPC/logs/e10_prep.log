@@ -1,0 +1,8 @@
+[e10 19:15:45] read h5ad (1265624, 35477) in 303 s; raw=True
+[e10 19:15:45] X from raw.X (raw counts), integer counts: True, nnz 2,545,339,623
+[e10 19:16:37] donor split: train 892,135 cells / 437 donors, test 373,489 / 188
+[e10 19:18:53] task 0 CD1c-positive myeloid dendritic cell: pos total 13207 (train 9232, test 3975), pi 1.04e-02, top genes ['CD74', 'HLA-DRA', 'CST3', 'HLA-DRB1', 'LYZ', 'HLA-DPB1']
+[e10 19:20:02] task 1 plasma cell: pos total 1672 (train 1252, test 420), pi 1.32e-03, top genes ['JCHAIN', 'IGHA1', 'IGKC', 'HSP90B1', 'TXNDC5', 'PPIB']
+[e10 19:21:18] task 2 hematopoietic stem cell: pos total 135 (train 103, test 32), pi 1.07e-04, top genes ['SNHG29', 'RPLP0', 'TMSB4X', 'RPS24', 'RPS4X', 'B2M']
+[e10 19:22:32] task 3 CD14-positive monocyte: pos total 202124 (train 142654, test 59470), pi 1.60e-01, top genes ['S100A8', 'S100A9', 'LYZ', 'FTL', 'FTH1', 'S100A6']
+[e10 19:22:32] prep done {'wall_seconds': 711.1, 'peak_ram_gb': 187.875, 'peak_vram_gb': 0.0}

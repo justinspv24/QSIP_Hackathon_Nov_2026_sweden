@@ -1,0 +1,350 @@
+{
+ "schema_version": 1,
+ "experiment": "e10_part_task2_pairs_K2048",
+ "created_utc": "2026-11-05T19:53:54+00:00",
+ "partial": true,
+ "config": {
+  "schema_version": 1,
+  "seed": 7,
+  "data": {
+   "dataset": "pbmc3k_processed",
+   "path": "data/pbmc3k_processed.h5ad",
+   "test_frac": 0.3,
+   "min_cells_per_gene": 3
+  },
+  "tasks": {
+   "positives": [
+    "B cells",
+    "Dendritic cells",
+    "Megakaryocytes"
+   ],
+   "gene_counts": [
+    4,
+    16,
+    256,
+    1024
+   ]
+  },
+  "sketch": {
+   "stream_mode": "uniform",
+   "tau_per_gene": 1.0,
+   "phase_limit": 1.5707963267948966,
+   "M_grid": [
+    1000,
+    3000,
+    10000,
+    30000,
+    100000,
+    300000,
+    1000000
+   ],
+   "repeats": 5
+  },
+  "scaling": {
+   "gene_counts": [
+    16,
+    64,
+    256,
+    1024
+   ],
+   "positive": "B cells",
+   "classifier_N": 1024
+  },
+  "imbalance": {
+   "pis": [
+    0.5,
+    0.1,
+    0.02,
+    0.005
+   ],
+   "N": 64,
+   "synthetic_cells_per_class": 4000,
+   "M_grid": [
+    3000,
+    10000,
+    30000,
+    100000,
+    300000,
+    1000000
+   ],
+   "repeats": 5
+  },
+  "circuits": {
+   "positive": "B cells",
+   "gene_counts": [
+    4,
+    16
+   ],
+   "cells_per_class": 4,
+   "shots": 2000,
+   "mock_alias": "garnet:mock"
+  },
+  "hardware": {
+   "N": 4,
+   "positive": "B cells",
+   "cells_per_class": 4,
+   "shots": 2000,
+   "n_calibration": 4,
+   "alpha_min": 0.3,
+   "preferred": [
+    "garnet",
+    "sirius"
+   ]
+  },
+  "resources": {
+   "feature_spaces": {
+    "all genes": 32768,
+    "gene pairs": 1073741824
+   },
+   "epsilon": 0.1,
+   "queries": 1,
+   "pi_rare": 0.014,
+   "logical_gate_rate_hz": 1000000.0
+  },
+  "experiment": {
+   "task": "hematopoietic stem cell",
+   "kind": "rare (pi ~ 1e-4)",
+   "space": "pairs",
+   "K": 2048,
+   "seeds": 3,
+   "M_over_N_grid": [
+    33,
+    100,
+    300,
+    900,
+    2700,
+    8100,
+    24300,
+    72900,
+    218700,
+    656100
+   ],
+   "max_records_per_seed": 100000000000.0,
+   "time_cap_min": 60.0,
+   "hashing_logreg_S": [],
+   "dataset": {
+    "source": {
+     "name": "AIDA Phase 1 Data Freeze v2 (Asian Immune Diversity Atlas), PBMC, 10x 5' v2",
+     "census_version": "2025-11-08",
+     "dataset_id": "c838aec3-03ef-4398-b882-0e3912abfff0",
+     "collection": "Asian Immune Diversity Atlas (AIDA)",
+     "url": "https://cellxgene-census-public-us-west-2.s3.us-west-2.amazonaws.com/cell-census/2025-11-08/h5ads/c838aec3-03ef-4398-b882-0e3912abfff0.h5ad",
+     "labels": "obs.cell_type (author annotation mapped to Cell Ontology by the submitters; curated, not re-clustered here)"
+    },
+    "sha256": "a5bce74985df8cbe8cf1f18877a1607ed556d99061dc08e7bdbc4dbae732c593",
+    "file_bytes": 14244724636,
+    "X_source": "raw.X (raw counts)",
+    "normalisation": "counts -> normalise to 1e4 per cell -> log1p (as PBMC3k .raw)",
+    "n_cells": 1265624,
+    "n_genes": 35477,
+    "nnz": 2545339623,
+    "n_donors": 625,
+    "split": "by donor (GroupShuffleSplit, test_size 0.3 of donors, seed 7)",
+    "n_train": 892135,
+    "n_test": 373489,
+    "n_train_donors": 437,
+    "n_test_donors": 188,
+    "subsampling": "none (all cells kept)",
+    "class_counts": {
+     "CD14-positive monocyte": 202124,
+     "naive thymus-derived CD4-positive, alpha-beta T cell": 157616,
+     "CD16-positive, CD56-dim natural killer cell, human": 151655,
+     "central memory CD4-positive, alpha-beta T cell": 110004,
+     "naive thymus-derived CD8-positive, alpha-beta T cell": 89029,
+     "T cell": 54800,
+     "CD8-positive, alpha-beta T cell": 53658,
+     "CD14-low, CD16-positive monocyte": 46628,
+     "CD8-positive, alpha-beta cytotoxic T cell": 46528,
+     "CD4-positive, alpha-beta T cell": 40100,
+     "naive B cell": 36778,
+     "memory B cell": 35114,
+     "gamma-delta T cell": 30695,
+     "CD8-positive, alpha-beta memory T cell": 28138,
+     "myeloid cell": 26020,
+     "effector memory CD4-positive, alpha-beta T cell": 25012,
+     "natural killer cell": 23234,
+     "mucosal invariant T cell": 23001,
+     "regulatory T cell": 15497,
+     "platelet": 14799,
+     "CD4-positive, alpha-beta cytotoxic T cell": 13594,
+     "CD1c-positive myeloid dendritic cell": 13207,
+     "B cell": 9144,
+     "CD16-negative, CD56-bright natural killer cell, human": 6152,
+     "mature B cell": 4850,
+     "plasmacytoid dendritic cell": 3796,
+     "plasma cell": 1672,
+     "pre-conventional dendritic cell": 894,
+     "innate lymphoid cell": 707,
+     "CD141-positive myeloid dendritic cell": 554,
+     "double negative T regulatory cell": 489,
+     "hematopoietic stem cell": 135
+    },
+    "prep_resources": {
+     "wall_seconds": 711.1,
+     "peak_ram_gb": 187.875,
+     "peak_vram_gb": 0.0
+    }
+   }
+  }
+ },
+ "git_commit": "ecf0b50e49a3e2b5d827b3405b08d1fcb7cdaef8-dirty",
+ "hostname": "quant1",
+ "hardware": {
+  "hostname": "quant1",
+  "cpu_count": 128,
+  "platform": "Linux-6.8.0-142-generic-x86_64-with-glibc2.39",
+  "python": "3.12.3",
+  "cpu_model": "AMD EPYC 7542 32-Core Processor",
+  "ram_gb": 2003.9,
+  "gpus_on_node": [
+   "0, NVIDIA RTX A6000, 49140 MiB, 575.57.08",
+   "1, NVIDIA RTX A6000, 49140 MiB, 575.57.08",
+   "2, NVIDIA RTX A6000, 49140 MiB, 575.57.08",
+   "3, NVIDIA RTX A6000, 49140 MiB, 575.57.08",
+   "4, NVIDIA RTX A6000, 49140 MiB, 575.57.08",
+   "5, NVIDIA RTX A6000, 49140 MiB, 575.57.08",
+   "6, NVIDIA RTX A6000, 49140 MiB, 575.57.08",
+   "7, NVIDIA RTX A6000, 49140 MiB, 575.57.08"
+  ],
+  "CUDA_VISIBLE_DEVICES": "1"
+ },
+ "resources": {
+  "wall_seconds": 510.9,
+  "peak_ram_gb": 84.53,
+  "peak_vram_gb": 31.823
+ },
+ "task": {
+  "task": "hematopoietic stem cell",
+  "kind": "rare (pi ~ 1e-4)",
+  "space": "pairs",
+  "K": 2048,
+  "N": 2098176,
+  "index_qubits": 22,
+  "n_train": 892135,
+  "n_test": 373489,
+  "n_train_pos": 103,
+  "n_test_pos": 32,
+  "n_pos_donors_train": 76,
+  "n_pos_donors_test": 19,
+  "pi_hat": 0.00011545337869268665,
+  "pi_atlas": 0.00010666675094656865,
+  "base_rate_test": 8.567856081437472e-05,
+  "abstain_rate_test": 0.0,
+  "abstain_rate_test_pos": 0.0,
+  "train_density": 0.16927130363440587,
+  "nnz_train": 316851546936,
+  "genes_head": [
+   "SNHG29",
+   "RPLP0",
+   "TMSB4X",
+   "RPS24",
+   "RPS4X",
+   "B2M",
+   "RPS2",
+   "RACK1",
+   "RPLP1",
+   "RPL5",
+   "RPS23",
+   "HLA-C"
+  ],
+  "exact_centroid": {
+   "balanced_accuracy": 0.9039800348500631,
+   "auprc": 0.4790164523326347,
+   "floats": 2098176,
+   "ints": 0,
+   "seeds": 0,
+   "bytes": 16785408
+  },
+  "d_eff": 7932.761197594914,
+  "delta_norm2": 4.512472217652956e-06,
+  "q_pos": 2.2835524900588243e-05,
+  "q_neg": 1.757646328167332e-05,
+  "M10_closed_form": 9197511127161.309,
+  "seconds": 450.9,
+  "logreg_full": {
+   "balanced_accuracy": 0.8281209834733316,
+   "auprc": 0.8784523446647691,
+   "floats": 2098177,
+   "ints": 0,
+   "seeds": 0,
+   "bytes": 16785416,
+   "n_iter": 27,
+   "converged": true,
+   "seconds": 27.8
+  },
+  "M_selection": [
+   {
+    "M_over_N": 2700,
+    "M": 5665075200,
+    "nonzero_records_mean": 958929888.3333334,
+    "balanced_accuracy_mean": 0.9146490593294544,
+    "balanced_accuracy_std": 0.008631729114872528,
+    "auprc_mean": 0.5409507520759659,
+    "auprc_std": 0.0380420943716447,
+    "rel_error_mean": 3.960062150627565,
+    "rel_error_seeds": [
+     3.9871809094083757,
+     3.9145567136670496,
+     3.9784488288072697
+    ],
+    "rel_error_predicted": 4.0293252128324255,
+    "quantum_sin_readout_balanced_accuracy_mean": 0.927993118462545,
+    "quantum_sin_readout_auprc_mean": 0.5744997116970483
+   },
+   {
+    "M_over_N": 8100,
+    "M": 16995225600,
+    "nonzero_records_mean": 2876912680.6666665,
+    "balanced_accuracy_mean": 0.8967216969869801,
+    "balanced_accuracy_std": 0.010521112524097459,
+    "auprc_mean": 0.4648652477228569,
+    "auprc_std": 0.03577815748126064,
+    "rel_error_mean": 2.35287341735924,
+    "rel_error_seeds": [
+     2.327542045832457,
+     2.3640342842882087,
+     2.3670439219570536
+    ],
+    "rel_error_predicted": 2.3263319962813465,
+    "quantum_sin_readout_balanced_accuracy_mean": 0.9063912896933247,
+    "quantum_sin_readout_auprc_mean": 0.49350999339253065
+   },
+   {
+    "M_over_N": 24300,
+    "M": 50985676800,
+    "nonzero_records_mean": 8630368801.333334,
+    "balanced_accuracy_mean": 0.908045206119223,
+    "balanced_accuracy_std": 0.0031129987352487747,
+    "auprc_mean": 0.4846219756427943,
+    "auprc_std": 0.03784359506583678,
+    "rel_error_mean": 1.341556632488962,
+    "rel_error_seeds": [
+     1.3163566229694807,
+     1.3650386502963445,
+     1.3432746242010607
+    ],
+    "rel_error_predicted": 1.343108404277475,
+    "quantum_sin_readout_balanced_accuracy_mean": 0.9085396851801768,
+    "quantum_sin_readout_auprc_mean": 0.5002229048326586
+   },
+   {
+    "M_over_N": 72900,
+    "M": 152957030400,
+    "nonzero_records_mean": 25891293061.666668,
+    "balanced_accuracy_mean": 0.9074248758893259,
+    "balanced_accuracy_std": 0.0016026372022890924,
+    "auprc_mean": 0.4947608857210159,
+    "auprc_std": 0.009315391866958804,
+    "rel_error_mean": 0.7790803205226756,
+    "rel_error_seeds": [
+     0.7734553722957976,
+     0.7807702889275767,
+     0.7830153003446526
+    ],
+    "rel_error_predicted": 0.7754439987604489,
+    "quantum_sin_readout_balanced_accuracy_mean": 0.9083696522178814,
+    "quantum_sin_readout_auprc_mean": 0.5071362128943303
+   }
+  ]
+ }
+}

@@ -1,0 +1,20 @@
+[e10 19:22:29] hematopoietic stem cell genes K=512: N=512, n=1,265,624 built in 32 s
+[e10 19:22:30] exact bal.acc 0.9505 auprc 0.6710 d_eff 94.9 pi 1.15e-04 test pos 32 M10 closed form 3.805e+09 (M/N 7.43e+06)
+[e10 19:22:31] logreg_full bal.acc 0.9687 auprc 0.7037 iters 14 [0 s]
+[e10 19:22:33] M/N=8100 stream bal.acc 0.9315±0.0365 auprc 0.232 rel.err 3.069 (pred 3.029) records 2.64e+06
+[e10 19:22:35] M/N=24300 stream bal.acc 0.9465±0.0130 auprc 0.579 rel.err 1.886 (pred 1.749) records 7.90e+06
+[e10 19:22:37] M/N=72900 stream bal.acc 0.9600±0.0057 auprc 0.659 rel.err 0.967 (pred 1.010) records 2.37e+07
+[e10 19:22:40] M/N=218700 stream bal.acc 0.9443±0.0263 auprc 0.642 rel.err 0.608 (pred 0.583) records 7.11e+07
+[e10 19:22:47] count_sketch       S* = 64 [6.8 s]
+[e10 19:22:54] hashing            S* = 256 [6.8 s]
+[e10 19:23:01] jl_sparse          S* = 32 [6.9 s]
+[e10 19:23:08] heavy_hitters_mg   S* = None [7.0 s]
+[e10 19:23:15] heavy_hitters_top  S* = 256 [6.7 s]
+[e10 19:23:22] reservoir          S* = None [7.1 s]
+[e10 19:23:23]   count_sketch       S*_stable None  S*_cell_stable 512
+[e10 19:23:23]   hashing            S*_stable 256  S*_cell_stable 256
+[e10 19:23:23]   jl_sparse          S*_stable 512  S*_cell_stable 512
+[e10 19:23:23]   heavy_hitters_mg   S*_stable None  S*_cell_stable None
+[e10 19:23:23]   heavy_hitters_top  S*_stable 256  S*_cell_stable 256
+[e10 19:23:23]   reservoir          S*_stable None  S*_cell_stable None
+[e10 19:23:23] done {'wall_seconds': 110.1, 'peak_ram_gb': 27.08, 'peak_vram_gb': 13.674}

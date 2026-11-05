@@ -101,10 +101,14 @@ def e9():
 def e10():
     d = hc.load_result("e10_atlas.json")
     tasks = [t for t in d["tasks"] if "methods" in t]
-    pairs = sorted([t for t in tasks if t["space"] == "pairs"], key=lambda t: t["pi_hat"])
+    pairs = sorted([t for t in tasks if t["space"] == "pairs" and t["K"] == 512], key=lambda t: t["pi_hat"])
     genes = {t["task"]: t for t in tasks if t["space"] == "genes"}
+    p2048 = {t["task"]: t for t in tasks if t["space"] == "pairs" and t["K"] == 2048}
     fig = plt.figure(figsize=(W, H))
-    gs = fig.add_gridspec(2, len(pairs) + 1, height_ratios=[1, 1], width_ratios=[1] * len(pairs) + [1.15])
+    gs = fig.add_gridspec(3, len(pairs) + 1, height_ratios=[1, 0.16, 0.95], width_ratios=[1] * len(pairs) + [1.25],
+                          hspace=0.35, wspace=0.3)
+    SHORT = {"CD1c-positive myeloid dendritic cell": "CD1c+ DC", "plasma cell": "plasma cell",
+             "hematopoietic stem cell": "HSC", "CD14-positive monocyte": "CD14+ mono"}
     for i, t in enumerate(pairs):
         ax = fig.add_subplot(gs[0, i])
         ex = t["exact_centroid"]["balanced_accuracy"]
@@ -124,8 +128,7 @@ def e10():
         ax.axvline(t["index_qubits"], color=RED, ls="--", lw=1.2)
         ax.set_xscale("log", base=2)
         ax.set_ylim(0.45, 1.02)
-        short = {"CD1c-positive myeloid dendritic cell": "CD1c+ DC", "plasma cell": "plasma cell",
-                 "hematopoietic stem cell": "HSC", "CD14-positive monocyte": "CD14+ mono"}.get(t["task"], t["task"])
+        short = SHORT.get(t["task"], t["task"])
         ax.set_title(f"{short}\nπ={t['pi_hat']:.1e} · {t['n_test_pos']} test pos", fontsize=12, loc="left")
         ax.set_xlabel("memory S (counters)", fontsize=11)
         ax.tick_params(labelsize=10)
@@ -134,7 +137,7 @@ def e10():
     # sample cost panel
     ax = fig.add_subplot(gs[:, -1])
     for space, mk, col in (("pairs", "o", INK), ("genes", "s", GOLD)):
-        ts = [t for t in tasks if t["space"] == space and t.get("sample_cost")]
+        ts = [t for t in tasks if t["space"] == space and t["K"] == 512 and t.get("sample_cost")]
         if not ts:
             continue
         x = np.array([1 / (t["pi_hat"] * (1 - t["pi_hat"])) for t in ts])
@@ -148,27 +151,43 @@ def e10():
     ax.set_xscale("log")
     ax.set_yscale("log")
     ax.set_xlabel("1 / (π(1−π))")
-    ax.set_ylabel("records for 10 % error,  M₁₀ / N")
-    ax.set_title("rare classes cost records, not memory", fontsize=13, loc="left")
-    ax.legend(fontsize=9.5, frameon=False, loc="upper left")
+    ax.set_ylabel("M₁₀ / N")
+    ax.set_title("sample cost\n(records for 10 % error)", fontsize=12.5, loc="left")
+    ax.legend(fontsize=8.5, frameon=False, loc="upper left")
+    # shared method legend
+    axl = fig.add_subplot(gs[1, :-1])
+    axl.axis("off")
+    hs = [plt.Line2D([], [], color=c, marker=m, ls="--" if k in ("heavy_hitters_top", "hashing_logreg") else "-", ms=5, lw=1.3)
+          for k, (c, m, _) in STYLE.items()]
+    hs += [plt.Line2D([], [], color=INK, ls=":", lw=1.2), plt.Line2D([], [], color=BLUE, ls="-.", lw=1),
+           plt.Line2D([], [], color=RED, ls="--", lw=1.2)]
+    axl.legend(hs, [v[2] for v in STYLE.values()] + ["exact centroid (±1 test cell band)", "logreg, all N", "log₂N qubits"],
+               ncol=5, fontsize=9.5, frameon=False, loc="center")
     # bottom row: summary table as text
-    axt = fig.add_subplot(gs[1, :-1])
+    axt = fig.add_subplot(gs[2, :-1])
     axt.axis("off")
-    hdr = ["task", "π", "test+", "exact", "logreg", "stream", "q-sim", "best one-pass S*", "d_eff"]
+    hdr = ["task", "π", "test +", "exact", "logreg", "stream", "q-sim", "best one-pass S* (method)", "d_eff"]
     lines = []
     for t in pairs:
         b = t.get("best_one_pass") or {}
         g = genes.get(t["task"])
-        lines.append([t["task"][:28], f"{t['pi_hat']:.1e}", str(t["n_test_pos"]),
+        lines.append([SHORT.get(t["task"], t["task"]) + " (pairs K=512)", f"{t['pi_hat']:.1e}", str(t["n_test_pos"]),
                       f"{t['exact_centroid']['balanced_accuracy']:.3f}", f"{t.get('logreg_full', {}).get('balanced_accuracy', float('nan')):.3f}",
                       f"{t['stream_full']['balanced_accuracy']:.3f}", f"{t['quantum_sim']['balanced_accuracy']:.3f}",
                       f"{b.get('S_star')} ({b.get('method', '-')})", f"{t['d_eff']:.0f}"])
+        t2 = p2048.get(t["task"])
+        if t2:
+            b2 = t2.get("best_one_pass") or {}
+            lines.append(["   pairs K=2048 (N=2.1M)", "", "", f"{t2['exact_centroid']['balanced_accuracy']:.3f}",
+                          f"{t2.get('logreg_full', {}).get('balanced_accuracy', float('nan')):.3f}", f"{t2['stream_full']['balanced_accuracy']:.3f}",
+                          f"{t2['quantum_sim']['balanced_accuracy']:.3f}", f"{b2.get('S_star')} ({b2.get('method', '-')})", f"{t2['d_eff']:.0f}"])
         if g:
             bg = g.get("best_one_pass") or {}
-            lines.append(["   genes only (N=512)", "", "", f"{g['exact_centroid']['balanced_accuracy']:.3f}",
+            lines.append(["   genes K=512 (N=512)", "", "", f"{g['exact_centroid']['balanced_accuracy']:.3f}",
                           f"{g.get('logreg_full', {}).get('balanced_accuracy', float('nan')):.3f}", f"{g['stream_full']['balanced_accuracy']:.3f}",
                           f"{g['quantum_sim']['balanced_accuracy']:.3f}", f"{bg.get('S_star')} ({bg.get('method', '-')})", f"{g['d_eff']:.0f}"])
-    tb = axt.table(cellText=lines, colLabels=hdr, loc="center", cellLoc="left", colLoc="left")
+    tb = axt.table(cellText=lines, colLabels=hdr, loc="center", cellLoc="left", colLoc="left",
+                   colWidths=[0.24, 0.075, 0.07, 0.065, 0.065, 0.065, 0.065, 0.26, 0.065])
     tb.auto_set_font_size(False)
     tb.set_fontsize(10.5)
     tb.scale(1, 1.35)
@@ -177,9 +196,10 @@ def e10():
         if r == 0:
             cell.set_text_props(weight="bold")
     ds = d["dataset"]
-    fig.suptitle(f"E10 · AIDA atlas ({ds['n_cells']:,} PBMCs, {ds['n_donors']} donors, curated labels, donor split): "
-                 "gene-pair task (N = 131,328) is solved by small classical sketches too", x=0.01, ha="left", fontsize=14)
-    fig.tight_layout(rect=(0, 0, 1, 0.94))
+    fig.suptitle(f"E10 · AIDA atlas ({ds['n_cells']:,} PBMCs, {ds['n_donors']} donors, curated labels, split by donor): small classical sketches\n"
+                 "(32–512 counters of N = 131,328) match the exact centroid for every task, π from 0.16 down to 1.2·10⁻⁴",
+                 x=0.01, y=0.995, ha="left", fontsize=13.5)
+    fig.subplots_adjust(left=0.05, right=0.985, top=0.83, bottom=0.08)
     out = hc.FIGURES / "fig_e10_atlas.png"
     fig.savefig(out)
     plt.close(fig)

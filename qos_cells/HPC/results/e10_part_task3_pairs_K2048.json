@@ -1,0 +1,3028 @@
+{
+ "schema_version": 1,
+ "experiment": "e10_part_task3_pairs_K2048",
+ "created_utc": "2026-11-05T19:44:12+00:00",
+ "partial": false,
+ "config": {
+  "schema_version": 1,
+  "seed": 7,
+  "data": {
+   "dataset": "pbmc3k_processed",
+   "path": "data/pbmc3k_processed.h5ad",
+   "test_frac": 0.3,
+   "min_cells_per_gene": 3
+  },
+  "tasks": {
+   "positives": [
+    "B cells",
+    "Dendritic cells",
+    "Megakaryocytes"
+   ],
+   "gene_counts": [
+    4,
+    16,
+    256,
+    1024
+   ]
+  },
+  "sketch": {
+   "stream_mode": "uniform",
+   "tau_per_gene": 1.0,
+   "phase_limit": 1.5707963267948966,
+   "M_grid": [
+    1000,
+    3000,
+    10000,
+    30000,
+    100000,
+    300000,
+    1000000
+   ],
+   "repeats": 5
+  },
+  "scaling": {
+   "gene_counts": [
+    16,
+    64,
+    256,
+    1024
+   ],
+   "positive": "B cells",
+   "classifier_N": 1024
+  },
+  "imbalance": {
+   "pis": [
+    0.5,
+    0.1,
+    0.02,
+    0.005
+   ],
+   "N": 64,
+   "synthetic_cells_per_class": 4000,
+   "M_grid": [
+    3000,
+    10000,
+    30000,
+    100000,
+    300000,
+    1000000
+   ],
+   "repeats": 5
+  },
+  "circuits": {
+   "positive": "B cells",
+   "gene_counts": [
+    4,
+    16
+   ],
+   "cells_per_class": 4,
+   "shots": 2000,
+   "mock_alias": "garnet:mock"
+  },
+  "hardware": {
+   "N": 4,
+   "positive": "B cells",
+   "cells_per_class": 4,
+   "shots": 2000,
+   "n_calibration": 4,
+   "alpha_min": 0.3,
+   "preferred": [
+    "garnet",
+    "sirius"
+   ]
+  },
+  "resources": {
+   "feature_spaces": {
+    "all genes": 32768,
+    "gene pairs": 1073741824
+   },
+   "epsilon": 0.1,
+   "queries": 1,
+   "pi_rare": 0.014,
+   "logical_gate_rate_hz": 1000000.0
+  },
+  "experiment": {
+   "task": "CD14-positive monocyte",
+   "kind": "common (pi ~ 0.16)",
+   "space": "pairs",
+   "K": 2048,
+   "seeds": 3,
+   "M_over_N_grid": [
+    33,
+    100,
+    300,
+    900,
+    2700,
+    8100,
+    24300,
+    72900,
+    218700,
+    656100
+   ],
+   "max_records_per_seed": 4000000000.0,
+   "time_cap_min": 40.0,
+   "hashing_logreg_S": [],
+   "dataset": {
+    "source": {
+     "name": "AIDA Phase 1 Data Freeze v2 (Asian Immune Diversity Atlas), PBMC, 10x 5' v2",
+     "census_version": "2025-11-08",
+     "dataset_id": "c838aec3-03ef-4398-b882-0e3912abfff0",
+     "collection": "Asian Immune Diversity Atlas (AIDA)",
+     "url": "https://cellxgene-census-public-us-west-2.s3.us-west-2.amazonaws.com/cell-census/2025-11-08/h5ads/c838aec3-03ef-4398-b882-0e3912abfff0.h5ad",
+     "labels": "obs.cell_type (author annotation mapped to Cell Ontology by the submitters; curated, not re-clustered here)"
+    },
+    "sha256": "a5bce74985df8cbe8cf1f18877a1607ed556d99061dc08e7bdbc4dbae732c593",
+    "file_bytes": 14244724636,
+    "X_source": "raw.X (raw counts)",
+    "normalisation": "counts -> normalise to 1e4 per cell -> log1p (as PBMC3k .raw)",
+    "n_cells": 1265624,
+    "n_genes": 35477,
+    "nnz": 2545339623,
+    "n_donors": 625,
+    "split": "by donor (GroupShuffleSplit, test_size 0.3 of donors, seed 7)",
+    "n_train": 892135,
+    "n_test": 373489,
+    "n_train_donors": 437,
+    "n_test_donors": 188,
+    "subsampling": "none (all cells kept)",
+    "class_counts": {
+     "CD14-positive monocyte": 202124,
+     "naive thymus-derived CD4-positive, alpha-beta T cell": 157616,
+     "CD16-positive, CD56-dim natural killer cell, human": 151655,
+     "central memory CD4-positive, alpha-beta T cell": 110004,
+     "naive thymus-derived CD8-positive, alpha-beta T cell": 89029,
+     "T cell": 54800,
+     "CD8-positive, alpha-beta T cell": 53658,
+     "CD14-low, CD16-positive monocyte": 46628,
+     "CD8-positive, alpha-beta cytotoxic T cell": 46528,
+     "CD4-positive, alpha-beta T cell": 40100,
+     "naive B cell": 36778,
+     "memory B cell": 35114,
+     "gamma-delta T cell": 30695,
+     "CD8-positive, alpha-beta memory T cell": 28138,
+     "myeloid cell": 26020,
+     "effector memory CD4-positive, alpha-beta T cell": 25012,
+     "natural killer cell": 23234,
+     "mucosal invariant T cell": 23001,
+     "regulatory T cell": 15497,
+     "platelet": 14799,
+     "CD4-positive, alpha-beta cytotoxic T cell": 13594,
+     "CD1c-positive myeloid dendritic cell": 13207,
+     "B cell": 9144,
+     "CD16-negative, CD56-bright natural killer cell, human": 6152,
+     "mature B cell": 4850,
+     "plasmacytoid dendritic cell": 3796,
+     "plasma cell": 1672,
+     "pre-conventional dendritic cell": 894,
+     "innate lymphoid cell": 707,
+     "CD141-positive myeloid dendritic cell": 554,
+     "double negative T regulatory cell": 489,
+     "hematopoietic stem cell": 135
+    },
+    "prep_resources": {
+     "wall_seconds": 711.1,
+     "peak_ram_gb": 187.875,
+     "peak_vram_gb": 0.0
+    }
+   }
+  }
+ },
+ "git_commit": "ecf0b50e49a3e2b5d827b3405b08d1fcb7cdaef8-dirty",
+ "hostname": "quant1",
+ "hardware": {
+  "hostname": "quant1",
+  "cpu_count": 128,
+  "platform": "Linux-6.8.0-142-generic-x86_64-with-glibc2.39",
+  "python": "3.12.3",
+  "cpu_model": "AMD EPYC 7542 32-Core Processor",
+  "ram_gb": 2003.9,
+  "gpus_on_node": [
+   "0, NVIDIA RTX A6000, 49140 MiB, 575.57.08",
+   "1, NVIDIA RTX A6000, 49140 MiB, 575.57.08",
+   "2, NVIDIA RTX A6000, 49140 MiB, 575.57.08",
+   "3, NVIDIA RTX A6000, 49140 MiB, 575.57.08",
+   "4, NVIDIA RTX A6000, 49140 MiB, 575.57.08",
+   "5, NVIDIA RTX A6000, 49140 MiB, 575.57.08",
+   "6, NVIDIA RTX A6000, 49140 MiB, 575.57.08",
+   "7, NVIDIA RTX A6000, 49140 MiB, 575.57.08"
+  ],
+  "CUDA_VISIBLE_DEVICES": "3"
+ },
+ "resources": {
+  "wall_seconds": 773.8,
+  "peak_ram_gb": 83.726,
+  "peak_vram_gb": 31.855
+ },
+ "task": {
+  "task": "CD14-positive monocyte",
+  "kind": "common (pi ~ 0.16)",
+  "space": "pairs",
+  "K": 2048,
+  "N": 2098176,
+  "index_qubits": 22,
+  "n_train": 892135,
+  "n_test": 373489,
+  "n_train_pos": 142654,
+  "n_test_pos": 59470,
+  "n_pos_donors_train": 414,
+  "n_pos_donors_test": 181,
+  "pi_hat": 0.15990180858278175,
+  "pi_atlas": 0.15970303976536476,
+  "base_rate_test": 0.15922825036346452,
+  "abstain_rate_test": 0.0,
+  "abstain_rate_test_pos": 0.0,
+  "train_density": 0.1636850465039848,
+  "nnz_train": 306394876636,
+  "genes_head": [
+   "S100A8",
+   "S100A9",
+   "LYZ",
+   "FTL",
+   "FTH1",
+   "S100A6",
+   "CST3",
+   "TYROBP",
+   "IFI30",
+   "RPS27",
+   "NEAT1",
+   "S100A4"
+  ],
+  "exact_centroid": {
+   "balanced_accuracy": 0.9627343240881064,
+   "auprc": 0.9090819950993114,
+   "floats": 2098176,
+   "ints": 0,
+   "seeds": 0,
+   "bytes": 16785408
+  },
+  "d_eff": 6350.993365932253,
+  "delta_norm2": 5.648425833678355e-06,
+  "q_pos": 1.2599403691946956e-05,
+  "q_neg": 1.948713914551503e-05,
+  "M10_closed_form": 3788574898.5626655,
+  "seconds": 711.1,
+  "logreg_full": {
+   "balanced_accuracy": 0.9866705087825693,
+   "auprc": 0.9951399988991322,
+   "floats": 2098177,
+   "ints": 0,
+   "seeds": 0,
+   "bytes": 16785416,
+   "n_iter": 300,
+   "converged": false,
+   "seconds": 289.7
+  },
+  "M_selection": [
+   {
+    "M_over_N": 33,
+    "M": 69239808,
+    "nonzero_records_mean": 11332003.333333334,
+    "balanced_accuracy_mean": 0.9625030427447182,
+    "balanced_accuracy_std": 0.0011025822374610232,
+    "auprc_mean": 0.909072587629308,
+    "auprc_std": 0.0018031297300519539,
+    "rel_error_mean": 0.7435461681509995,
+    "rel_error_seeds": [
+     0.7506568092743652,
+     0.7362039690407117,
+     0.7437777261379213
+    ],
+    "rel_error_predicted": 0.7397074815863781,
+    "quantum_sin_readout_balanced_accuracy_mean": 0.9623341182645793,
+    "quantum_sin_readout_auprc_mean": 0.9083070981871884
+   },
+   {
+    "M_over_N": 100,
+    "M": 209817600,
+    "nonzero_records_mean": 34340043.0,
+    "balanced_accuracy_mean": 0.9627224220558482,
+    "balanced_accuracy_std": 0.00028584089788829907,
+    "auprc_mean": 0.9092780116332965,
+    "auprc_std": 0.000496341970309892,
+    "rel_error_mean": 0.424928038747377,
+    "rel_error_seeds": [
+     0.4263118067165104,
+     0.4227855462064841,
+     0.4256867633191363
+    ],
+    "rel_error_predicted": 0.42492959680858244,
+    "quantum_sin_readout_balanced_accuracy_mean": 0.962385361095316,
+    "quantum_sin_readout_auprc_mean": 0.9080612671970023
+   }
+  ],
+  "M_converged_over_N": 33,
+  "M_run": 209817600,
+  "M_run_over_N": 100,
+  "M_rule": "start at the grid M one step below the first with predicted rel. error <= 2.5; converged = stream bal.acc >= exact - 0.01 and rel. error < 1; run one grid step beyond; capped by records/seed and time",
+  "stream_full": {
+   "balanced_accuracy": 0.9627224220558482,
+   "auprc": 0.9092780116332965,
+   "balanced_accuracy_std": 0.00028584089788829907,
+   "floats": 2098176,
+   "ints": 0,
+   "seeds": 0,
+   "bytes": 16785408,
+   "nonzero_records_mean": 34340043.0
+  },
+  "quantum_sim": {
+   "index_qubits": 22,
+   "balanced_accuracy": 0.962385361095316,
+   "auprc": 0.9080612671970023,
+   "M": 209817600,
+   "note": "classical simulation of the oracle sketch (p.sin(c phi)); NOT run on hardware"
+  },
+  "sample_cost": {
+   "M10_measured": 3808221614.445217,
+   "M10_closed_form": 3788574898.5626655,
+   "ratio_measured_over_closed": 1.0051857799855046,
+   "fitted_slope": -0.5046720375529001,
+   "law_constant_kappa": 5089314.660728726,
+   "M10_times_pi_1mpi_over_N": 243.8168545839943,
+   "rule": "rel_err(M) = ||phi_M - Delta|| / ||Delta||, mean over seeds; M10 = M with rel_err = 0.1 from the c/sqrt(M) fit"
+  },
+  "S_grid": [
+   8,
+   16,
+   32,
+   64,
+   128,
+   256,
+   512,
+   1024,
+   2048,
+   4096,
+   8192,
+   16384,
+   32768,
+   65536,
+   131072,
+   262144,
+   524288,
+   1048576,
+   2097152,
+   2098176
+  ],
+  "methods": {
+   "count_sketch": {
+    "label": "count-sketch (3 rows, median)",
+    "rows": [
+     {
+      "S": 8,
+      "floats": 6,
+      "ints": 0,
+      "seeds": 6,
+      "bytes": 96,
+      "balanced_accuracy_mean": 0.6968851799366789,
+      "balanced_accuracy_std": 0.14560423365112307,
+      "auprc_mean": 0.36449352519518924,
+      "auprc_std": 0.18887389187769288,
+      "balanced_accuracy_seeds": [
+       0.7364,
+       0.5021,
+       0.8521
+      ],
+      "auprc_seeds": [
+       0.4016,
+       0.1169,
+       0.575
+      ]
+     },
+     {
+      "S": 16,
+      "floats": 15,
+      "ints": 0,
+      "seeds": 6,
+      "bytes": 168,
+      "balanced_accuracy_mean": 0.9065073234134388,
+      "balanced_accuracy_std": 0.03774691521479984,
+      "auprc_mean": 0.7287292452718703,
+      "auprc_std": 0.0915195681246576,
+      "balanced_accuracy_seeds": [
+       0.9464,
+       0.9173,
+       0.8558
+      ],
+      "auprc_seeds": [
+       0.7367,
+       0.8366,
+       0.6129
+      ]
+     },
+     {
+      "S": 32,
+      "floats": 30,
+      "ints": 0,
+      "seeds": 6,
+      "bytes": 288,
+      "balanced_accuracy_mean": 0.9485987728806453,
+      "balanced_accuracy_std": 0.0026928338889069085,
+      "auprc_mean": 0.7671019891659263,
+      "auprc_std": 0.047143697109894675,
+      "balanced_accuracy_seeds": [
+       0.9449,
+       0.9496,
+       0.9513
+      ],
+      "auprc_seeds": [
+       0.7004,
+       0.8002,
+       0.8007
+      ]
+     },
+     {
+      "S": 64,
+      "floats": 63,
+      "ints": 0,
+      "seeds": 6,
+      "bytes": 552,
+      "balanced_accuracy_mean": 0.949915266823103,
+      "balanced_accuracy_std": 0.004024300493850675,
+      "auprc_mean": 0.7422373277352888,
+      "auprc_std": 0.08136222236981575,
+      "balanced_accuracy_seeds": [
+       0.9504,
+       0.9546,
+       0.9447
+      ],
+      "auprc_seeds": [
+       0.7446,
+       0.8407,
+       0.6414
+      ]
+     },
+     {
+      "S": 128,
+      "floats": 126,
+      "ints": 0,
+      "seeds": 6,
+      "bytes": 1056,
+      "balanced_accuracy_mean": 0.9539773949963214,
+      "balanced_accuracy_std": 0.0011852121407445121,
+      "auprc_mean": 0.8077897917322453,
+      "auprc_std": 0.02985223523520691,
+      "balanced_accuracy_seeds": [
+       0.9551,
+       0.9545,
+       0.9523
+      ],
+      "auprc_seeds": [
+       0.8249,
+       0.8327,
+       0.7658
+      ]
+     },
+     {
+      "S": 256,
+      "floats": 255,
+      "ints": 0,
+      "seeds": 6,
+      "bytes": 2088,
+      "balanced_accuracy_mean": 0.9620554297145113,
+      "balanced_accuracy_std": 0.0016942513443999672,
+      "auprc_mean": 0.8917788314481422,
+      "auprc_std": 0.018860846916686554,
+      "balanced_accuracy_seeds": [
+       0.9619,
+       0.9642,
+       0.96
+      ],
+      "auprc_seeds": [
+       0.9012,
+       0.9087,
+       0.8655
+      ]
+     },
+     {
+      "S": 512,
+      "floats": 510,
+      "ints": 0,
+      "seeds": 6,
+      "bytes": 4128,
+      "balanced_accuracy_mean": 0.9643886597350395,
+      "balanced_accuracy_std": 0.004066924422838632,
+      "auprc_mean": 0.9031722267930681,
+      "auprc_std": 0.01997466114154221,
+      "balanced_accuracy_seeds": [
+       0.968,
+       0.9665,
+       0.9587
+      ],
+      "auprc_seeds": [
+       0.9138,
+       0.9205,
+       0.8752
+      ]
+     },
+     {
+      "S": 1024,
+      "floats": 1023,
+      "ints": 0,
+      "seeds": 6,
+      "bytes": 8232,
+      "balanced_accuracy_mean": 0.9621322540403175,
+      "balanced_accuracy_std": 0.002410027348019866,
+      "auprc_mean": 0.9059590724585832,
+      "auprc_std": 0.010493606970680238,
+      "balanced_accuracy_seeds": [
+       0.9635,
+       0.9587,
+       0.9641
+      ],
+      "auprc_seeds": [
+       0.9175,
+       0.8921,
+       0.9083
+      ]
+     },
+     {
+      "S": 2048,
+      "floats": 2046,
+      "ints": 0,
+      "seeds": 6,
+      "bytes": 16416,
+      "balanced_accuracy_mean": 0.9630399261575038,
+      "balanced_accuracy_std": 0.0009345475792327685,
+      "auprc_mean": 0.908349025041345,
+      "auprc_std": 0.0023035403666956306,
+      "balanced_accuracy_seeds": [
+       0.9626,
+       0.9622,
+       0.9643
+      ],
+      "auprc_seeds": [
+       0.9099,
+       0.9051,
+       0.91
+      ]
+     },
+     {
+      "S": 4096,
+      "floats": 4095,
+      "ints": 0,
+      "seeds": 6,
+      "bytes": 32808,
+      "balanced_accuracy_mean": 0.961190767814691,
+      "balanced_accuracy_std": 0.00315540814875034,
+      "auprc_mean": 0.9038559661056181,
+      "auprc_std": 0.00543805023300673,
+      "balanced_accuracy_seeds": [
+       0.9617,
+       0.9648,
+       0.9571
+      ],
+      "auprc_seeds": [
+       0.9009,
+       0.9115,
+       0.8992
+      ]
+     },
+     {
+      "S": 8192,
+      "floats": 8190,
+      "ints": 0,
+      "seeds": 6,
+      "bytes": 65568,
+      "balanced_accuracy_mean": 0.9612823175811794,
+      "balanced_accuracy_std": 0.0008956989005269192,
+      "auprc_mean": 0.9082598981757256,
+      "auprc_std": 0.0019256172253753142,
+      "balanced_accuracy_seeds": [
+       0.9607,
+       0.9625,
+       0.9606
+      ],
+      "auprc_seeds": [
+       0.9066,
+       0.911,
+       0.9072
+      ]
+     },
+     {
+      "S": 16384,
+      "floats": 16383,
+      "ints": 0,
+      "seeds": 6,
+      "bytes": 131112,
+      "balanced_accuracy_mean": 0.9615066772998778,
+      "balanced_accuracy_std": 0.00011829103752186318,
+      "auprc_mean": 0.9099897424168552,
+      "auprc_std": 0.0005090345325382173,
+      "balanced_accuracy_seeds": [
+       0.9614,
+       0.9617,
+       0.9614
+      ],
+      "auprc_seeds": [
+       0.9103,
+       0.9093,
+       0.9104
+      ]
+     },
+     {
+      "S": 32768,
+      "floats": 32766,
+      "ints": 0,
+      "seeds": 6,
+      "bytes": 262176,
+      "balanced_accuracy_mean": 0.9612905351742368,
+      "balanced_accuracy_std": 0.0007669324229444289,
+      "auprc_mean": 0.9091275248228352,
+      "auprc_std": 0.0007739625679577882,
+      "balanced_accuracy_seeds": [
+       0.9622,
+       0.9614,
+       0.9603
+      ],
+      "auprc_seeds": [
+       0.9099,
+       0.9081,
+       0.9094
+      ]
+     },
+     {
+      "S": 65536,
+      "floats": 65535,
+      "ints": 0,
+      "seeds": 6,
+      "bytes": 524328,
+      "balanced_accuracy_mean": 0.963294488353355,
+      "balanced_accuracy_std": 0.000414742278403772,
+      "auprc_mean": 0.9096674832472281,
+      "auprc_std": 0.0004116237253842871,
+      "balanced_accuracy_seeds": [
+       0.9628,
+       0.9633,
+       0.9638
+      ],
+      "auprc_seeds": [
+       0.9091,
+       0.9099,
+       0.91
+      ]
+     },
+     {
+      "S": 131072,
+      "floats": 131070,
+      "ints": 0,
+      "seeds": 6,
+      "bytes": 1048608,
+      "balanced_accuracy_mean": 0.9631657329576524,
+      "balanced_accuracy_std": 9.56144889435547e-05,
+      "auprc_mean": 0.9095061022265813,
+      "auprc_std": 0.0004864424334927841,
+      "balanced_accuracy_seeds": [
+       0.9632,
+       0.963,
+       0.9632
+      ],
+      "auprc_seeds": [
+       0.91,
+       0.9088,
+       0.9097
+      ]
+     },
+     {
+      "S": 262144,
+      "floats": 262143,
+      "ints": 0,
+      "seeds": 6,
+      "bytes": 2097192,
+      "balanced_accuracy_mean": 0.962835540733885,
+      "balanced_accuracy_std": 0.00013629921649588057,
+      "auprc_mean": 0.9093015368633753,
+      "auprc_std": 0.00016371481480085512,
+      "balanced_accuracy_seeds": [
+       0.9628,
+       0.9627,
+       0.963
+      ],
+      "auprc_seeds": [
+       0.9094,
+       0.9091,
+       0.9094
+      ]
+     },
+     {
+      "S": 524288,
+      "floats": 524286,
+      "ints": 0,
+      "seeds": 6,
+      "bytes": 4194336,
+      "balanced_accuracy_mean": 0.9627067287911194,
+      "balanced_accuracy_std": 0.0002820054022141654,
+      "auprc_mean": 0.9091551148967335,
+      "auprc_std": 0.0005077448303769393,
+      "balanced_accuracy_seeds": [
+       0.9629,
+       0.9623,
+       0.9629
+      ],
+      "auprc_seeds": [
+       0.9097,
+       0.9085,
+       0.9093
+      ]
+     },
+     {
+      "S": 1048576,
+      "floats": 1048575,
+      "ints": 0,
+      "seeds": 6,
+      "bytes": 8388648,
+      "balanced_accuracy_mean": 0.9627894132347219,
+      "balanced_accuracy_std": 0.00024777417808705647,
+      "auprc_mean": 0.9093022193126923,
+      "auprc_std": 0.0005957715953756272,
+      "balanced_accuracy_seeds": [
+       0.963,
+       0.9625,
+       0.9629
+      ],
+      "auprc_seeds": [
+       0.91,
+       0.9085,
+       0.9094
+      ]
+     },
+     {
+      "S": 2097152,
+      "floats": 2097150,
+      "ints": 0,
+      "seeds": 6,
+      "bytes": 16777248,
+      "balanced_accuracy_mean": 0.9626978663955433,
+      "balanced_accuracy_std": 0.00026774130957506306,
+      "auprc_mean": 0.9092358448241127,
+      "auprc_std": 0.0005348165835209826,
+      "balanced_accuracy_seeds": [
+       0.9629,
+       0.9623,
+       0.9629
+      ],
+      "auprc_seeds": [
+       0.9098,
+       0.9085,
+       0.9094
+      ]
+     },
+     {
+      "S": 2098176,
+      "floats": 2098176,
+      "ints": 0,
+      "seeds": 6,
+      "bytes": 16785456,
+      "balanced_accuracy_mean": 0.9627204555728271,
+      "balanced_accuracy_std": 0.0003173642227746693,
+      "auprc_mean": 0.9092513903684036,
+      "auprc_std": 0.000524602871940879,
+      "balanced_accuracy_seeds": [
+       0.963,
+       0.9623,
+       0.9628
+      ],
+      "auprc_seeds": [
+       0.9098,
+       0.9085,
+       0.9095
+      ]
+     }
+    ],
+    "seeds": 3,
+    "S_star": 128,
+    "S_star_over_N": 6.1005368472425575e-05,
+    "bytes_at_S_star": 1056,
+    "seconds": 48.1,
+    "S_star_stable": 128,
+    "S_star_stable_over_N": 6.1005368472425575e-05,
+    "S_star_stream": 128,
+    "S_star_stream_over_N": 6.1005368472425575e-05,
+    "S_star_stream_stable": 128,
+    "S_star_stream_stable_over_N": 6.1005368472425575e-05,
+    "S_star_auprc": 512,
+    "S_star_auprc_over_N": 0.0002440214738897023,
+    "S_star_cell": 128,
+    "S_star_cell_over_N": 6.1005368472425575e-05,
+    "S_star_cell_stable": 128,
+    "S_star_cell_stable_over_N": 6.1005368472425575e-05,
+    "bytes_at_S_star_cell_stable": 1056
+   },
+   "hashing": {
+    "label": "feature hashing (signed, 1 row)",
+    "rows": [
+     {
+      "S": 8,
+      "floats": 8,
+      "ints": 0,
+      "seeds": 2,
+      "bytes": 80,
+      "balanced_accuracy_mean": 0.8661166165165705,
+      "balanced_accuracy_std": 0.012558787194925713,
+      "auprc_mean": 0.6679202267933081,
+      "auprc_std": 0.03369314294377893,
+      "balanced_accuracy_seeds": [
+       0.8725,
+       0.8486,
+       0.8773
+      ],
+      "auprc_seeds": [
+       0.6305,
+       0.6612,
+       0.7122
+      ]
+     },
+     {
+      "S": 16,
+      "floats": 16,
+      "ints": 0,
+      "seeds": 2,
+      "bytes": 144,
+      "balanced_accuracy_mean": 0.9272616064136102,
+      "balanced_accuracy_std": 0.01129104619652516,
+      "auprc_mean": 0.8000903981871952,
+      "auprc_std": 0.01861707129842616,
+      "balanced_accuracy_seeds": [
+       0.9355,
+       0.935,
+       0.9113
+      ],
+      "auprc_seeds": [
+       0.8227,
+       0.7771,
+       0.8004
+      ]
+     },
+     {
+      "S": 32,
+      "floats": 32,
+      "ints": 0,
+      "seeds": 2,
+      "bytes": 272,
+      "balanced_accuracy_mean": 0.9473832691101225,
+      "balanced_accuracy_std": 0.005908558049187688,
+      "auprc_mean": 0.8461460540534098,
+      "auprc_std": 0.010632017982238368,
+      "balanced_accuracy_seeds": [
+       0.954,
+       0.9484,
+       0.9397
+      ],
+      "auprc_seeds": [
+       0.8575,
+       0.8319,
+       0.849
+      ]
+     },
+     {
+      "S": 64,
+      "floats": 64,
+      "ints": 0,
+      "seeds": 2,
+      "bytes": 528,
+      "balanced_accuracy_mean": 0.9517269984712421,
+      "balanced_accuracy_std": 0.005975454170994935,
+      "auprc_mean": 0.8484406531761595,
+      "auprc_std": 0.02618787330568092,
+      "balanced_accuracy_seeds": [
+       0.9595,
+       0.9506,
+       0.945
+      ],
+      "auprc_seeds": [
+       0.8846,
+       0.8234,
+       0.8373
+      ]
+     },
+     {
+      "S": 128,
+      "floats": 128,
+      "ints": 0,
+      "seeds": 2,
+      "bytes": 1040,
+      "balanced_accuracy_mean": 0.9545205045388355,
+      "balanced_accuracy_std": 0.0037103697790553665,
+      "auprc_mean": 0.8254479618733918,
+      "auprc_std": 0.06265536139685307,
+      "balanced_accuracy_seeds": [
+       0.9565,
+       0.9493,
+       0.9577
+      ],
+      "auprc_seeds": [
+       0.8521,
+       0.7389,
+       0.8853
+      ]
+     },
+     {
+      "S": 256,
+      "floats": 256,
+      "ints": 0,
+      "seeds": 2,
+      "bytes": 2064,
+      "balanced_accuracy_mean": 0.9567498818708559,
+      "balanced_accuracy_std": 0.00310866087758615,
+      "auprc_mean": 0.866050073834049,
+      "auprc_std": 0.021455436809186483,
+      "balanced_accuracy_seeds": [
+       0.9593,
+       0.9524,
+       0.9585
+      ],
+      "auprc_seeds": [
+       0.8655,
+       0.84,
+       0.8926
+      ]
+     },
+     {
+      "S": 512,
+      "floats": 512,
+      "ints": 0,
+      "seeds": 2,
+      "bytes": 4112,
+      "balanced_accuracy_mean": 0.956348308511585,
+      "balanced_accuracy_std": 0.0019430858321884703,
+      "auprc_mean": 0.8750215528087216,
+      "auprc_std": 0.018769195903405457,
+      "balanced_accuracy_seeds": [
+       0.9578,
+       0.9536,
+       0.9576
+      ],
+      "auprc_seeds": [
+       0.8765,
+       0.8514,
+       0.8973
+      ]
+     },
+     {
+      "S": 1024,
+      "floats": 1024,
+      "ints": 0,
+      "seeds": 2,
+      "bytes": 8208,
+      "balanced_accuracy_mean": 0.9564617332184714,
+      "balanced_accuracy_std": 0.0008403919799796539,
+      "auprc_mean": 0.8795548972871385,
+      "auprc_std": 0.021410877958619647,
+      "balanced_accuracy_seeds": [
+       0.9557,
+       0.956,
+       0.9576
+      ],
+      "auprc_seeds": [
+       0.8499,
+       0.889,
+       0.8997
+      ]
+     },
+     {
+      "S": 2048,
+      "floats": 2048,
+      "ints": 0,
+      "seeds": 2,
+      "bytes": 16400,
+      "balanced_accuracy_mean": 0.9589830130764446,
+      "balanced_accuracy_std": 0.0010516189396973924,
+      "auprc_mean": 0.9052431232098458,
+      "auprc_std": 0.001517692372472593,
+      "balanced_accuracy_seeds": [
+       0.9587,
+       0.9604,
+       0.9579
+      ],
+      "auprc_seeds": [
+       0.9032,
+       0.9068,
+       0.9057
+      ]
+     },
+     {
+      "S": 4096,
+      "floats": 4096,
+      "ints": 0,
+      "seeds": 2,
+      "bytes": 32784,
+      "balanced_accuracy_mean": 0.9578965430459746,
+      "balanced_accuracy_std": 0.0009788588146099645,
+      "auprc_mean": 0.9046286005716411,
+      "auprc_std": 0.002536452479546788,
+      "balanced_accuracy_seeds": [
+       0.9565,
+       0.9587,
+       0.9584
+      ],
+      "auprc_seeds": [
+       0.9014,
+       0.9049,
+       0.9076
+      ]
+     },
+     {
+      "S": 8192,
+      "floats": 8192,
+      "ints": 0,
+      "seeds": 2,
+      "bytes": 65552,
+      "balanced_accuracy_mean": 0.9601331953504316,
+      "balanced_accuracy_std": 0.002485626158649764,
+      "auprc_mean": 0.9078532633840907,
+      "auprc_std": 0.003941599120188954,
+      "balanced_accuracy_seeds": [
+       0.9566,
+       0.9619,
+       0.9619
+      ],
+      "auprc_seeds": [
+       0.9023,
+       0.9099,
+       0.9113
+      ]
+     },
+     {
+      "S": 16384,
+      "floats": 16384,
+      "ints": 0,
+      "seeds": 2,
+      "bytes": 131088,
+      "balanced_accuracy_mean": 0.9610213711005328,
+      "balanced_accuracy_std": 0.0005930576576795536,
+      "auprc_mean": 0.9088740469142494,
+      "auprc_std": 0.000665223029396413,
+      "balanced_accuracy_seeds": [
+       0.9611,
+       0.9603,
+       0.9617
+      ],
+      "auprc_seeds": [
+       0.9083,
+       0.9086,
+       0.9098
+      ]
+     },
+     {
+      "S": 32768,
+      "floats": 32768,
+      "ints": 0,
+      "seeds": 2,
+      "bytes": 262160,
+      "balanced_accuracy_mean": 0.9608814327466594,
+      "balanced_accuracy_std": 0.0011577752201629766,
+      "auprc_mean": 0.9085623678323684,
+      "auprc_std": 0.0011731777870929484,
+      "balanced_accuracy_seeds": [
+       0.9593,
+       0.9614,
+       0.962
+      ],
+      "auprc_seeds": [
+       0.9069,
+       0.9092,
+       0.9095
+      ]
+     },
+     {
+      "S": 65536,
+      "floats": 65536,
+      "ints": 0,
+      "seeds": 2,
+      "bytes": 524304,
+      "balanced_accuracy_mean": 0.9623680430485452,
+      "balanced_accuracy_std": 0.0010908823636594973,
+      "auprc_mean": 0.909224699033321,
+      "auprc_std": 0.001091329079628946,
+      "balanced_accuracy_seeds": [
+       0.9608,
+       0.9633,
+       0.9629
+      ],
+      "auprc_seeds": [
+       0.9078,
+       0.9104,
+       0.9095
+      ]
+     },
+     {
+      "S": 131072,
+      "floats": 131072,
+      "ints": 0,
+      "seeds": 2,
+      "bytes": 1048592,
+      "balanced_accuracy_mean": 0.9625807186500165,
+      "balanced_accuracy_std": 0.0006165031176992576,
+      "auprc_mean": 0.9090934697262556,
+      "auprc_std": 0.0006847367476329567,
+      "balanced_accuracy_seeds": [
+       0.9618,
+       0.9627,
+       0.9633
+      ],
+      "auprc_seeds": [
+       0.9082,
+       0.9093,
+       0.9098
+      ]
+     },
+     {
+      "S": 262144,
+      "floats": 262144,
+      "ints": 0,
+      "seeds": 2,
+      "bytes": 2097168,
+      "balanced_accuracy_mean": 0.9624834427347917,
+      "balanced_accuracy_std": 7.055943583492994e-05,
+      "auprc_mean": 0.9090411105389834,
+      "auprc_std": 0.00017923401548214954,
+      "balanced_accuracy_seeds": [
+       0.9624,
+       0.9626,
+       0.9625
+      ],
+      "auprc_seeds": [
+       0.9089,
+       0.9089,
+       0.9093
+      ]
+     },
+     {
+      "S": 524288,
+      "floats": 524288,
+      "ints": 0,
+      "seeds": 2,
+      "bytes": 4194320,
+      "balanced_accuracy_mean": 0.9625081990943317,
+      "balanced_accuracy_std": 0.00015011684879224975,
+      "auprc_mean": 0.9090631620476947,
+      "auprc_std": 0.0002847235073843463,
+      "balanced_accuracy_seeds": [
+       0.9626,
+       0.9623,
+       0.9627
+      ],
+      "auprc_seeds": [
+       0.9093,
+       0.9087,
+       0.9093
+      ]
+     },
+     {
+      "S": 1048576,
+      "floats": 1048576,
+      "ints": 0,
+      "seeds": 2,
+      "bytes": 8388624,
+      "balanced_accuracy_mean": 0.962525918539573,
+      "balanced_accuracy_std": 0.0003115713221590402,
+      "auprc_mean": 0.909167600661977,
+      "auprc_std": 0.0004093406022537522,
+      "balanced_accuracy_seeds": [
+       0.9624,
+       0.9622,
+       0.963
+      ],
+      "auprc_seeds": [
+       0.9093,
+       0.9086,
+       0.9096
+      ]
+     },
+     {
+      "S": 2097152,
+      "floats": 2097152,
+      "ints": 0,
+      "seeds": 2,
+      "bytes": 16777232,
+      "balanced_accuracy_mean": 0.9626578506914458,
+      "balanced_accuracy_std": 0.0002089618784790717,
+      "auprc_mean": 0.9092370008803554,
+      "auprc_std": 0.00046294004034370647,
+      "balanced_accuracy_seeds": [
+       0.9627,
+       0.9624,
+       0.9629
+      ],
+      "auprc_seeds": [
+       0.9095,
+       0.9086,
+       0.9096
+      ]
+     },
+     {
+      "S": 2098176,
+      "floats": 2098176,
+      "ints": 0,
+      "seeds": 2,
+      "bytes": 16785424,
+      "balanced_accuracy_mean": 0.9627622200680325,
+      "balanced_accuracy_std": 0.00021594733724881627,
+      "auprc_mean": 0.9092179936449201,
+      "auprc_std": 0.0004905479026948977,
+      "balanced_accuracy_seeds": [
+       0.963,
+       0.9625,
+       0.9628
+      ],
+      "auprc_seeds": [
+       0.9097,
+       0.9086,
+       0.9094
+      ]
+     }
+    ],
+    "seeds": 3,
+    "S_star": 128,
+    "S_star_over_N": 6.1005368472425575e-05,
+    "bytes_at_S_star": 1040,
+    "seconds": 47.9,
+    "S_star_stable": 128,
+    "S_star_stable_over_N": 6.1005368472425575e-05,
+    "S_star_stream": 128,
+    "S_star_stream_over_N": 6.1005368472425575e-05,
+    "S_star_stream_stable": 128,
+    "S_star_stream_stable_over_N": 6.1005368472425575e-05,
+    "S_star_auprc": 2048,
+    "S_star_auprc_over_N": 0.0009760858955588092,
+    "S_star_cell": 128,
+    "S_star_cell_over_N": 6.1005368472425575e-05,
+    "S_star_cell_stable": 128,
+    "S_star_cell_stable_over_N": 6.1005368472425575e-05,
+    "bytes_at_S_star_cell_stable": 1040
+   },
+   "jl_sparse": {
+    "label": "sparse JL projection (4 rows)",
+    "rows": [
+     {
+      "S": 8,
+      "floats": 8,
+      "ints": 0,
+      "seeds": 8,
+      "bytes": 128,
+      "balanced_accuracy_mean": 0.8817044115929678,
+      "balanced_accuracy_std": 0.03446420484531425,
+      "auprc_mean": 0.6419342607045438,
+      "auprc_std": 0.13582312546110384,
+      "balanced_accuracy_seeds": [
+       0.8474,
+       0.9288,
+       0.8689
+      ],
+      "auprc_seeds": [
+       0.4784,
+       0.811,
+       0.6364
+      ]
+     },
+     {
+      "S": 16,
+      "floats": 16,
+      "ints": 0,
+      "seeds": 8,
+      "bytes": 192,
+      "balanced_accuracy_mean": 0.9232407398272949,
+      "balanced_accuracy_std": 0.01747706909963199,
+      "auprc_mean": 0.7250775772222665,
+      "auprc_std": 0.10443878836157237,
+      "balanced_accuracy_seeds": [
+       0.9251,
+       0.9437,
+       0.901
+      ],
+      "auprc_seeds": [
+       0.6724,
+       0.8709,
+       0.6319
+      ]
+     },
+     {
+      "S": 32,
+      "floats": 32,
+      "ints": 0,
+      "seeds": 8,
+      "bytes": 320,
+      "balanced_accuracy_mean": 0.9426219080680164,
+      "balanced_accuracy_std": 0.0026943274301731578,
+      "auprc_mean": 0.7469199312977541,
+      "auprc_std": 0.09500360343714123,
+      "balanced_accuracy_seeds": [
+       0.946,
+       0.9425,
+       0.9394
+      ],
+      "auprc_seeds": [
+       0.7491,
+       0.8622,
+       0.6295
+      ]
+     },
+     {
+      "S": 64,
+      "floats": 64,
+      "ints": 0,
+      "seeds": 8,
+      "bytes": 576,
+      "balanced_accuracy_mean": 0.9541995635074013,
+      "balanced_accuracy_std": 0.006545477431941666,
+      "auprc_mean": 0.8161666723906432,
+      "auprc_std": 0.06716623335996015,
+      "balanced_accuracy_seeds": [
+       0.9468,
+       0.9627,
+       0.9531
+      ],
+      "auprc_seeds": [
+       0.7799,
+       0.9103,
+       0.7583
+      ]
+     },
+     {
+      "S": 128,
+      "floats": 128,
+      "ints": 0,
+      "seeds": 8,
+      "bytes": 1088,
+      "balanced_accuracy_mean": 0.9577990676095783,
+      "balanced_accuracy_std": 0.007089738156074203,
+      "auprc_mean": 0.8533083668171147,
+      "auprc_std": 0.05108279588572811,
+      "balanced_accuracy_seeds": [
+       0.9514,
+       0.9677,
+       0.9543
+      ],
+      "auprc_seeds": [
+       0.8069,
+       0.9245,
+       0.8286
+      ]
+     },
+     {
+      "S": 256,
+      "floats": 256,
+      "ints": 0,
+      "seeds": 8,
+      "bytes": 2112,
+      "balanced_accuracy_mean": 0.9598385958437214,
+      "balanced_accuracy_std": 0.005946808095986483,
+      "auprc_mean": 0.892481080645799,
+      "auprc_std": 0.021122627698723064,
+      "balanced_accuracy_seeds": [
+       0.9548,
+       0.9682,
+       0.9565
+      ],
+      "auprc_seeds": [
+       0.878,
+       0.9223,
+       0.8771
+      ]
+     },
+     {
+      "S": 512,
+      "floats": 512,
+      "ints": 0,
+      "seeds": 8,
+      "bytes": 4160,
+      "balanced_accuracy_mean": 0.9585848152002147,
+      "balanced_accuracy_std": 0.004310429298874281,
+      "auprc_mean": 0.8905591459785412,
+      "auprc_std": 0.023596239653650514,
+      "balanced_accuracy_seeds": [
+       0.9585,
+       0.9639,
+       0.9533
+      ],
+      "auprc_seeds": [
+       0.8971,
+       0.9156,
+       0.859
+      ]
+     },
+     {
+      "S": 1024,
+      "floats": 1024,
+      "ints": 0,
+      "seeds": 8,
+      "bytes": 8256,
+      "balanced_accuracy_mean": 0.9585892502802585,
+      "balanced_accuracy_std": 0.003531536065211027,
+      "auprc_mean": 0.8977667361730526,
+      "auprc_std": 0.016318028045388646,
+      "balanced_accuracy_seeds": [
+       0.9591,
+       0.9627,
+       0.954
+      ],
+      "auprc_seeds": [
+       0.9034,
+       0.9144,
+       0.8756
+      ]
+     },
+     {
+      "S": 2048,
+      "floats": 2048,
+      "ints": 0,
+      "seeds": 8,
+      "bytes": 16448,
+      "balanced_accuracy_mean": 0.9613695203189696,
+      "balanced_accuracy_std": 0.0024871722758861422,
+      "auprc_mean": 0.9084769164478036,
+      "auprc_std": 0.0033828468084145386,
+      "balanced_accuracy_seeds": [
+       0.9626,
+       0.9636,
+       0.9579
+      ],
+      "auprc_seeds": [
+       0.9091,
+       0.9123,
+       0.904
+      ]
+     },
+     {
+      "S": 4096,
+      "floats": 4096,
+      "ints": 0,
+      "seeds": 8,
+      "bytes": 32832,
+      "balanced_accuracy_mean": 0.9625570580058446,
+      "balanced_accuracy_std": 0.001036720910991694,
+      "auprc_mean": 0.9108111778972731,
+      "auprc_std": 0.0017465921252118478,
+      "balanced_accuracy_seeds": [
+       0.9613,
+       0.9638,
+       0.9626
+      ],
+      "auprc_seeds": [
+       0.9089,
+       0.9131,
+       0.9105
+      ]
+     },
+     {
+      "S": 8192,
+      "floats": 8192,
+      "ints": 0,
+      "seeds": 8,
+      "bytes": 65600,
+      "balanced_accuracy_mean": 0.9631467784820723,
+      "balanced_accuracy_std": 0.0005697665871565975,
+      "auprc_mean": 0.9099676830705992,
+      "auprc_std": 0.002441027414627782,
+      "balanced_accuracy_seeds": [
+       0.9627,
+       0.9628,
+       0.9639
+      ],
+      "auprc_seeds": [
+       0.9066,
+       0.9112,
+       0.9121
+      ]
+     },
+     {
+      "S": 16384,
+      "floats": 16384,
+      "ints": 0,
+      "seeds": 8,
+      "bytes": 131136,
+      "balanced_accuracy_mean": 0.9626956970178046,
+      "balanced_accuracy_std": 0.00031287061157877865,
+      "auprc_mean": 0.9091852214524695,
+      "auprc_std": 0.000989039976822591,
+      "balanced_accuracy_seeds": [
+       0.9628,
+       0.9623,
+       0.963
+      ],
+      "auprc_seeds": [
+       0.9086,
+       0.9084,
+       0.9106
+      ]
+     },
+     {
+      "S": 32768,
+      "floats": 32768,
+      "ints": 0,
+      "seeds": 8,
+      "bytes": 262208,
+      "balanced_accuracy_mean": 0.962415268458559,
+      "balanced_accuracy_std": 0.0007005242829708019,
+      "auprc_mean": 0.9091584927617679,
+      "auprc_std": 0.0009559899765842002,
+      "balanced_accuracy_seeds": [
+       0.9626,
+       0.9615,
+       0.9631
+      ],
+      "auprc_seeds": [
+       0.9096,
+       0.9078,
+       0.91
+      ]
+     },
+     {
+      "S": 65536,
+      "floats": 65536,
+      "ints": 0,
+      "seeds": 8,
+      "bytes": 524352,
+      "balanced_accuracy_mean": 0.9627200124244893,
+      "balanced_accuracy_std": 0.0003233730579626067,
+      "auprc_mean": 0.9090061699640207,
+      "auprc_std": 0.0007879320363115113,
+      "balanced_accuracy_seeds": [
+       0.9631,
+       0.9623,
+       0.9627
+      ],
+      "auprc_seeds": [
+       0.9101,
+       0.9085,
+       0.9084
+      ]
+     },
+     {
+      "S": 131072,
+      "floats": 131072,
+      "ints": 0,
+      "seeds": 8,
+      "bytes": 1048640,
+      "balanced_accuracy_mean": 0.963027330317057,
+      "balanced_accuracy_std": 0.0004367427054097405,
+      "auprc_mean": 0.9091438780569184,
+      "auprc_std": 0.000844423559823657,
+      "balanced_accuracy_seeds": [
+       0.9636,
+       0.9629,
+       0.9626
+      ],
+      "auprc_seeds": [
+       0.9103,
+       0.9084,
+       0.9087
+      ]
+     },
+     {
+      "S": 262144,
+      "floats": 262144,
+      "ints": 0,
+      "seeds": 8,
+      "bytes": 2097216,
+      "balanced_accuracy_mean": 0.9627657594001158,
+      "balanced_accuracy_std": 0.0002534443891549575,
+      "auprc_mean": 0.9092513270163899,
+      "auprc_std": 0.0006711260187559804,
+      "balanced_accuracy_seeds": [
+       0.9631,
+       0.9626,
+       0.9626
+      ],
+      "auprc_seeds": [
+       0.9102,
+       0.9088,
+       0.9088
+      ]
+     },
+     {
+      "S": 524288,
+      "floats": 524288,
+      "ints": 0,
+      "seeds": 8,
+      "bytes": 4194368,
+      "balanced_accuracy_mean": 0.962671623105277,
+      "balanced_accuracy_std": 0.00014122898158996661,
+      "auprc_mean": 0.9094384408510982,
+      "auprc_std": 0.0005924545576035673,
+      "balanced_accuracy_seeds": [
+       0.9629,
+       0.9626,
+       0.9625
+      ],
+      "auprc_seeds": [
+       0.9103,
+       0.9089,
+       0.9091
+      ]
+     },
+     {
+      "S": 1048576,
+      "floats": 1048576,
+      "ints": 0,
+      "seeds": 8,
+      "bytes": 8388672,
+      "balanced_accuracy_mean": 0.9628370686826514,
+      "balanced_accuracy_std": 7.402938947503849e-05,
+      "auprc_mean": 0.9095242848631843,
+      "auprc_std": 0.00040859816225701347,
+      "balanced_accuracy_seeds": [
+       0.9629,
+       0.9628,
+       0.9628
+      ],
+      "auprc_seeds": [
+       0.9101,
+       0.9091,
+       0.9094
+      ]
+     },
+     {
+      "S": 2097152,
+      "floats": 2097152,
+      "ints": 0,
+      "seeds": 8,
+      "bytes": 16777280,
+      "balanced_accuracy_mean": 0.9628545393779332,
+      "balanced_accuracy_std": 0.00010620525300265271,
+      "auprc_mean": 0.9094136871821311,
+      "auprc_std": 0.000423990469229666,
+      "balanced_accuracy_seeds": [
+       0.963,
+       0.9627,
+       0.9629
+      ],
+      "auprc_seeds": [
+       0.9099,
+       0.9089,
+       0.9095
+      ]
+     },
+     {
+      "S": 2098176,
+      "floats": 2098176,
+      "ints": 0,
+      "seeds": 8,
+      "bytes": 16785472,
+      "balanced_accuracy_mean": 0.9626022989852138,
+      "balanced_accuracy_std": 0.0002634480998443916,
+      "auprc_mean": 0.9091925892166066,
+      "auprc_std": 0.0005737459857237677,
+      "balanced_accuracy_seeds": [
+       0.9627,
+       0.9622,
+       0.9628
+      ],
+      "auprc_seeds": [
+       0.9097,
+       0.9084,
+       0.9095
+      ]
+     }
+    ],
+    "seeds": 3,
+    "S_star": 64,
+    "S_star_over_N": 3.0502684236212788e-05,
+    "bytes_at_S_star": 576,
+    "seconds": 48.7,
+    "S_star_stable": 64,
+    "S_star_stable_over_N": 3.0502684236212788e-05,
+    "S_star_stream": 64,
+    "S_star_stream_over_N": 3.0502684236212788e-05,
+    "S_star_stream_stable": 64,
+    "S_star_stream_stable_over_N": 3.0502684236212788e-05,
+    "S_star_auprc": 2048,
+    "S_star_auprc_over_N": 0.0009760858955588092,
+    "S_star_cell": 64,
+    "S_star_cell_over_N": 3.0502684236212788e-05,
+    "S_star_cell_stable": 64,
+    "S_star_cell_stable_over_N": 3.0502684236212788e-05,
+    "bytes_at_S_star_cell_stable": 576
+   },
+   "heavy_hitters_mg": {
+    "label": "heavy hitters: Misra\u2013Gries (S/2 + S/2)",
+    "rows": [
+     {
+      "S": 8,
+      "floats": 8,
+      "ints": 8,
+      "seeds": 0,
+      "bytes": 96,
+      "balanced_accuracy_mean": 0.868840499976644,
+      "balanced_accuracy_std": 0.04629178791901307,
+      "auprc_mean": 0.6257988126175552,
+      "auprc_std": 0.09033938381969103,
+      "balanced_accuracy_seeds": [
+       0.8614,
+       0.8163,
+       0.9289
+      ],
+      "auprc_seeds": [
+       0.6615,
+       0.5017,
+       0.7142
+      ]
+     },
+     {
+      "S": 16,
+      "floats": 16,
+      "ints": 16,
+      "seeds": 0,
+      "bytes": 192,
+      "balanced_accuracy_mean": 0.898321923689803,
+      "balanced_accuracy_std": 0.02611087588808137,
+      "auprc_mean": 0.6680431985690936,
+      "auprc_std": 0.06116644441426065,
+      "balanced_accuracy_seeds": [
+       0.8883,
+       0.8725,
+       0.9341
+      ],
+      "auprc_seeds": [
+       0.7265,
+       0.5836,
+       0.694
+      ]
+     },
+     {
+      "S": 32,
+      "floats": 32,
+      "ints": 32,
+      "seeds": 0,
+      "bytes": 384,
+      "balanced_accuracy_mean": 0.9212759534769742,
+      "balanced_accuracy_std": 0.011037230495803805,
+      "auprc_mean": 0.7214232752845113,
+      "auprc_std": 0.04845843529386161,
+      "balanced_accuracy_seeds": [
+       0.9137,
+       0.9133,
+       0.9369
+      ],
+      "auprc_seeds": [
+       0.7752,
+       0.6577,
+       0.7314
+      ]
+     },
+     {
+      "S": 64,
+      "floats": 64,
+      "ints": 64,
+      "seeds": 0,
+      "bytes": 768,
+      "balanced_accuracy_mean": 0.9413701485447027,
+      "balanced_accuracy_std": 0.007265211824992525,
+      "auprc_mean": 0.7723744931064515,
+      "auprc_std": 0.040609681137752485,
+      "balanced_accuracy_seeds": [
+       0.9328,
+       0.9408,
+       0.9506
+      ],
+      "auprc_seeds": [
+       0.7934,
+       0.7156,
+       0.8082
+      ]
+     },
+     {
+      "S": 128,
+      "floats": 128,
+      "ints": 128,
+      "seeds": 0,
+      "bytes": 1536,
+      "balanced_accuracy_mean": 0.952847604899853,
+      "balanced_accuracy_std": 0.0015718889844623068,
+      "auprc_mean": 0.8047220369832185,
+      "auprc_std": 0.03979100773676019,
+      "balanced_accuracy_seeds": [
+       0.954,
+       0.9506,
+       0.9539
+      ],
+      "auprc_seeds": [
+       0.8363,
+       0.7486,
+       0.8292
+      ]
+     },
+     {
+      "S": 256,
+      "floats": 256,
+      "ints": 256,
+      "seeds": 0,
+      "bytes": 3072,
+      "balanced_accuracy_mean": 0.9564471888426275,
+      "balanced_accuracy_std": 0.0009927159453037228,
+      "auprc_mean": 0.815059732222478,
+      "auprc_std": 0.01678456814583782,
+      "balanced_accuracy_seeds": [
+       0.9574,
+       0.9551,
+       0.9569
+      ],
+      "auprc_seeds": [
+       0.8139,
+       0.7951,
+       0.8362
+      ]
+     },
+     {
+      "S": 512,
+      "floats": 512,
+      "ints": 512,
+      "seeds": 0,
+      "bytes": 6144,
+      "balanced_accuracy_mean": 0.9585967046307601,
+      "balanced_accuracy_std": 0.0007902919712575172,
+      "auprc_mean": 0.8349406680471624,
+      "auprc_std": 0.01965474218764522,
+      "balanced_accuracy_seeds": [
+       0.9585,
+       0.9577,
+       0.9596
+      ],
+      "auprc_seeds": [
+       0.8186,
+       0.8237,
+       0.8626
+      ]
+     },
+     {
+      "S": 1024,
+      "floats": 1024,
+      "ints": 1024,
+      "seeds": 0,
+      "bytes": 12288,
+      "balanced_accuracy_mean": 0.958894505365239,
+      "balanced_accuracy_std": 0.0011543415975936281,
+      "auprc_mean": 0.851525495501604,
+      "auprc_std": 0.019491765830679336,
+      "balanced_accuracy_seeds": [
+       0.9591,
+       0.9574,
+       0.9602
+      ],
+      "auprc_seeds": [
+       0.8478,
+       0.8297,
+       0.877
+      ]
+     },
+     {
+      "S": 2048,
+      "floats": 2048,
+      "ints": 2048,
+      "seeds": 0,
+      "bytes": 24576,
+      "balanced_accuracy_mean": 0.9578703201219326,
+      "balanced_accuracy_std": 0.0008777930475812201,
+      "auprc_mean": 0.8637935893291893,
+      "auprc_std": 0.012147030044373466,
+      "balanced_accuracy_seeds": [
+       0.9579,
+       0.9568,
+       0.9589
+      ],
+      "auprc_seeds": [
+       0.8575,
+       0.8531,
+       0.8808
+      ]
+     },
+     {
+      "S": 4096,
+      "floats": 4096,
+      "ints": 4096,
+      "seeds": 0,
+      "bytes": 49152,
+      "balanced_accuracy_mean": 0.9546443751821817,
+      "balanced_accuracy_std": 0.0005818110164217557,
+      "auprc_mean": 0.8514986471266317,
+      "auprc_std": 0.009678107084960677,
+      "balanced_accuracy_seeds": [
+       0.9544,
+       0.9541,
+       0.9555
+      ],
+      "auprc_seeds": [
+       0.8474,
+       0.8422,
+       0.8648
+      ]
+     },
+     {
+      "S": 8192,
+      "floats": 8192,
+      "ints": 8192,
+      "seeds": 0,
+      "bytes": 98304,
+      "balanced_accuracy_mean": 0.9510314041863138,
+      "balanced_accuracy_std": 7.14696253145063e-05,
+      "auprc_mean": 0.8232782869587,
+      "auprc_std": 0.0031324584357351843,
+      "balanced_accuracy_seeds": [
+       0.9509,
+       0.9511,
+       0.9511
+      ],
+      "auprc_seeds": [
+       0.8225,
+       0.8199,
+       0.8274
+      ]
+     },
+     {
+      "S": 16384,
+      "floats": 16384,
+      "ints": 16384,
+      "seeds": 0,
+      "bytes": 196608,
+      "balanced_accuracy_mean": 0.9501835205747691,
+      "balanced_accuracy_std": 8.719684705366705e-05,
+      "auprc_mean": 0.8241437546625452,
+      "auprc_std": 0.0021728715927602244,
+      "balanced_accuracy_seeds": [
+       0.9502,
+       0.9503,
+       0.9501
+      ],
+      "auprc_seeds": [
+       0.8238,
+       0.8217,
+       0.827
+      ]
+     },
+     {
+      "S": 32768,
+      "floats": 32768,
+      "ints": 32768,
+      "seeds": 0,
+      "bytes": 393216,
+      "balanced_accuracy_mean": 0.9513651653365556,
+      "balanced_accuracy_std": 3.846842127686393e-06,
+      "auprc_mean": 0.8536752678134262,
+      "auprc_std": 0.001953828293623301,
+      "balanced_accuracy_seeds": [
+       0.9514,
+       0.9514,
+       0.9514
+      ],
+      "auprc_seeds": [
+       0.855,
+       0.8509,
+       0.8552
+      ]
+     },
+     {
+      "S": 65536,
+      "floats": 65536,
+      "ints": 65536,
+      "seeds": 0,
+      "bytes": 786432,
+      "balanced_accuracy_mean": 0.9531916287262335,
+      "balanced_accuracy_std": 4.49179050154331e-05,
+      "auprc_mean": 0.8831889795170539,
+      "auprc_std": 0.0012400616378002462,
+      "balanced_accuracy_seeds": [
+       0.9532,
+       0.9531,
+       0.9532
+      ],
+      "auprc_seeds": [
+       0.8839,
+       0.8814,
+       0.8842
+      ]
+     },
+     {
+      "S": 131072,
+      "floats": 131072,
+      "ints": 131072,
+      "seeds": 0,
+      "bytes": 1572864,
+      "balanced_accuracy_mean": 0.9551512068564341,
+      "balanced_accuracy_std": 0.0001522282432724681,
+      "auprc_mean": 0.898069468855009,
+      "auprc_std": 0.0008706667239659965,
+      "balanced_accuracy_seeds": [
+       0.9554,
+       0.955,
+       0.9551
+      ],
+      "auprc_seeds": [
+       0.8988,
+       0.8968,
+       0.8986
+      ]
+     },
+     {
+      "S": 262144,
+      "floats": 262144,
+      "ints": 262144,
+      "seeds": 0,
+      "bytes": 3145728,
+      "balanced_accuracy_mean": 0.9570433091951466,
+      "balanced_accuracy_std": 0.00018309300047616517,
+      "auprc_mean": 0.9045608547666841,
+      "auprc_std": 0.0006648834171461553,
+      "balanced_accuracy_seeds": [
+       0.9572,
+       0.9568,
+       0.9571
+      ],
+      "auprc_seeds": [
+       0.9052,
+       0.9036,
+       0.9048
+      ]
+     },
+     {
+      "S": 524288,
+      "floats": 524288,
+      "ints": 524288,
+      "seeds": 0,
+      "bytes": 6291456,
+      "balanced_accuracy_mean": 0.9598657162649701,
+      "balanced_accuracy_std": 0.0003268466428815202,
+      "auprc_mean": 0.9074657131582496,
+      "auprc_std": 0.0005654034891102313,
+      "balanced_accuracy_seeds": [
+       0.9601,
+       0.9594,
+       0.9601
+      ],
+      "auprc_seeds": [
+       0.908,
+       0.9067,
+       0.9077
+      ]
+     },
+     {
+      "S": 1048576,
+      "floats": 1048576,
+      "ints": 1048576,
+      "seeds": 0,
+      "bytes": 12582912,
+      "balanced_accuracy_mean": 0.9619312220467423,
+      "balanced_accuracy_std": 0.0002700742566987665,
+      "auprc_mean": 0.9087623143843183,
+      "auprc_std": 0.0005116578735258869,
+      "balanced_accuracy_seeds": [
+       0.9621,
+       0.9615,
+       0.9621
+      ],
+      "auprc_seeds": [
+       0.9093,
+       0.9081,
+       0.9089
+      ]
+     },
+     {
+      "S": 2097152,
+      "floats": 2097152,
+      "ints": 2097152,
+      "seeds": 0,
+      "bytes": 25165824,
+      "balanced_accuracy_mean": 0.962631791839564,
+      "balanced_accuracy_std": 0.00026142695028093016,
+      "auprc_mean": 0.909213273024149,
+      "auprc_std": 0.0004994950868110595,
+      "balanced_accuracy_seeds": [
+       0.9629,
+       0.9623,
+       0.9627
+      ],
+      "auprc_seeds": [
+       0.9097,
+       0.9085,
+       0.9094
+      ]
+     },
+     {
+      "S": 2098176,
+      "floats": 2098176,
+      "ints": 2098176,
+      "seeds": 0,
+      "bytes": 25178112,
+      "balanced_accuracy_mean": 0.962631791839564,
+      "balanced_accuracy_std": 0.00026142695028093016,
+      "auprc_mean": 0.9092134115041871,
+      "auprc_std": 0.0004994845369295451,
+      "balanced_accuracy_seeds": [
+       0.9629,
+       0.9623,
+       0.9627
+      ],
+      "auprc_seeds": [
+       0.9097,
+       0.9085,
+       0.9094
+      ]
+     }
+    ],
+    "seeds": 3,
+    "S_star": 128,
+    "S_star_over_N": 6.1005368472425575e-05,
+    "bytes_at_S_star": 1536,
+    "seconds": 48.8,
+    "S_star_stable": 65536,
+    "S_star_stable_over_N": 0.031234748657881894,
+    "S_star_stream": 128,
+    "S_star_stream_over_N": 6.1005368472425575e-05,
+    "S_star_stream_stable": 65536,
+    "S_star_stream_stable_over_N": 0.031234748657881894,
+    "S_star_auprc": 262144,
+    "S_star_auprc_over_N": 0.12493899463152758,
+    "S_star_cell": 128,
+    "S_star_cell_over_N": 6.1005368472425575e-05,
+    "S_star_cell_stable": 65536,
+    "S_star_cell_stable_over_N": 0.031234748657881894,
+    "bytes_at_S_star_cell_stable": 786432
+   },
+   "heavy_hitters_top": {
+    "label": "heavy hitters: oracle top-S |\u0394|",
+    "rows": [
+     {
+      "S": 8,
+      "floats": 8,
+      "ints": 8,
+      "seeds": 0,
+      "bytes": 96,
+      "balanced_accuracy_mean": 0.9697644388703677,
+      "balanced_accuracy_std": 0.0036006235883362324,
+      "auprc_mean": 0.9123124681310341,
+      "auprc_std": 0.008866209421650059,
+      "balanced_accuracy_seeds": [
+       0.9744,
+       0.9693,
+       0.9656
+      ],
+      "auprc_seeds": [
+       0.922,
+       0.9005,
+       0.9144
+      ]
+     },
+     {
+      "S": 16,
+      "floats": 16,
+      "ints": 16,
+      "seeds": 0,
+      "bytes": 192,
+      "balanced_accuracy_mean": 0.9707667261028599,
+      "balanced_accuracy_std": 0.0025508620753434933,
+      "auprc_mean": 0.9176300151915798,
+      "auprc_std": 0.0012185266058947206,
+      "balanced_accuracy_seeds": [
+       0.9733,
+       0.9718,
+       0.9673
+      ],
+      "auprc_seeds": [
+       0.917,
+       0.9193,
+       0.9166
+      ]
+     },
+     {
+      "S": 32,
+      "floats": 32,
+      "ints": 32,
+      "seeds": 0,
+      "bytes": 384,
+      "balanced_accuracy_mean": 0.9720293164771352,
+      "balanced_accuracy_std": 0.0007332833975113962,
+      "auprc_mean": 0.9192707677108197,
+      "auprc_std": 0.0012746775287986384,
+      "balanced_accuracy_seeds": [
+       0.9716,
+       0.9731,
+       0.9714
+      ],
+      "auprc_seeds": [
+       0.9175,
+       0.9202,
+       0.9201
+      ]
+     },
+     {
+      "S": 64,
+      "floats": 64,
+      "ints": 64,
+      "seeds": 0,
+      "bytes": 768,
+      "balanced_accuracy_mean": 0.973875552891475,
+      "balanced_accuracy_std": 0.0013443790872050448,
+      "auprc_mean": 0.9221865595167626,
+      "auprc_std": 0.0012306200763679122,
+      "balanced_accuracy_seeds": [
+       0.9745,
+       0.9751,
+       0.972
+      ],
+      "auprc_seeds": [
+       0.9227,
+       0.9233,
+       0.9205
+      ]
+     },
+     {
+      "S": 128,
+      "floats": 128,
+      "ints": 128,
+      "seeds": 0,
+      "bytes": 1536,
+      "balanced_accuracy_mean": 0.9728185475846193,
+      "balanced_accuracy_std": 0.0005739917966684255,
+      "auprc_mean": 0.9219373714345359,
+      "auprc_std": 0.0004976757666562163,
+      "balanced_accuracy_seeds": [
+       0.9721,
+       0.9734,
+       0.9729
+      ],
+      "auprc_seeds": [
+       0.9216,
+       0.9216,
+       0.9226
+      ]
+     },
+     {
+      "S": 256,
+      "floats": 256,
+      "ints": 256,
+      "seeds": 0,
+      "bytes": 3072,
+      "balanced_accuracy_mean": 0.9690194175615771,
+      "balanced_accuracy_std": 0.00022381698748603045,
+      "auprc_mean": 0.919953759103112,
+      "auprc_std": 0.0009358767537920004,
+      "balanced_accuracy_seeds": [
+       0.9687,
+       0.969,
+       0.9693
+      ],
+      "auprc_seeds": [
+       0.9205,
+       0.9186,
+       0.9207
+      ]
+     },
+     {
+      "S": 512,
+      "floats": 512,
+      "ints": 512,
+      "seeds": 0,
+      "bytes": 6144,
+      "balanced_accuracy_mean": 0.9664983200089791,
+      "balanced_accuracy_std": 0.00034561231879987617,
+      "auprc_mean": 0.9163992186937024,
+      "auprc_std": 0.0008758135066442161,
+      "balanced_accuracy_seeds": [
+       0.9662,
+       0.9663,
+       0.967
+      ],
+      "auprc_seeds": [
+       0.9152,
+       0.9171,
+       0.9169
+      ]
+     },
+     {
+      "S": 1024,
+      "floats": 1024,
+      "ints": 1024,
+      "seeds": 0,
+      "bytes": 12288,
+      "balanced_accuracy_mean": 0.9626612994911099,
+      "balanced_accuracy_std": 0.00016257809300141037,
+      "auprc_mean": 0.9082796945652337,
+      "auprc_std": 0.0025100903003787934,
+      "balanced_accuracy_seeds": [
+       0.9626,
+       0.9629,
+       0.9625
+      ],
+      "auprc_seeds": [
+       0.9058,
+       0.9117,
+       0.9074
+      ]
+     },
+     {
+      "S": 2048,
+      "floats": 2048,
+      "ints": 2048,
+      "seeds": 0,
+      "bytes": 24576,
+      "balanced_accuracy_mean": 0.9571389957773407,
+      "balanced_accuracy_std": 4.4974227160452205e-05,
+      "auprc_mean": 0.8956186877061109,
+      "auprc_std": 0.000652681695181651,
+      "balanced_accuracy_seeds": [
+       0.9571,
+       0.9572,
+       0.9571
+      ],
+      "auprc_seeds": [
+       0.8947,
+       0.8963,
+       0.8959
+      ]
+     },
+     {
+      "S": 4096,
+      "floats": 4096,
+      "ints": 4096,
+      "seeds": 0,
+      "bytes": 49152,
+      "balanced_accuracy_mean": 0.9545411753462955,
+      "balanced_accuracy_std": 0.0002831449787730188,
+      "auprc_mean": 0.8906036905822029,
+      "auprc_std": 0.0012348285525733732,
+      "balanced_accuracy_seeds": [
+       0.9549,
+       0.9543,
+       0.9544
+      ],
+      "auprc_seeds": [
+       0.8902,
+       0.8894,
+       0.8923
+      ]
+     },
+     {
+      "S": 8192,
+      "floats": 8192,
+      "ints": 8192,
+      "seeds": 0,
+      "bytes": 98304,
+      "balanced_accuracy_mean": 0.9542278558254781,
+      "balanced_accuracy_std": 6.22886035142428e-05,
+      "auprc_mean": 0.8934041810237687,
+      "auprc_std": 0.000779515877738524,
+      "balanced_accuracy_seeds": [
+       0.9542,
+       0.9542,
+       0.9543
+      ],
+      "auprc_seeds": [
+       0.8935,
+       0.8924,
+       0.8943
+      ]
+     },
+     {
+      "S": 16384,
+      "floats": 16384,
+      "ints": 16384,
+      "seeds": 0,
+      "bytes": 196608,
+      "balanced_accuracy_mean": 0.955263833157345,
+      "balanced_accuracy_std": 0.00010587143365545805,
+      "auprc_mean": 0.9003744218203948,
+      "auprc_std": 0.0010512457744022623,
+      "balanced_accuracy_seeds": [
+       0.9553,
+       0.9551,
+       0.9554
+      ],
+      "auprc_seeds": [
+       0.9014,
+       0.8989,
+       0.9008
+      ]
+     },
+     {
+      "S": 32768,
+      "floats": 32768,
+      "ints": 32768,
+      "seeds": 0,
+      "bytes": 393216,
+      "balanced_accuracy_mean": 0.9563981137028564,
+      "balanced_accuracy_std": 0.0001436599608924924,
+      "auprc_mean": 0.9047702930467949,
+      "auprc_std": 0.0008280198844593752,
+      "balanced_accuracy_seeds": [
+       0.9566,
+       0.9562,
+       0.9564
+      ],
+      "auprc_seeds": [
+       0.9056,
+       0.9036,
+       0.9051
+      ]
+     },
+     {
+      "S": 65536,
+      "floats": 65536,
+      "ints": 65536,
+      "seeds": 0,
+      "bytes": 786432,
+      "balanced_accuracy_mean": 0.9583284506559758,
+      "balanced_accuracy_std": 0.00029804092273065194,
+      "auprc_mean": 0.9072487965823587,
+      "auprc_std": 0.0005968289859762282,
+      "balanced_accuracy_seeds": [
+       0.9585,
+       0.9579,
+       0.9586
+      ],
+      "auprc_seeds": [
+       0.9078,
+       0.9064,
+       0.9075
+      ]
+     },
+     {
+      "S": 131072,
+      "floats": 131072,
+      "ints": 131072,
+      "seeds": 0,
+      "bytes": 1572864,
+      "balanced_accuracy_mean": 0.9606007733850781,
+      "balanced_accuracy_std": 0.0003140206994754362,
+      "auprc_mean": 0.9085291002130367,
+      "auprc_std": 0.0005272699586966687,
+      "balanced_accuracy_seeds": [
+       0.9608,
+       0.9602,
+       0.9608
+      ],
+      "auprc_seeds": [
+       0.9091,
+       0.9078,
+       0.9087
+      ]
+     },
+     {
+      "S": 262144,
+      "floats": 262144,
+      "ints": 262144,
+      "seeds": 0,
+      "bytes": 3145728,
+      "balanced_accuracy_mean": 0.9620452976338859,
+      "balanced_accuracy_std": 0.0002742089787220126,
+      "auprc_mean": 0.9090700844057625,
+      "auprc_std": 0.0005094407440018565,
+      "balanced_accuracy_seeds": [
+       0.9622,
+       0.9617,
+       0.9623
+      ],
+      "auprc_seeds": [
+       0.9096,
+       0.9084,
+       0.9092
+      ]
+     },
+     {
+      "S": 524288,
+      "floats": 524288,
+      "ints": 524288,
+      "seeds": 0,
+      "bytes": 6291456,
+      "balanced_accuracy_mean": 0.9625339727922975,
+      "balanced_accuracy_std": 0.00020679619468517508,
+      "auprc_mean": 0.9092363897357324,
+      "auprc_std": 0.0004987817714748739,
+      "balanced_accuracy_seeds": [
+       0.9627,
+       0.9622,
+       0.9627
+      ],
+      "auprc_seeds": [
+       0.9098,
+       0.9086,
+       0.9094
+      ]
+     },
+     {
+      "S": 1048576,
+      "floats": 1048576,
+      "ints": 1048576,
+      "seeds": 0,
+      "bytes": 12582912,
+      "balanced_accuracy_mean": 0.9626901142894129,
+      "balanced_accuracy_std": 0.000289330256324218,
+      "auprc_mean": 0.9092688963364837,
+      "auprc_std": 0.0004966389385586325,
+      "balanced_accuracy_seeds": [
+       0.963,
+       0.9623,
+       0.9628
+      ],
+      "auprc_seeds": [
+       0.9098,
+       0.9086,
+       0.9094
+      ]
+     },
+     {
+      "S": 2097152,
+      "floats": 2097152,
+      "ints": 2097152,
+      "seeds": 0,
+      "bytes": 25165824,
+      "balanced_accuracy_mean": 0.9627224220558482,
+      "balanced_accuracy_std": 0.00028584089788829907,
+      "auprc_mean": 0.9092780116332965,
+      "auprc_std": 0.000496341970309892,
+      "balanced_accuracy_seeds": [
+       0.963,
+       0.9623,
+       0.9629
+      ],
+      "auprc_seeds": [
+       0.9098,
+       0.9086,
+       0.9094
+      ]
+     },
+     {
+      "S": 2098176,
+      "floats": 2098176,
+      "ints": 2098176,
+      "seeds": 0,
+      "bytes": 25178112,
+      "balanced_accuracy_mean": 0.9627224220558482,
+      "balanced_accuracy_std": 0.00028584089788829907,
+      "auprc_mean": 0.9092780116332965,
+      "auprc_std": 0.000496341970309892,
+      "balanced_accuracy_seeds": [
+       0.963,
+       0.9623,
+       0.9629
+      ],
+      "auprc_seeds": [
+       0.9098,
+       0.9086,
+       0.9094
+      ]
+     }
+    ],
+    "seeds": 3,
+    "S_star": 8,
+    "S_star_over_N": 3.8128355295265984e-06,
+    "bytes_at_S_star": 96,
+    "seconds": 48.6,
+    "S_star_stable": 8,
+    "S_star_stable_over_N": 3.8128355295265984e-06,
+    "S_star_stream": 8,
+    "S_star_stream_over_N": 3.8128355295265984e-06,
+    "S_star_stream_stable": 8,
+    "S_star_stream_stable_over_N": 3.8128355295265984e-06,
+    "S_star_auprc": 8,
+    "S_star_auprc_over_N": 3.8128355295265984e-06,
+    "S_star_cell": 8,
+    "S_star_cell_over_N": 3.8128355295265984e-06,
+    "S_star_cell_stable": 8,
+    "S_star_cell_stable_over_N": 3.8128355295265984e-06,
+    "bytes_at_S_star_cell_stable": 96
+   },
+   "reservoir": {
+    "label": "reservoir: S nonzero records",
+    "rows": [
+     {
+      "S": 8,
+      "floats": 8,
+      "ints": 8,
+      "seeds": 0,
+      "bytes": 96,
+      "balanced_accuracy_mean": 0.6011813732270022,
+      "balanced_accuracy_std": 0.07112485245990534,
+      "auprc_mean": 0.18134615062135281,
+      "auprc_std": 0.06702999256504828,
+      "balanced_accuracy_seeds": [
+       0.5006,
+       0.6538,
+       0.6491
+      ],
+      "auprc_seeds": [
+       0.0876,
+       0.216,
+       0.2404
+      ]
+     },
+     {
+      "S": 16,
+      "floats": 16,
+      "ints": 16,
+      "seeds": 0,
+      "bytes": 192,
+      "balanced_accuracy_mean": 0.678419069773471,
+      "balanced_accuracy_std": 0.14709401965920016,
+      "auprc_mean": 0.3224021534445125,
+      "auprc_std": 0.17275110822588144,
+      "balanced_accuracy_seeds": [
+       0.675,
+       0.5,
+       0.8603
+      ],
+      "auprc_seeds": [
+       0.3427,
+       0.1014,
+       0.5231
+      ]
+     },
+     {
+      "S": 32,
+      "floats": 32,
+      "ints": 32,
+      "seeds": 0,
+      "bytes": 384,
+      "balanced_accuracy_mean": 0.6880768500732835,
+      "balanced_accuracy_std": 0.13023379429909696,
+      "auprc_mean": 0.3569122316377172,
+      "auprc_std": 0.17864592293329257,
+      "balanced_accuracy_seeds": [
+       0.7585,
+       0.8003,
+       0.5055
+      ],
+      "auprc_seeds": [
+       0.4876,
+       0.4788,
+       0.1043
+      ]
+     },
+     {
+      "S": 64,
+      "floats": 64,
+      "ints": 64,
+      "seeds": 0,
+      "bytes": 768,
+      "balanced_accuracy_mean": 0.6003503282705785,
+      "balanced_accuracy_std": 0.05625281519251672,
+      "auprc_mean": 0.24794887484329167,
+      "auprc_std": 0.036898339057035025,
+      "balanced_accuracy_seeds": [
+       0.549,
+       0.6786,
+       0.5734
+      ],
+      "auprc_seeds": [
+       0.1962,
+       0.2682,
+       0.2794
+      ]
+     },
+     {
+      "S": 128,
+      "floats": 128,
+      "ints": 128,
+      "seeds": 0,
+      "bytes": 1536,
+      "balanced_accuracy_mean": 0.6601553880735431,
+      "balanced_accuracy_std": 0.1273059946337741,
+      "auprc_mean": 0.30752018775896744,
+      "auprc_std": 0.19518571890158654,
+      "balanced_accuracy_seeds": [
+       0.8366,
+       0.541,
+       0.6028
+      ],
+      "auprc_seeds": [
+       0.5747,
+       0.1139,
+       0.234
+      ]
+     },
+     {
+      "S": 256,
+      "floats": 256,
+      "ints": 256,
+      "seeds": 0,
+      "bytes": 3072,
+      "balanced_accuracy_mean": 0.7204876019815462,
+      "balanced_accuracy_std": 0.1154069966839734,
+      "auprc_mean": 0.3230119538838378,
+      "auprc_std": 0.1673557475442358,
+      "balanced_accuracy_seeds": [
+       0.6634,
+       0.8815,
+       0.6167
+      ],
+      "auprc_seeds": [
+       0.2697,
+       0.5494,
+       0.15
+      ]
+     },
+     {
+      "S": 512,
+      "floats": 512,
+      "ints": 512,
+      "seeds": 0,
+      "bytes": 6144,
+      "balanced_accuracy_mean": 0.7424482551699443,
+      "balanced_accuracy_std": 0.11798552404105699,
+      "auprc_mean": 0.39625680036981925,
+      "auprc_std": 0.19429608883336158,
+      "balanced_accuracy_seeds": [
+       0.7117,
+       0.6158,
+       0.8998
+      ],
+      "auprc_seeds": [
+       0.3672,
+       0.1742,
+       0.6474
+      ]
+     },
+     {
+      "S": 1024,
+      "floats": 1024,
+      "ints": 1024,
+      "seeds": 0,
+      "bytes": 12288,
+      "balanced_accuracy_mean": 0.8988698264348356,
+      "balanced_accuracy_std": 0.014388992909825772,
+      "auprc_mean": 0.6389610763665018,
+      "auprc_std": 0.047727842121497534,
+      "balanced_accuracy_seeds": [
+       0.8815,
+       0.9167,
+       0.8984
+      ],
+      "auprc_seeds": [
+       0.5791,
+       0.6418,
+       0.696
+      ]
+     },
+     {
+      "S": 2048,
+      "floats": 2048,
+      "ints": 2048,
+      "seeds": 0,
+      "bytes": 24576,
+      "balanced_accuracy_mean": 0.8187339814725215,
+      "balanced_accuracy_std": 0.13434992590267383,
+      "auprc_mean": 0.5129286853386906,
+      "auprc_std": 0.22212206696755854,
+      "balanced_accuracy_seeds": [
+       0.6299,
+       0.8947,
+       0.9316
+      ],
+      "auprc_seeds": [
+       0.1988,
+       0.6674,
+       0.6726
+      ]
+     },
+     {
+      "S": 4096,
+      "floats": 4096,
+      "ints": 4096,
+      "seeds": 0,
+      "bytes": 49152,
+      "balanced_accuracy_mean": 0.9544198414938022,
+      "balanced_accuracy_std": 0.007209214636054057,
+      "auprc_mean": 0.8508411962897897,
+      "auprc_std": 0.03153007083925904,
+      "balanced_accuracy_seeds": [
+       0.949,
+       0.9646,
+       0.9496
+      ],
+      "auprc_seeds": [
+       0.8146,
+       0.8915,
+       0.8464
+      ]
+     },
+     {
+      "S": 8192,
+      "floats": 8192,
+      "ints": 8192,
+      "seeds": 0,
+      "bytes": 98304,
+      "balanced_accuracy_mean": 0.9436439763752732,
+      "balanced_accuracy_std": 0.01497903745959687,
+      "auprc_mean": 0.7586439829596657,
+      "auprc_std": 0.11753346033685115,
+      "balanced_accuracy_seeds": [
+       0.952,
+       0.9563,
+       0.9226
+      ],
+      "auprc_seeds": [
+       0.7766,
+       0.8927,
+       0.6065
+      ]
+     },
+     {
+      "S": 16384,
+      "floats": 16384,
+      "ints": 16384,
+      "seeds": 0,
+      "bytes": 196608,
+      "balanced_accuracy_mean": 0.9523798836679798,
+      "balanced_accuracy_std": 0.003884140465844791,
+      "auprc_mean": 0.8359603802717753,
+      "auprc_std": 0.027654932637286994,
+      "balanced_accuracy_seeds": [
+       0.9471,
+       0.9563,
+       0.9537
+      ],
+      "auprc_seeds": [
+       0.7975,
+       0.8614,
+       0.849
+      ]
+     },
+     {
+      "S": 32768,
+      "floats": 32768,
+      "ints": 32768,
+      "seeds": 0,
+      "bytes": 393216,
+      "balanced_accuracy_mean": 0.9588270074582804,
+      "balanced_accuracy_std": 0.005308940955058695,
+      "auprc_mean": 0.8783479211461094,
+      "auprc_std": 0.03378667363349306,
+      "balanced_accuracy_seeds": [
+       0.952,
+       0.9595,
+       0.965
+      ],
+      "auprc_seeds": [
+       0.8306,
+       0.9021,
+       0.9023
+      ]
+     },
+     {
+      "S": 65536,
+      "floats": 65536,
+      "ints": 65536,
+      "seeds": 0,
+      "bytes": 786432,
+      "balanced_accuracy_mean": 0.9602889752265797,
+      "balanced_accuracy_std": 0.0043543617955371875,
+      "auprc_mean": 0.8906683671729443,
+      "auprc_std": 0.023301053106728503,
+      "balanced_accuracy_seeds": [
+       0.96,
+       0.9657,
+       0.9551
+      ],
+      "auprc_seeds": [
+       0.9095,
+       0.9047,
+       0.8578
+      ]
+     },
+     {
+      "S": 131072,
+      "floats": 131072,
+      "ints": 131072,
+      "seeds": 0,
+      "bytes": 1572864,
+      "balanced_accuracy_mean": 0.9598761589885285,
+      "balanced_accuracy_std": 0.003718209155943993,
+      "auprc_mean": 0.8869380698683074,
+      "auprc_std": 0.015111629437752155,
+      "balanced_accuracy_seeds": [
+       0.9651,
+       0.9567,
+       0.9578
+      ],
+      "auprc_seeds": [
+       0.908,
+       0.8731,
+       0.8797
+      ]
+     },
+     {
+      "S": 262144,
+      "floats": 262144,
+      "ints": 262144,
+      "seeds": 0,
+      "bytes": 3145728,
+      "balanced_accuracy_mean": 0.9580080942208599,
+      "balanced_accuracy_std": 0.0007303544933379902,
+      "auprc_mean": 0.8989081498789688,
+      "auprc_std": 0.005480332048416308,
+      "balanced_accuracy_seeds": [
+       0.957,
+       0.9583,
+       0.9587
+      ],
+      "auprc_seeds": [
+       0.8947,
+       0.8954,
+       0.9066
+      ]
+     },
+     {
+      "S": 524288,
+      "floats": 524288,
+      "ints": 524288,
+      "seeds": 0,
+      "bytes": 6291456,
+      "balanced_accuracy_mean": 0.9637965796505413,
+      "balanced_accuracy_std": 0.0026949937538149494,
+      "auprc_mean": 0.9099066353372035,
+      "auprc_std": 0.005886174797458316,
+      "balanced_accuracy_seeds": [
+       0.9607,
+       0.9634,
+       0.9673
+      ],
+      "auprc_seeds": [
+       0.903,
+       0.9094,
+       0.9174
+      ]
+     },
+     {
+      "S": 1048576,
+      "floats": 1048576,
+      "ints": 1048576,
+      "seeds": 0,
+      "bytes": 12582912,
+      "balanced_accuracy_mean": 0.9611327761508814,
+      "balanced_accuracy_std": 0.003521694257015268,
+      "auprc_mean": 0.9059523807505272,
+      "auprc_std": 0.003086595147695893,
+      "balanced_accuracy_seeds": [
+       0.961,
+       0.9569,
+       0.9655
+      ],
+      "auprc_seeds": [
+       0.9044,
+       0.9032,
+       0.9103
+      ]
+     },
+     {
+      "S": 2097152,
+      "floats": 2097152,
+      "ints": 2097152,
+      "seeds": 0,
+      "bytes": 25165824,
+      "balanced_accuracy_mean": 0.9602568502117559,
+      "balanced_accuracy_std": 0.003018828003133259,
+      "auprc_mean": 0.904916085473528,
+      "auprc_std": 0.0034093197761662095,
+      "balanced_accuracy_seeds": [
+       0.956,
+       0.963,
+       0.9618
+      ],
+      "auprc_seeds": [
+       0.9001,
+       0.9078,
+       0.9068
+      ]
+     },
+     {
+      "S": 2098176,
+      "floats": 2098176,
+      "ints": 2098176,
+      "seeds": 0,
+      "bytes": 25178112,
+      "balanced_accuracy_mean": 0.9613574838714153,
+      "balanced_accuracy_std": 0.0027624468406809064,
+      "auprc_mean": 0.9080625586681667,
+      "auprc_std": 0.0021028448987007466,
+      "balanced_accuracy_seeds": [
+       0.9576,
+       0.9624,
+       0.9641
+      ],
+      "auprc_seeds": [
+       0.9053,
+       0.9104,
+       0.9085
+      ]
+     }
+    ],
+    "seeds": 3,
+    "S_star": 4096,
+    "S_star_over_N": 0.0019521717911176184,
+    "bytes_at_S_star": 49152,
+    "seconds": 49.7,
+    "S_star_stable": 32768,
+    "S_star_stable_over_N": 0.015617374328940947,
+    "S_star_stream": 4096,
+    "S_star_stream_over_N": 0.0019521717911176184,
+    "S_star_stream_stable": 32768,
+    "S_star_stream_stable_over_N": 0.015617374328940947,
+    "S_star_auprc": 524288,
+    "S_star_auprc_over_N": 0.24987798926305516,
+    "S_star_cell": 4096,
+    "S_star_cell_over_N": 0.0019521717911176184,
+    "S_star_cell_stable": 32768,
+    "S_star_cell_stable_over_N": 0.015617374328940947,
+    "bytes_at_S_star_cell_stable": 393216
+   }
+  },
+  "granularity_balanced_accuracy_one_test_cell": 8.407600470825626e-06,
+  "tolerance_cell": 0.01
+ }
+}

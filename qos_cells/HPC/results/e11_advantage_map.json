@@ -1,7 +1,7 @@
 {
  "schema_version": 1,
  "experiment": "e11_advantage_map",
- "created_utc": "2026-11-05T19:16:58+00:00",
+ "created_utc": "2026-11-05T19:36:14+00:00",
  "partial": false,
  "config": {
   "schema_version": 1,
@@ -144,7 +144,7 @@
    "upper_bound_reference": "heavy_hitters_top (oracle top-S, not one-pass)"
   }
  },
- "git_commit": "f6e49db51c8bf1292e09ed4230dbd6644e0a3481-dirty",
+ "git_commit": "ecf0b50e49a3e2b5d827b3405b08d1fcb7cdaef8-dirty",
  "hostname": "quant1",
  "hardware": {
   "hostname": "quant1",
@@ -166,8 +166,8 @@
   "CUDA_VISIBLE_DEVICES": null
  },
  "resources": {
-  "wall_seconds": 1.6,
-  "peak_ram_gb": 0.281,
+  "wall_seconds": 1.7,
+  "peak_ram_gb": 0.278,
   "peak_vram_gb": 0.0
  },
  "synthetic": [
@@ -26661,9 +26661,57 @@
    "source_file": "e9_fullpairs.json",
    "y": 0.22880036258504405,
    "log2N": 26.486828808601505
+  },
+  {
+   "label": "AIDA CD1c-positive myeloid dendritic cell (pairs)",
+   "dataset": "AIDA (E10, pairs)",
+   "task": "CD1c-positive myeloid dendritic cell",
+   "K": 512,
+   "N": 131328,
+   "d_eff": 2135.9909276382377,
+   "best_S_star_over_N": 0.003898635477582846,
+   "source_file": "e10_atlas.json",
+   "y": 0.6505210927647023,
+   "log2N": 17.002815015607055
+  },
+  {
+   "label": "AIDA plasma cell (pairs)",
+   "dataset": "AIDA (E10, pairs)",
+   "task": "plasma cell",
+   "K": 512,
+   "N": 131328,
+   "d_eff": 1130.6147652298378,
+   "best_S_star_over_N": 0.0004873294346978557,
+   "source_file": "e10_atlas.json",
+   "y": 0.5965419089964642,
+   "log2N": 17.002815015607055
+  },
+  {
+   "label": "AIDA hematopoietic stem cell (pairs)",
+   "dataset": "AIDA (E10, pairs)",
+   "task": "hematopoietic stem cell",
+   "K": 512,
+   "N": 131328,
+   "d_eff": 6090.875084106315,
+   "best_S_star_over_N": 0.0009746588693957114,
+   "source_file": "e10_atlas.json",
+   "y": 0.7394324875060682,
+   "log2N": 17.002815015607055
+  },
+  {
+   "label": "AIDA CD14-positive monocyte (pairs)",
+   "dataset": "AIDA (E10, pairs)",
+   "task": "CD14-positive monocyte",
+   "K": 512,
+   "N": 131328,
+   "d_eff": 4466.084395072303,
+   "best_S_star_over_N": 0.00024366471734892786,
+   "source_file": "e10_atlas.json",
+   "y": 0.7131051409657369,
+   "log2N": 17.002815015607055
   }
  ],
- "caption": "Synthetic: one-pass sketches need S*/N >= 0.25 (or never reach the exact centroid) at alpha in [0.75, 1.0]; S*/N <= 1e-2 at alpha in [0.0, 0.25, 0.5] for some N (best = Misra-Gries, S* ~ d_eff). Linear sketches (count-sketch, hashing, sparse JL) never reach the exact centroid at any S <= N here: dense noise collides into the signal. Real tasks (12): log d_eff / log N = 0.23\u20130.51, i.e. the signal is concentrated in few features; measured best S*/N = 8.5e-08\u20139.7e-04. Real data sit in the region where small classical sketches suffice.",
+ "caption": "Synthetic: one-pass sketches need S*/N >= 0.25 (or never reach the exact centroid) at alpha in [0.75, 1.0]; S*/N <= 1e-2 at alpha in [0.0, 0.25, 0.5] for some N (best = Misra-Gries, S* ~ d_eff). Linear sketches (count-sketch, hashing, sparse JL) never reach the exact centroid at any S <= N here: dense noise collides into the signal. Real gene-pair tasks (16; PBMC3k K = 512\u202613,714, AIDA K = 512/2,048): log d_eff / log N = 0.23\u20130.74; measured best one-pass S*/N = 8.5e-08\u20133.9e-03 (all <= 1e-2). The most spread real task (AIDA hematopoietic stem cell (pairs), y = 0.74) sits next to the synthetic failure edge (y ~ 0.75) but still needs only S*/N = 1e-03: the isotropic-noise model is pessimistic, so d_eff alone does not predict failure. No real task falls where classical sketches fail.",
  "run_resources": {
   "wall_seconds": 54.8,
   "peak_ram_gb": 0.447,

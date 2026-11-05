@@ -41,3 +41,21 @@ Decisions since 18:50:
 - D12. E9 logreg at K=13714 crashed twice (segfault, empty log). Cause: scipy L-BFGS-B workspace (~(2m+5)·n doubles, int32-indexed) overflows at n = 9.4·10⁷ with history m = 10. Fix: m = 5 when n > 5·10⁷ (same objective and optimum, different path). Relaunched 19:20.
 - D13. E10 at K=512 runs in ~5–10 min per task, so the optional K=2048 pair space (N = 2,098,176, 22 qubits) is also run, on GPUs 0/6/7.
 - D14. E10 convergence rule adds "rel. error < 1" to E7's rule (BA ≥ exact − 0.01): with 3,975 test positives a noisy Δ̂ can already match the balanced accuracy, so this keeps M from being chosen absurdly small. The M grid is extended to 656,100·N and starts one step below the M whose closed-form rel. error is ≤ 2.5; records per seed are capped at 4·10⁹.
+
+## 19:37 — status 2 (T+55 min)
+
+| exp | state | key numbers | ETA |
+|---|---|---|---|
+| E8 | **done** (committed) | circuit = formula ≤ 3.1e-16, n ≤ 30 | — |
+| E9 | **done** (committed) | best one-pass S* = 8–1,024 counters for N = 1.3·10⁵ … 9.4·10⁷; logreg on all N = 9.4·10⁷ pairs: B 0.994 / DC 0.955 / Mk 0.800 (same as K=512) | — |
+| E10 K=512 | **done** | AIDA 1,265,624 cells, donor split. Best one-pass S* = 32–512 of N = 131,328 for all 4 tasks (π 0.16 → 1.2e-4); HSC: 32 test positives, exact 0.945, sketch S* = 128. Sample cost: measured M₁₀ / closed form = 0.93–1.04, slope −0.50; M₁₀·π(1−π)/N = 190–900 over a 1,400× range of π → the 1/(π(1−π)) law holds | — |
+| E10 K=2048 | running (4 GPUs) | exact BA: CD1c+ DC 0.969, plasma 0.988, HSC 0.904, CD14+ mono 0.963 | 19:55 |
+| E11 | synthetic done; real points pending E10 K=2048 | — | 20:00 |
+| write-up | README / slide notes in progress | | 20:20 |
+
+Decisions:
+- D15. E10 K=2048 first attempt ran out of GPU memory (two jobs on one GPU + full-size copies of the 892k × 2048 matrix in the Gram and logreg code). Fix: row-batched Gram and logreg forward/backward on views (no copies), one task per GPU. Re-verified: centroid, scores and logreg at K=512 unchanged (logreg 0.9944 / 0.9545 / 0.8000). hashing+logreg is off at K=2048 (would hash ~10¹¹ pair entries per seed) — cut.
+- D16. E10 HSC (pairs, K=512) hit the 4·10⁹ records/seed cap at M/N = 218,700; it had already converged at M/N = 72,900 (rel. error 0.78), which is used.
+
+## 19:46 — decisions
+- D17. E10 K=2048 done for all 4 tasks, but HSC (K=2048) hit the 4·10⁹ records/seed cap before its stream converged (rel. error 2.35). The GPU sampler does ~3·10⁸ records/s, so the cap was too cautious. Rerunning the three capped runs (HSC K=512 and K=2048, plasma cell K=2048) with cap 10¹¹ and time cap 60 min. The capped results are kept in logs/superseded/. ETA 20:10.

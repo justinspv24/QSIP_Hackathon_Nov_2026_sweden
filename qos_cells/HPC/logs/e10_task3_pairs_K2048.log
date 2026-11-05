@@ -1,0 +1,18 @@
+[e10 19:34:16] CD14-positive monocyte pairs K=2048: N=2,098,176, n=1,265,624 built in 116 s
+[e10 19:34:18] exact bal.acc 0.9627 auprc 0.9091 d_eff 6351.0 pi 1.60e-01 test pos 59470 M10 closed form 3.789e+09 (M/N 1.81e+03)
+[e10 19:39:08] logreg_full bal.acc 0.9867 auprc 0.9951 iters 300 [290 s]
+[e10 19:39:13] M/N=33 stream bal.acc 0.9625±0.0011 auprc 0.909 rel.err 0.744 (pred 0.740) records 1.13e+07
+[e10 19:39:18] M/N=100 stream bal.acc 0.9627±0.0003 auprc 0.909 rel.err 0.425 (pred 0.425) records 3.43e+07
+[e10 19:40:07] count_sketch       S* = 128 [48.1 s]
+[e10 19:40:55] hashing            S* = 128 [47.9 s]
+[e10 19:41:44] jl_sparse          S* = 64 [48.7 s]
+[e10 19:42:33] heavy_hitters_mg   S* = 128 [48.8 s]
+[e10 19:43:21] heavy_hitters_top  S* = 8 [48.6 s]
+[e10 19:44:11] reservoir          S* = 4096 [49.7 s]
+[e10 19:44:12]   count_sketch       S*_stable 128  S*_cell_stable 128
+[e10 19:44:12]   hashing            S*_stable 128  S*_cell_stable 128
+[e10 19:44:12]   jl_sparse          S*_stable 64  S*_cell_stable 64
+[e10 19:44:12]   heavy_hitters_mg   S*_stable 65536  S*_cell_stable 65536
+[e10 19:44:12]   heavy_hitters_top  S*_stable 8  S*_cell_stable 8
+[e10 19:44:12]   reservoir          S*_stable 32768  S*_cell_stable 32768
+[e10 19:44:12] done {'wall_seconds': 773.8, 'peak_ram_gb': 83.726, 'peak_vram_gb': 31.855}
