@@ -74,10 +74,12 @@ def e9():
         ax.set_ylim(4, max(Nall) * 4)
         ax.axhline(max(Nall) * 1.6, color=DIM, lw=0.6, ls=":")
         npos = rows[0][2]["n_test_pos"] if rows else "?"
-        ax.set_title(f"{c}  ({npos} test positives)", loc="left")
+        ax.set_title(f"{c}  ({npos} test positives)", loc="left", pad=30)
         ax.set_xlabel("feature dimension N (gene pairs)")
-        for N, K, _ in rows:
-            ax.text(N, 5.2, f"K={K}", fontsize=9.5, ha="center", va="bottom", color=DIM, rotation=90)
+        top = ax.secondary_xaxis("top")
+        top.set_xticks([r[0] for r in rows], [f"K={r[1]}" for r in rows], fontsize=9.5, color=DIM, rotation=35, ha="left")
+        top.tick_params(length=3)
+        top.set_xticks([], minor=True)
     axes[0].set_ylabel("S* = counters needed (log)")
     axes[0].text(min(Nall) / 1.8, max(Nall) * 1.6, "never", fontsize=10, color=DIM, va="center")
     H_, L_ = [], []
@@ -87,10 +89,9 @@ def e9():
                 H_.append(h)
                 L_.append(l)
     fig.legend(H_, L_, loc="lower center", ncol=4, frameon=False, bbox_to_anchor=(0.5, 0.0))
-    fig.suptitle("E9 · PBMC3k gene pairs up to N = 9.4·10⁷: classical sketches need only S* ≈ 8–4,096 counters; "
-                 "S* does not grow with N\nS* = smallest S whose mean balanced accuracy stays within max(0.01, one test cell) "
-                 "of the exact centroid (stable rule, as E7)", x=0.01, ha="left", fontsize=14.5)
-    fig.subplots_adjust(left=0.07, right=0.99, top=0.82, bottom=0.25, wspace=0.08)
+    fig.suptitle("E9 · PBMC3k gene pairs up to N = 9.4·10⁷: the best one-pass classical sketch needs S* = 8–1,024 counters;\n"
+                 "S* does not grow with N.   S* = smallest S with mean bal. acc. within max(0.01, one test cell) of the exact centroid (E7 rule)", x=0.01, y=0.995, ha="left", fontsize=13)
+    fig.subplots_adjust(left=0.07, right=0.97, top=0.72, bottom=0.24, wspace=0.08)
     out = hc.FIGURES / "fig_e9_sstar_vs_N.png"
     fig.savefig(out)
     plt.close(fig)

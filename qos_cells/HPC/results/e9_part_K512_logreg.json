@@ -1,7 +1,7 @@
 {
  "schema_version": 1,
  "experiment": "e9_part_K512_logreg",
- "created_utc": "2026-11-05T18:54:41+00:00",
+ "created_utc": "2026-11-05T19:31:10+00:00",
  "partial": false,
  "config": {
   "schema_version": 1,
@@ -146,7 +146,7 @@
    }
   }
  },
- "git_commit": "60624661f5332a8559ae4eb4b2df415855558915-dirty",
+ "git_commit": "0999e9f5fdca4c0ff4317569853534e631262a1b-dirty",
  "hostname": "quant1",
  "hardware": {
   "hostname": "quant1",
@@ -165,12 +165,12 @@
    "6, NVIDIA RTX A6000, 49140 MiB, 575.57.08",
    "7, NVIDIA RTX A6000, 49140 MiB, 575.57.08"
   ],
-  "CUDA_VISIBLE_DEVICES": "6"
+  "CUDA_VISIBLE_DEVICES": "1"
  },
  "resources": {
-  "wall_seconds": 19.6,
-  "peak_ram_gb": 0.748,
-  "peak_vram_gb": 0.033
+  "wall_seconds": 12.6,
+  "peak_ram_gb": 0.806,
+  "peak_vram_gb": 0.034
  },
  "tasks": [
   {
@@ -189,7 +189,7 @@
     "n_iter": 19,
     "converged": true,
     "max_iter": 300,
-    "seconds": 8.1,
+    "seconds": 4.5,
     "method": "class-balanced L2 logistic regression (C=1) on all N pair features, solved in K x K form on GPU (L-BFGS)"
    }
   },
@@ -209,7 +209,7 @@
     "n_iter": 26,
     "converged": true,
     "max_iter": 300,
-    "seconds": 0.6,
+    "seconds": 0.5,
     "method": "class-balanced L2 logistic regression (C=1) on all N pair features, solved in K x K form on GPU (L-BFGS)"
    }
   },

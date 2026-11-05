@@ -1,7 +1,7 @@
 {
  "schema_version": 1,
  "experiment": "e9_fullpairs",
- "created_utc": "2026-11-05T19:02:22+00:00",
+ "created_utc": "2026-11-05T19:31:21+00:00",
  "partial": false,
  "config": {
   "schema_version": 1,
@@ -103,6 +103,7 @@
   },
   "experiment": {
    "merged_from": [
+    "e9_part_K13714_logreg.json",
     "e9_part_K13714_main.json",
     "e9_part_K2048_logreg.json",
     "e9_part_K2048_main.json",
@@ -114,7 +115,7 @@
    "note": "see parts[*].config for each run's settings"
   }
  },
- "git_commit": "1cb43222f9935d9a882b6c2ccc6c0a45d634a33a",
+ "git_commit": "0999e9f5fdca4c0ff4317569853534e631262a1b-dirty",
  "hostname": "quant1",
  "hardware": {
   "hostname": "quant1",
@@ -136,8 +137,8 @@
   "CUDA_VISIBLE_DEVICES": null
  },
  "resources": {
-  "wall_seconds": 2.1,
-  "peak_ram_gb": 0.281,
+  "wall_seconds": 1.9,
+  "peak_ram_gb": 0.282,
   "peak_vram_gb": 0.0
  },
  "by_K": [
@@ -3191,7 +3192,7 @@
       "n_iter": 19,
       "converged": true,
       "max_iter": 300,
-      "seconds": 8.1,
+      "seconds": 4.5,
       "method": "class-balanced L2 logistic regression (C=1) on all N pair features, solved in K x K form on GPU (L-BFGS)"
      },
      "granularity_balanced_accuracy_one_test_cell": 0.0048543689320388345,
@@ -6244,7 +6245,7 @@
       "n_iter": 26,
       "converged": true,
       "max_iter": 300,
-      "seconds": 0.6,
+      "seconds": 0.5,
       "method": "class-balanced L2 logistic regression (C=1) on all N pair features, solved in K x K form on GPU (L-BFGS)"
      },
      "granularity_balanced_accuracy_one_test_cell": 0.045454545454545456,
@@ -34304,6 +34305,20 @@
       }
      },
      "seconds": 138.7,
+     "logreg_full": {
+      "balanced_accuracy": 0.9944199416630265,
+      "auprc": 0.9947614084403468,
+      "floats": 94043756,
+      "ints": 0,
+      "seeds": 0,
+      "bytes": 752350048,
+      "feature_scale": 395227.3911159263,
+      "n_iter": 22,
+      "converged": true,
+      "max_iter": 200,
+      "seconds": 125.6,
+      "method": "class-balanced L2 logistic regression (C=1) on all N pair features, solved in K x K form on GPU (L-BFGS)"
+     },
      "granularity_balanced_accuracy_one_test_cell": 0.0048543689320388345,
      "tolerance_cell": 0.01
     },
@@ -37070,6 +37085,20 @@
       }
      },
      "seconds": 122.6,
+     "logreg_full": {
+      "balanced_accuracy": 0.9545454545454546,
+      "auprc": 0.9590909090909091,
+      "floats": 94043756,
+      "ints": 0,
+      "seeds": 0,
+      "bytes": 752350048,
+      "feature_scale": 389637.6105092091,
+      "n_iter": 23,
+      "converged": true,
+      "max_iter": 200,
+      "seconds": 122.1,
+      "method": "class-balanced L2 logistic regression (C=1) on all N pair features, solved in K x K form on GPU (L-BFGS)"
+     },
      "granularity_balanced_accuracy_one_test_cell": 0.045454545454545456,
      "tolerance_cell": 0.045454545454545456
     },
@@ -39854,6 +39883,20 @@
       }
      },
      "seconds": 125.3,
+     "logreg_full": {
+      "balanced_accuracy": 0.8,
+      "auprc": 0.7781818181818182,
+      "floats": 94043756,
+      "ints": 0,
+      "seeds": 0,
+      "bytes": 752350048,
+      "feature_scale": 396559.87865655473,
+      "n_iter": 17,
+      "converged": true,
+      "max_iter": 200,
+      "seconds": 87.4,
+      "method": "class-balanced L2 logistic regression (C=1) on all N pair features, solved in K x K form on GPU (L-BFGS)"
+     },
      "granularity_balanced_accuracy_one_test_cell": 0.1,
      "tolerance_cell": 0.1
     }
@@ -40506,6 +40549,59 @@
   }
  ],
  "parts": {
+  "e9_part_K13714_logreg.json": {
+   "partial": false,
+   "resources": {
+    "wall_seconds": 346.5,
+    "peak_ram_gb": 20.628,
+    "peak_vram_gb": 5.598
+   },
+   "git_commit": "0999e9f5fdca4c0ff4317569853534e631262a1b-dirty",
+   "config": {
+    "K": 13714,
+    "part": "logreg",
+    "seeds": 5,
+    "hashing_logreg_seeds": 3,
+    "M_over_N_grid": [
+     33,
+     100,
+     300,
+     900,
+     2700,
+     8100
+    ],
+    "reservoir": true,
+    "logreg_max_iter": 200,
+    "positives": [
+     "B cells",
+     "Dendritic cells",
+     "Megakaryocytes"
+    ],
+    "split_seed": 7,
+    "test_frac": 0.3,
+    "S_grid": "powers of 2 from 8 to min(2^22, N), plus N; hashing+logreg S <= 2^16",
+    "stream": "E7 Poissonised uniform stream, simulated by Poisson splitting (total records ~ Poisson(lambda E), uniform nonzero entry)",
+    "dataset": {
+     "file": "/mnt/clarsa-fs/home/lu_jpvarkey/oracle_sketching/QSIP_Hackathon_Nov_2026_sweden/qos_cells/data/pbmc3k_processed.h5ad",
+     "sha256": "0db367b991dd9580",
+     "n_cells": 2638,
+     "n_genes": 13714,
+     "nnz": 2238732,
+     "fraction_zero": 0.9381181668224355,
+     "genes_measured_in_10x_run": 32738,
+     "class_counts": {
+      "CD4 T cells": 1144,
+      "CD14+ Monocytes": 480,
+      "B cells": 342,
+      "CD8 T cells": 316,
+      "NK cells": 154,
+      "FCGR3A+ Monocytes": 150,
+      "Dendritic cells": 37,
+      "Megakaryocytes": 15
+     }
+    }
+   }
+  },
   "e9_part_K13714_main.json": {
    "partial": false,
    "resources": {
@@ -40668,11 +40764,11 @@
   "e9_part_K512_logreg.json": {
    "partial": false,
    "resources": {
-    "wall_seconds": 19.6,
-    "peak_ram_gb": 0.748,
-    "peak_vram_gb": 0.033
+    "wall_seconds": 12.6,
+    "peak_ram_gb": 0.806,
+    "peak_vram_gb": 0.034
    },
-   "git_commit": "60624661f5332a8559ae4eb4b2df415855558915-dirty",
+   "git_commit": "0999e9f5fdca4c0ff4317569853534e631262a1b-dirty",
    "config": {
     "K": 512,
     "part": "logreg",

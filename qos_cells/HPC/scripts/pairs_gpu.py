@@ -106,13 +106,15 @@ class PairData:
     # ---- class statistics -------------------------------------------------------------------------------------
     def gram(self, rows, weights=None):
         """sum_i w_i u_i u_i^T over rows (float64 accumulate via float32 GEMM blocks)."""
-        rows = cp.asarray(rows)
-        U = self.Ud[rows].astype(cp.float32)
-        if weights is not None:
-            Uw = U * cp.asarray(weights, dtype=cp.float32)[:, None]
-        else:
-            Uw = U
-        return (Uw.T @ U).astype(cp.float64)
+        rows = np.asarray(rows)
+        G = cp.zeros((self.K, self.K), dtype=cp.float64)
+        wt = None if weights is None else np.asarray(weights, dtype=np.float32)
+        for a in range(0, len(rows), 100_000):                      # row batches: no full-size copies
+            U = self.Ud[cp.asarray(rows[a:a + 100_000])].astype(cp.float32)
+            Uw = U if wt is None else U * cp.asarray(wt[a:a + 100_000])[:, None]
+            G += (Uw.T @ U).astype(cp.float64)
+            del U, Uw
+        return G
 
     def centroid_delta(self, rows, y):
         """Exact centroid Delta = mean_pos p - mean_neg p over `rows` (pair space, length N, float64)."""
@@ -323,14 +325,25 @@ def fit_logreg(forward, backward, n_w, y, C=1.0, max_iter=300, tol=1e-4):
 
 def logreg_pairs(pd: PairData, tr_rows, y_tr, scale, C=1.0, max_iter=300, tol=1e-4):
     """Logistic regression on ALL N pair features, done in K x K form. Returns (w (N,), b, n_iter, converged)."""
-    U = pd.Ud[cp.asarray(tr_rows)].astype(cp.float32)
+    tr_rows = np.asarray(tr_rows)
+    contiguous = bool(len(tr_rows) and tr_rows[0] == 0 and np.all(np.diff(tr_rows) == 1))
+    U = pd.Ud[: len(tr_rows)] if contiguous else pd.Ud[cp.asarray(tr_rows)]   # a view when rows are 0..n-1
+    B = 100_000
 
     def forward(w):
         T = pd.to_T(w, cp.float32)
-        return scale * cp.sum((U @ T) * U, axis=1, dtype=cp.float64)
+        out = cp.empty(U.shape[0], dtype=cp.float64)
+        for a in range(0, U.shape[0], B):
+            Ub = U[a:a + B]
+            out[a:a + B] = cp.sum((Ub @ T) * Ub, axis=1, dtype=cp.float64)
+        return scale * out
 
     def backward(r):
-        G = (U * r.astype(cp.float32)[:, None]).T @ U
+        G = cp.zeros((pd.K, pd.K), dtype=cp.float32)
+        r32 = r.astype(cp.float32)
+        for a in range(0, U.shape[0], B):
+            Ub = U[a:a + B]
+            G += (Ub * r32[a:a + B, None]).T @ Ub
         return scale * pd.from_T(G).astype(cp.float64)
 
     return fit_logreg(forward, backward, pd.N, y_tr, C=C, max_iter=max_iter, tol=tol)
