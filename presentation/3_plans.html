@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3 Plans</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F5F3EF;--ink:#08090B;--gold:#FFC900;--mute:#6B6A66;--line:#DAD6CE;--card:#FFFFFF}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--ink);font-family:"Space Grotesk",system-ui,sans-serif;overflow:hidden}
+#viewport{position:fixed;inset:0;display:grid;place-items:center}
+#stage{width:1280px;height:720px;position:relative;transform-origin:center}
+.slide{position:absolute;inset:0;padding:60px 80px 72px;display:none;flex-direction:column}
+.slide.active{display:flex;animation:in .3s ease}
+@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1}}
+
+/* typography */
+.kicker{font:600 14px "JetBrains Mono",monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);margin-bottom:14px;display:flex;align-items:center;gap:12px}
+.badge{display:inline-flex;align-items:center;gap:8px;background:var(--ink);color:var(--bg);font:600 13px "JetBrains Mono",monospace;letter-spacing:.1em;padding:6px 12px;border-radius:6px}
+.badge i{width:10px;height:10px;background:var(--gold);border-radius:2px;display:inline-block}
+h1{font-size:80px;line-height:1;font-weight:700;letter-spacing:-.03em}
+h2{font-size:44px;line-height:1.1;font-weight:700;letter-spacing:-.02em;margin-bottom:28px}
+.lead{font-size:24px;line-height:1.45;color:var(--mute);max-width:820px}
+.mono{font-family:"JetBrains Mono",monospace}
+.mute{color:var(--mute)}
+
+/* layout */
+.row{display:flex;gap:24px}
+.grow{flex:1;min-height:0}
+.col{flex:1;display:flex;flex-direction:column}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px 26px}
+.card h3{font-size:21px;margin-bottom:8px}
+.card p{font-size:17px;line-height:1.45;color:var(--mute)}
+.card.ink{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.card.ink p{color:#B9B6AE}
+.card.accent{border-top:6px solid var(--gold)}
+.label{font:600 12px "JetBrains Mono",monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);margin-bottom:10px}
+.card.ink .label{color:var(--gold)}
+.big{font-size:56px;font-weight:700;line-height:1;letter-spacing:-.02em}
+.dot{width:12px;height:12px;border-radius:50%;background:var(--gold);display:inline-block;flex:none;margin-top:8px}
+.list{display:flex;flex-direction:column;gap:12px}
+.list div{display:flex;gap:14px;font-size:20px;line-height:1.35}
+
+/* plan chip */
+.plannum{width:88px;height:88px;border-radius:20px;background:var(--gold);display:grid;place-items:center;font-size:52px;font-weight:700;flex:none}
+
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:17px;background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+th,td{text-align:left;padding:14px 18px;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.35}
+tr:last-child td{border-bottom:none}
+th{background:var(--ink);color:var(--bg);font:600 13px "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase}
+th .sw{display:inline-block;width:10px;height:10px;background:var(--gold);border-radius:2px;margin-right:8px}
+td:first-child{font:600 13px "JetBrains Mono",monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);width:170px}
+td.tbd{color:var(--mute);font-style:italic}
+
+svg text{font-family:"Space Grotesk",sans-serif}
+.footer{position:absolute;left:80px;right:80px;bottom:28px;display:flex;justify-content:space-between;align-items:center;font:12px "JetBrains Mono",monospace;color:var(--mute);letter-spacing:.06em}
+.footer .bar{display:flex;gap:4px}
+.footer .bar span{width:18px;height:4px;border-radius:2px;background:var(--line)}
+.footer .bar span.on{background:var(--ink)}
+.footer .bar span.cur{background:var(--gold)}
+@media print{html,body{overflow:visible}#viewport{position:static;display:block}#stage{transform:none!important}.slide{display:flex!important;position:relative;page-break-after:always;height:720px;animation:none}}
+</style>
+</head>
+<body>
+<div id="viewport"><div id="stage">
+
+<!-- 1 TITLE -->
+<section class="slide" style="background:var(--ink);color:var(--bg)">
+  <div class="kicker" style="color:#B9B6AE">QSIP Hackathon · ExtremeData4QML · Stockholm · 5 Nov 2026</div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:30px">
+    <div style="display:flex;gap:14px">
+      <div class="plannum">1</div><div class="plannum">2</div>
+      <div class="plannum" style="background:transparent;border:3px dashed var(--gold);color:var(--gold)">3</div>
+    </div>
+    <h1>Three plans.<br>One challenge.</h1>
+    <p class="lead" style="color:#B9B6AE">We'd like your feedback before we pick one and start building.</p>
+  </div>
+</section>
+
+<!-- 2 CHALLENGE -->
+<section class="slide">
+  <div class="kicker"><span class="badge"><i></i>The brief</span></div>
+  <h2>Every plan follows the same five steps</h2>
+  <svg viewBox="0 0 1120 210" width="100%">
+    <g font-size="19">
+      <!-- step boxes -->
+      <g transform="translate(0,20)">
+        <rect width="196" height="150" rx="16" fill="#08090B"/>
+        <text x="22" y="46" fill="#FFC900" font-family="JetBrains Mono" font-size="15" font-weight="600">01</text>
+        <text x="22" y="92" fill="#F5F3EF" font-weight="700">Choose a</text><text x="22" y="118" fill="#F5F3EF" font-weight="700">dataset</text>
+      </g>
+      <g transform="translate(231,20)">
+        <rect width="196" height="150" rx="16" fill="#FFFFFF" stroke="#DAD6CE"/>
+        <text x="22" y="46" fill="#6B6A66" font-family="JetBrains Mono" font-size="15" font-weight="600">02</text>
+        <text x="22" y="92" fill="#08090B" font-weight="700">Describe the</text><text x="22" y="118" fill="#08090B" font-weight="700">challenge</text>
+      </g>
+      <g transform="translate(462,20)">
+        <rect width="196" height="150" rx="16" fill="#FFC900"/>
+        <text x="22" y="46" fill="#08090B" font-family="JetBrains Mono" font-size="15" font-weight="600">03</text>
+        <text x="22" y="92" fill="#08090B" font-weight="700">Argue for a</text><text x="22" y="118" fill="#08090B" font-weight="700">quantum model</text>
+      </g>
+      <g transform="translate(693,20)">
+        <rect width="196" height="150" rx="16" fill="#FFFFFF" stroke="#DAD6CE"/>
+        <text x="22" y="46" fill="#6B6A66" font-family="JetBrains Mono" font-size="15" font-weight="600">04</text>
+        <text x="22" y="92" fill="#08090B" font-weight="700">Build a small</text><text x="22" y="118" fill="#08090B" font-weight="700">prototype</text>
+      </g>
+      <g transform="translate(924,20)">
+        <rect width="196" height="150" rx="16" fill="#08090B"/>
+        <text x="22" y="46" fill="#FFC900" font-family="JetBrains Mono" font-size="15" font-weight="600">05</text>
+        <text x="22" y="92" fill="#F5F3EF" font-weight="700">Connect to the</text><text x="22" y="118" fill="#F5F3EF" font-weight="700">real world</text>
+      </g>
+      <g stroke="#08090B" stroke-width="2.5" fill="none">
+        <path d="M200 95 h24 m-7 -7 l7 7 l-7 7"/><path d="M431 95 h24 m-7 -7 l7 7 l-7 7"/>
+        <path d="M662 95 h24 m-7 -7 l7 7 l-7 7"/><path d="M893 95 h24 m-7 -7 l7 7 l-7 7"/>
+      </g>
+    </g>
+  </svg>
+  <div class="row" style="margin-top:28px">
+    <div class="card col"><div class="label">Judged on</div><p style="font-size:19px;color:var(--ink)">1 · Mechanistic reasoning &nbsp; 2 · Creativity &nbsp; 3 · Presentation</p></div>
+    <div class="card col"><div class="label">Rules we keep</div><p style="font-size:19px;color:var(--ink)">No generic circuit on generic data · No need to beat classical · Simulation is enough</p></div>
+  </div>
+</section>
+
+<!-- 3 OVERVIEW -->
+<section class="slide">
+  <div class="kicker"><span class="badge"><i></i>Overview</span></div>
+  <h2>The three plans at a glance</h2>
+  <div class="row grow">
+    <div class="card col accent">
+      <div style="display:flex;gap:16px;align-items:center;margin-bottom:18px"><div class="plannum" style="width:56px;height:56px;font-size:32px;border-radius:14px">1</div><h3 style="font-size:24px;margin:0">Stream it into qubits</h3></div>
+      <div class="label">Data</div><p style="margin-bottom:14px;color:var(--ink)">Network intrusion logs (KDD Cup 99)</p>
+      <div class="label">Hard because</div><p style="margin-bottom:14px;color:var(--ink)">Too big to store · rare attacks</p>
+      <div class="label">Quantum idea</div><p style="color:var(--ink)">Quantum oracle sketching: memory grows with log of the number of features</p>
+    </div>
+    <div class="card col accent">
+      <div style="display:flex;gap:16px;align-items:center;margin-bottom:18px"><div class="plannum" style="width:56px;height:56px;font-size:32px;border-radius:14px">2</div><h3 style="font-size:24px;margin:0">Learn phases from few shots</h3></div>
+      <div class="label">Data</div><p style="margin-bottom:14px;color:var(--ink)">Quantum spin chains (PennyLane qspin, Ising model)</p>
+      <div class="label">Hard because</div><p style="margin-bottom:14px;color:var(--ink)">Data are quantum states; every measurement costs a shot</p>
+      <div class="label">Quantum idea</div><p style="color:var(--ink)">QCNN vs classical-shadow baseline: who needs fewer states and shots?</p>
+    </div>
+    <div class="card col" style="border:2px dashed var(--line);background:transparent;justify-content:center;align-items:center;text-align:center">
+      <div class="plannum" style="width:56px;height:56px;font-size:32px;border-radius:14px;background:transparent;border:3px dashed var(--gold)">3</div>
+      <h3 style="font-size:24px;margin-top:18px">In progress</h3>
+      <p>Being written now</p>
+    </div>
+  </div>
+</section>
+
+<!-- 4 PLAN 1 IDEA -->
+<section class="slide">
+  <div class="kicker"><span class="badge"><i></i>Plan 1</span>Steps 1–3 · data, challenge, model</div>
+  <h2>Data too big to store: stream it into qubits</h2>
+  <div class="row" style="align-items:stretch">
+    <div class="card col" style="flex:1.6;padding:20px">
+      <svg viewBox="0 0 700 300" width="100%">
+        <defs><marker id="a1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10z" fill="#08090B"/></marker></defs>
+        <text x="10" y="26" font-size="14" fill="#6B6A66" font-family="JetBrains Mono">① CONNECTIONS ARRIVE</text>
+        <g>
+          <rect x="10" y="50" width="40" height="40" rx="8" fill="#08090B"/><rect x="58" y="50" width="40" height="40" rx="8" fill="#08090B"/>
+          <rect x="106" y="50" width="40" height="40" rx="8" fill="#FFC900"/><rect x="154" y="50" width="40" height="40" rx="8" fill="#08090B"/>
+          <rect x="202" y="50" width="40" height="40" rx="8" fill="#08090B"/>
+        </g>
+        <text x="10" y="116" font-size="14" fill="#6B6A66">each seen once, then thrown away</text>
+        <line x1="252" y1="70" x2="300" y2="70" stroke="#08090B" stroke-width="2.5" marker-end="url(#a1)"/>
+
+        <text x="312" y="26" font-size="14" fill="#6B6A66" font-family="JetBrains Mono">② SMALL ROTATION EACH</text>
+        <g stroke="#08090B" stroke-width="1.5"><line x1="312" y1="52" x2="560" y2="52"/><line x1="312" y1="72" x2="560" y2="72"/><line x1="312" y1="92" x2="560" y2="92"/></g>
+        <g fill="#FFC900" stroke="#08090B" stroke-width="1.5">
+          <rect x="332" y="42" width="40" height="60" rx="6"/><rect x="392" y="42" width="40" height="60" rx="6"/>
+          <rect x="452" y="42" width="40" height="60" rx="6"/><rect x="512" y="42" width="40" height="60" rx="6"/>
+        </g>
+        <text x="312" y="128" font-size="14" fill="#6B6A66" font-family="JetBrains Mono">n = ⌈log₂ d⌉ qubits</text>
+        <line x1="570" y1="72" x2="610" y2="72" stroke="#08090B" stroke-width="2.5" marker-end="url(#a1)"/>
+        <rect x="616" y="44" width="76" height="56" rx="10" fill="#08090B"/>
+        <text x="654" y="70" text-anchor="middle" font-size="13" fill="#F5F3EF">normal /</text>
+        <text x="654" y="88" text-anchor="middle" font-size="13" fill="#F5F3EF">attack</text>
+        <text x="612" y="26" font-size="14" fill="#6B6A66" font-family="JetBrains Mono">③ READ</text>
+
+        <!-- memory comparison -->
+        <text x="10" y="178" font-size="14" fill="#6B6A66" font-family="JetBrains Mono">MEMORY FOR d FEATURES</text>
+        <text x="10" y="214" font-size="16" fill="#08090B">classical</text>
+        <rect x="100" y="198" width="580" height="22" rx="5" fill="#08090B"/>
+        <text x="670" y="214" text-anchor="end" font-size="14" fill="#F5F3EF" font-family="JetBrains Mono">d</text>
+        <text x="10" y="256" font-size="16" fill="#08090B">quantum</text>
+        <rect x="100" y="240" width="66" height="22" rx="5" fill="#FFC900"/>
+        <text x="176" y="256" font-size="14" fill="#08090B" font-family="JetBrains Mono">log₂ d</text>
+        <text x="10" y="292" font-size="13" fill="#6B6A66">Zhao, Zlokapa, Preskill, Huang (2026), arXiv:2604.07639 · no QRAM needed</text>
+      </svg>
+    </div>
+    <div class="col" style="gap:14px">
+      <div class="card"><div class="label">① Dataset</div><p style="color:var(--ink)">KDD Cup 99 · ~500k connections · 41 features · 22 attack types</p></div>
+      <div class="card"><div class="label">② Challenge</div><p style="color:var(--ink)">Huge, fast stream + extreme imbalance (U2R: only 52 records)</p></div>
+      <div class="card ink"><div class="label">③ Why quantum</div><p style="color:var(--bg)">The data can't be stored; the sketch never stores it. Memory: d → log₂ d.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 5 PLAN 1 PROTOTYPE -->
+<section class="slide">
+  <div class="kicker"><span class="badge"><i></i>Plan 1</span>Steps 4–5 · prototype, real world</div>
+  <h2>Three tiers, plus an honest stress test</h2>
+  <div class="row">
+    <div class="card col accent"><div class="label">Tier 1 · classical</div><h3>Streaming baseline</h3><p>Memory needed for a given accuracy. Full dataset.</p></div>
+    <div class="card col accent"><div class="label">Tier 2 · simulator</div><h3>Oracle sketching</h3><p>6–7 qubits, ideal + noisy. Where does it break?</p></div>
+    <div class="card col accent"><div class="label">Tier 3 · IQM</div><h3>Hardware toy</h3><p>2–3 qubits, 4–16 samples. Inference only.</p></div>
+  </div>
+  <div class="row" style="margin-top:24px">
+    <div class="card col">
+      <div class="label">What we measure</div>
+      <div class="list">
+        <div><span class="dot"></span>Memory: classical vs quantum</div>
+        <div><span class="dot"></span>Per-class recall + AUPRC (not accuracy)</div>
+        <div><span class="dot"></span>Rare attacks: when does the sketch miss them?</div>
+      </div>
+    </div>
+    <div class="card col ink">
+      <div class="label">Risks · your view?</div>
+      <div class="list">
+        <div><span class="dot"></span><span>41 features may be too few: in our quick check the quantum overhead only pays off above ~50–75 features</span></div>
+        <div><span class="dot"></span><span>Circuit depth grows with stream length → only short streams on today's hardware</span></div>
+      </div>
+    </div>
+  </div>
+  <p class="mute" style="margin-top:18px;font-size:16px"><b style="color:var(--ink)">Real world:</b> intrusion detection on backbone traffic, card-fraud streams, sensor data too large to write to disk.</p>
+</section>
+
+<!-- 6 PLAN 2 IDEA -->
+<section class="slide">
+  <div class="kicker"><span class="badge"><i></i>Plan 2</span>Steps 1–3 · data, challenge, model</div>
+  <h2>When data are quantum states, every shot costs</h2>
+  <div class="row" style="align-items:stretch">
+    <div class="card col" style="flex:1.6;padding:20px">
+      <svg viewBox="0 0 700 300" width="100%">
+        <defs><marker id="a2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10z" fill="#08090B"/></marker></defs>
+        <!-- spin chain -->
+        <text x="10" y="26" font-size="14" fill="#6B6A66" font-family="JetBrains Mono">SPIN CHAIN STATE  |ψ(h)⟩</text>
+        <line x1="30" y1="70" x2="330" y2="70" stroke="#DAD6CE" stroke-width="3"/>
+        <g id="spins">
+          <circle cx="30" cy="70" r="14" fill="#08090B"/><path d="M30 80 v-20 m-6 6 l6 -6 l6 6" stroke="#F5F3EF" stroke-width="2" fill="none"/>
+          <circle cx="90" cy="70" r="14" fill="#08090B"/><path d="M90 80 v-20 m-6 6 l6 -6 l6 6" stroke="#F5F3EF" stroke-width="2" fill="none"/>
+          <circle cx="150" cy="70" r="14" fill="#08090B"/><path d="M150 60 v20 m-6 -6 l6 6 l6 -6" stroke="#F5F3EF" stroke-width="2" fill="none"/>
+          <circle cx="210" cy="70" r="14" fill="#08090B"/><path d="M210 80 v-20 m-6 6 l6 -6 l6 6" stroke="#F5F3EF" stroke-width="2" fill="none"/>
+          <circle cx="270" cy="70" r="14" fill="#08090B"/><path d="M270 80 v-20 m-6 6 l6 -6 l6 6" stroke="#F5F3EF" stroke-width="2" fill="none"/>
+          <circle cx="330" cy="70" r="14" fill="#08090B"/><path d="M330 60 v20 m-6 -6 l6 6 l6 -6" stroke="#F5F3EF" stroke-width="2" fill="none"/>
+        </g>
+        <text x="10" y="116" font-size="14" fill="#6B6A66">ordered or disordered phase? (transverse-field Ising)</text>
+
+        <line x1="350" y1="70" x2="394" y2="70" stroke="#08090B" stroke-width="2.5" marker-end="url(#a2)"/>
+        <!-- two learners -->
+        <rect x="402" y="30" width="290" height="44" rx="10" fill="#FFC900"/>
+        <text x="418" y="58" font-size="16" fill="#08090B" font-weight="700">QCNN</text>
+        <text x="476" y="58" font-size="14" fill="#08090B">circuit before measuring</text>
+        <rect x="402" y="86" width="290" height="44" rx="10" fill="#08090B"/>
+        <text x="418" y="114" font-size="16" fill="#F5F3EF" font-weight="700">Shadows</text>
+        <text x="500" y="114" font-size="14" fill="#B9B6AE">measure first, classical ML</text>
+
+        <!-- ledger -->
+        <text x="10" y="178" font-size="14" fill="#6B6A66" font-family="JetBrains Mono">THE MEASUREMENT LEDGER · WHO PAYS LESS?</text>
+        <g font-size="16">
+          <rect x="10" y="194" width="216" height="80" rx="12" fill="none" stroke="#08090B" stroke-width="1.5"/>
+          <text x="28" y="226" fill="#08090B" font-weight="700">labelled states</text><text x="28" y="254" fill="#6B6A66" font-family="JetBrains Mono" font-size="14">N</text>
+          <rect x="242" y="194" width="216" height="80" rx="12" fill="none" stroke="#08090B" stroke-width="1.5"/>
+          <text x="260" y="226" fill="#08090B" font-weight="700">shots per state</text><text x="260" y="254" fill="#6B6A66" font-family="JetBrains Mono" font-size="14">M</text>
+          <rect x="474" y="194" width="216" height="80" rx="12" fill="none" stroke="#08090B" stroke-width="1.5"/>
+          <text x="492" y="226" fill="#08090B" font-weight="700">parameters</text><text x="492" y="254" fill="#6B6A66" font-family="JetBrains Mono" font-size="14">T = 18·log₂ n</text>
+        </g>
+      </svg>
+    </div>
+    <div class="col" style="gap:14px">
+      <div class="card"><div class="label">① Dataset</div><p style="color:var(--ink)">PennyLane qspin: Ising chains with 4, 8, 16 qubits (a starter dataset)</p></div>
+      <div class="card"><div class="label">② Challenge</div><p style="color:var(--ink)">Few labelled states, and each measurement is expensive</p></div>
+      <div class="card ink"><div class="label">③ Why quantum</div><p style="color:var(--bg)">Weight sharing → few parameters → fewer states needed (Caro et al. bound √(T/N))</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 7 PLAN 2 PROTOTYPE -->
+<section class="slide">
+  <div class="kicker"><span class="badge"><i></i>Plan 2</span>Steps 4–5 · prototype, real world</div>
+  <h2 style="margin-bottom:18px">Five small experiments, one fair rival</h2>
+  <div class="row">
+    <div class="card col accent"><div class="label">E1</div><h3>Learning curve</h3><p>Accuracy vs number of labelled states</p></div>
+    <div class="card col accent"><div class="label">E2</div><h3>Bound check</h3><p>Does the gap follow √(T/N)?</p></div>
+    <div class="card col accent"><div class="label">E3</div><h3>Shot budget</h3><p>Accuracy vs shots per state</p></div>
+    <div class="card col accent"><div class="label">E4</div><h3>Size transfer</h3><p>Train at 8 qubits, test at 16</p></div>
+    <div class="card col accent"><div class="label">E5</div><h3>Kernels</h3><p>Quantum vs classical kernel geometry</p></div>
+  </div>
+  <div class="row" style="margin-top:16px">
+    <div class="card col">
+      <div class="label">Plan details</div>
+      <div class="list">
+        <div><span class="dot"></span>Laptop simulation, ≤16 qubits</div>
+        <div><span class="dot"></span>Optional: frozen 4-qubit QCNN on IQM</div>
+        <div><span class="dot"></span>Fallback: unsupervised anomaly detection (no labels)</div>
+      </div>
+    </div>
+    <div class="card col ink">
+      <div class="label">Risks · your view?</div>
+      <div class="list">
+        <div><span class="dot"></span><span>Classical shadows already solve these phases well, so we claim constants, not exponential gains</span></div>
+        <div><span class="dot"></span><span>Shot crossover and 8→16 transfer are untested: a null result is possible</span></div>
+      </div>
+    </div>
+  </div>
+  <p class="mute" style="margin-top:12px;font-size:16px"><b style="color:var(--ink)">Real world:</b> characterising quantum devices and materials, where every measurement takes lab time.</p>
+</section>
+
+<!-- 8 PLAN 3 -->
+<section class="slide">
+  <div class="kicker"><span class="badge"><i></i>Plan 3</span></div>
+  <div style="flex:1;display:flex;gap:56px;align-items:center">
+    <div class="plannum" style="width:200px;height:200px;font-size:120px;border-radius:40px;background:transparent;border:5px dashed var(--gold)">3</div>
+    <div>
+      <h2 style="margin-bottom:16px">Plan 3 is in progress</h2>
+      <p class="lead">Same five steps. We'll fill this slide in once it is written.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 9 COMPARE -->
+<section class="slide">
+  <div class="kicker"><span class="badge"><i></i>Side by side</span></div>
+  <h2>How the plans compare</h2>
+  <table>
+    <tr><th></th><th><span class="sw"></span>Plan 1 · Oracle sketching</th><th><span class="sw"></span>Plan 2 · QCNN vs shadows</th><th><span class="sw"></span>Plan 3</th></tr>
+    <tr><td>Data</td><td>KDD Cup 99 (classical)</td><td>qspin spin chains (quantum)</td><td class="tbd">tbd</td></tr>
+    <tr><td>Extreme property</td><td>Too big to store · rare attacks</td><td>Few states · costly shots</td><td class="tbd">tbd</td></tr>
+    <tr><td>Quantum lever</td><td>Memory d → log₂ d</td><td>Fewer parameters → fewer samples</td><td class="tbd">tbd</td></tr>
+    <tr><td>Qubits</td><td>6–7 sim · 2–3 on IQM</td><td>4–16 sim · 4 on IQM</td><td class="tbd">tbd</td></tr>
+    <tr><td>Main risk</td><td>Advantage needs large d and deep circuits</td><td>Classical shadows may match it</td><td class="tbd">tbd</td></tr>
+  </table>
+</section>
+
+<!-- 10 QUESTIONS -->
+<section class="slide" style="background:var(--ink);color:var(--bg)">
+  <div class="kicker" style="color:#B9B6AE"><span class="badge" style="background:var(--gold);color:var(--ink)">Your feedback</span></div>
+  <h2 style="font-size:56px">Which plan fits the challenge best?</h2>
+  <div class="row grow" style="align-items:flex-start">
+    <div class="card col" style="background:#15161A;border-color:#2A2B30"><div class="big" style="color:var(--gold)">?</div><p style="color:#B9B6AE;margin-top:14px;font-size:19px">Is the reasoning mechanistic enough?</p></div>
+    <div class="card col" style="background:#15161A;border-color:#2A2B30"><div class="big" style="color:var(--gold)">?</div><p style="color:#B9B6AE;margin-top:14px;font-size:19px">Is a "where it breaks" result welcome?</p></div>
+    <div class="card col" style="background:#15161A;border-color:#2A2B30"><div class="big" style="color:var(--gold)">?</div><p style="color:#B9B6AE;margin-top:14px;font-size:19px">Is the scope right for 1.5 days?</p></div>
+  </div>
+</section>
+
+</div></div>
+<script>
+const slides=[...document.querySelectorAll(".slide")];let cur=0;
+slides.forEach((s,i)=>{const f=document.createElement("div");f.className="footer";
+ const dark=s.style.background.includes("var(--ink)");
+ f.innerHTML=`<span>3 plans · QSIP 2026</span><span class="bar">${slides.map((_,j)=>`<span class="${j<i?"on":j===i?"cur":""}"${dark&&j<i?' style="background:#F5F3EF"':""}></span>`).join("")}</span>`;s.appendChild(f);});
+function show(i){cur=Math.max(0,Math.min(slides.length-1,i));slides.forEach((s,j)=>s.classList.toggle("active",j===cur));try{history.replaceState(null,"","#"+(cur+1))}catch(e){}}
+addEventListener("keydown",e=>{if(["ArrowRight","PageDown"," ","Enter"].includes(e.key)){e.preventDefault();show(cur+1)}
+ if(["ArrowLeft","PageUp","Backspace"].includes(e.key)){e.preventDefault();show(cur-1)}
+ if(e.key==="f"||e.key==="F"){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen().catch(()=>{})}});
+addEventListener("click",e=>show(cur+(e.clientX>innerWidth/2?1:-1)));
+function fit(){document.getElementById("stage").style.transform=`scale(${Math.min(innerWidth/1280,innerHeight/720)})`}
+addEventListener("resize",fit);fit();show((parseInt(location.hash.slice(1))||1)-1);
+</script>
+</body>
+</html>

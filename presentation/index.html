@@ -1,0 +1,545 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Streaming Into Qubits</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F5F3EF; --ink:#08090B; --gold:#FFC900;
+  --dim:rgba(8,9,11,.55); --faint:rgba(8,9,11,.14); --line:rgba(8,9,11,.25);
+  --red:#FF5A4E;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--ink);font-family:"Space Grotesk",system-ui,sans-serif;overflow:hidden}
+#viewport{position:fixed;inset:0;display:grid;place-items:center}
+#stage{width:1280px;height:720px;position:relative;transform-origin:center center}
+.slide{position:absolute;inset:0;padding:64px 80px 70px;display:none;flex-direction:column}
+.slide.active{display:flex;animation:in .35s ease}
+@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.step{font-family:"JetBrains Mono",monospace;font-size:15px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink);margin-bottom:14px;display:flex;gap:14px;align-items:center}
+.step .num{background:var(--gold);border:none;border-radius:999px;width:30px;height:30px;display:grid;place-items:center;letter-spacing:0}
+h1{font-size:76px;line-height:1.02;font-weight:700;letter-spacing:-.02em}
+h2{font-size:46px;line-height:1.08;font-weight:700;letter-spacing:-.015em;margin-bottom:26px;max-width:1080px}
+:not(.card).gold{color:var(--ink);background:linear-gradient(transparent 58%,var(--gold) 58%,var(--gold) 92%,transparent 92%);padding:0 .08em}
+.card.gold{background:rgba(255,201,0,.10)}
+h3.gold{background:none;padding:0;border-bottom:3px solid var(--gold);align-self:flex-start}
+td.gold,.n.gold{font-weight:700;background:none}
+.big.gold{display:inline-block;align-self:flex-start}
+.pipeline .pstep span{display:block;margin-top:8px}
+.dim{color:var(--dim)}
+p.lead{font-size:26px;line-height:1.4;color:var(--dim);max-width:900px}
+.mono{font-family:"JetBrains Mono",monospace}
+.row{display:flex;gap:40px;flex:1;min-height:0}
+.col{flex:1;display:flex;flex-direction:column;justify-content:center}
+.card{border:1.5px solid var(--line);border-radius:14px;padding:22px 24px}
+.card.gold{border-color:var(--gold)}
+.card h3{font-size:22px;margin-bottom:8px}
+.card p{font-size:18px;line-height:1.45;color:var(--dim)}
+.big{font-size:64px;font-weight:700;line-height:1}
+.tag{align-self:flex-start;display:inline-block;font-family:"JetBrains Mono",monospace;font-size:13px;padding:4px 10px;border-radius:999px;border:1.5px solid var(--gold);background:rgba(255,201,0,.18);color:var(--ink)}
+.tag.pending{border-color:var(--dim);color:var(--dim)}
+ul.clean{list-style:none;display:flex;flex-direction:column;gap:14px}
+ul.clean li{font-size:22px;line-height:1.35;padding-left:28px;position:relative}
+ul.clean li::before{content:"";position:absolute;left:0;top:11px;width:12px;height:12px;background:var(--gold);outline:1px solid rgba(8,9,11,.25);border-radius:3px}
+table{border-collapse:collapse;width:100%;font-size:19px}
+th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--faint)}
+th{font-family:"JetBrains Mono",monospace;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);font-weight:400}
+td.n{font-family:"JetBrains Mono",monospace}
+svg text{font-family:"Space Grotesk",sans-serif}
+.footer{position:absolute;left:80px;right:80px;bottom:26px;display:flex;justify-content:space-between;font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--dim);letter-spacing:.06em}
+#progress{position:fixed;left:0;bottom:0;height:4px;background:var(--gold);transition:width .3s}
+#hint{position:fixed;left:50%;transform:translateX(-50%);bottom:12px;font:12px "JetBrains Mono",monospace;color:var(--dim);opacity:.6}
+.pipeline{display:flex;align-items:stretch;gap:0;margin-top:6px}
+.pipeline .pstep{flex:1;border:1.5px solid var(--line);padding:18px 16px;border-radius:12px;position:relative}
+.pipeline .pstep.on{border-color:var(--gold);background:rgba(255,201,0,.06)}
+.pipeline .arrow{width:34px;display:grid;place-items:center;color:var(--ink);font-size:24px}
+.pipeline .pstep b{display:inline-block;font-size:13px;font-family:"JetBrains Mono",monospace;color:var(--ink);background:var(--gold);padding:1px 6px;border-radius:4px;margin-bottom:6px}
+.pipeline .pstep span{font-size:17px;line-height:1.3}
+.note{font-size:16px;color:var(--dim);margin-top:14px}
+@media print{
+  html,body{overflow:visible}
+  #viewport{position:static;display:block}
+  #stage{transform:none!important}
+  .slide{display:flex!important;position:relative;page-break-after:always;height:720px;animation:none}
+  #progress,#hint{display:none}
+}
+</style>
+</head>
+<body>
+<!--
+  ============================================================
+  RESULTS — edit this block after running the experiments.
+  Leave a value as null and its slide shows "pending".
+  ============================================================
+-->
+<script>
+const RESULTS = {
+  // Tier 1 vs Tier 2: binary normal-vs-attack on deduplicated KDD99 (10% subset)
+  performance: {
+    classical: { auprc: null, recall_normal: null, recall_attack: null, memory_floats: null },
+    quantum:   { auprc: null, recall_normal: null, recall_attack: null, qubits: null }
+  },
+  // Rare-class recall per attack group (0..1). Fill both rows.
+  rareClass: {
+    groups: ["DoS", "Probe", "R2L", "U2R"],
+    classical: [null, null, null, null],
+    quantum:   [null, null, null, null]
+  },
+  // Tier 3: IQM toy run. Error vs stream length T (e.g. total-variation distance or |<O> - <O>_ideal|)
+  hardware: {
+    device: null,            // e.g. "IQM Garnet"
+    qubits: null,            // e.g. 3
+    T:          [4, 8, 16],
+    ideal:      [null, null, null],
+    noisy_sim:  [null, null, null],
+    iqm:        [null, null, null]
+  }
+};
+</script>
+
+<div id="viewport"><div id="stage">
+
+<!-- 1 · TITLE -->
+<section class="slide">
+  <div class="step">QSIP Hackathon · ExtremeData4QML · Stockholm 2026</div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:34px">
+    <h1>Some data is too big<br>and too fast to store.<br><span class="gold">So we stream it into qubits.</span></h1>
+    <p class="lead">Quantum oracle sketching on network-intrusion traffic: where it works, and where it breaks.</p>
+  </div>
+  <!-- the 5-step story the challenge asks for -->
+  <div class="pipeline">
+    <div class="pstep"><b>01</b><span>Choose a dataset</span></div><div class="arrow">→</div>
+    <div class="pstep"><b>02</b><span>Describe the challenge</span></div><div class="arrow">→</div>
+    <div class="pstep"><b>03</b><span>Argue for a quantum technique</span></div><div class="arrow">→</div>
+    <div class="pstep"><b>04</b><span>Build a small prototype</span></div><div class="arrow">→</div>
+    <div class="pstep"><b>05</b><span>Connect to the real world</span></div>
+  </div>
+</section>
+
+<!-- 2 · STEP 1 DATASET -->
+<section class="slide">
+  <div class="step"><span class="num">1</span>Choose a dataset with a challenging property</div>
+  <h2>KDD Cup 99: <span class="gold">a firehose of network connections</span></h2>
+  <div class="row">
+    <div class="col" style="flex:1.25">
+      <!-- stream diagram -->
+      <svg viewBox="0 0 620 330" width="100%">
+        <defs>
+          <marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10z" fill="#FFC900"/></marker>
+        </defs>
+        <!-- server -->
+        <rect x="20" y="110" width="110" height="110" rx="12" fill="none" stroke="#08090B" stroke-opacity=".4" stroke-width="1.5"/>
+        <text x="75" y="160" text-anchor="middle" fill="#08090B" font-size="15">Network</text>
+        <text x="75" y="180" text-anchor="middle" fill="#08090B" font-size="15">traffic</text>
+        <!-- packets -->
+        <g>
+          <rect x="160" y="150" width="34" height="30" rx="5" fill="#08090B" opacity=".85"/>
+          <rect x="206" y="150" width="34" height="30" rx="5" fill="#08090B" opacity=".85"/>
+          <rect x="252" y="150" width="34" height="30" rx="5" fill="#FFC900"/>
+          <rect x="298" y="150" width="34" height="30" rx="5" fill="#08090B" opacity=".85"/>
+          <rect x="344" y="150" width="34" height="30" rx="5" fill="#08090B" opacity=".85"/>
+          <rect x="390" y="150" width="34" height="30" rx="5" fill="#08090B" opacity=".85"/>
+        </g>
+        <line x1="430" y1="165" x2="500" y2="165" stroke="#FFC900" stroke-width="2" marker-end="url(#ah)"/>
+        <text x="560" y="160" text-anchor="middle" fill="#08090B" font-weight="700" font-size="17" font-weight="700">normal</text>
+        <text x="560" y="182" text-anchor="middle" fill="#08090B" font-weight="700" font-size="17" font-weight="700">or attack?</text>
+        <!-- one record expanded -->
+        <line x1="269" y1="180" x2="269" y2="222" stroke="#FFC900" stroke-dasharray="3 3"/>
+        <rect x="130" y="222" width="300" height="84" rx="10" fill="none" stroke="#FFC900" stroke-width="2.5"/>
+        <text x="146" y="248" fill="#08090B" font-size="14" font-family="JetBrains Mono">one connection = 41 numbers</text>
+        <text x="146" y="272" fill="#08090B" fill-opacity=".6" font-size="13" font-family="JetBrains Mono">duration, protocol, service,</text>
+        <text x="146" y="292" fill="#08090B" fill-opacity=".6" font-size="13" font-family="JetBrains Mono">bytes, error rates, ...</text>
+        <text x="300" y="120" text-anchor="middle" fill="#08090B" fill-opacity=".55" font-size="14">connections keep arriving · never stops</text>
+      </svg>
+    </div>
+    <div class="col" style="gap:16px">
+      <div class="card"><div class="big gold">~4.9M</div><p>connection records (we use the 10% subset, ~500k)</p></div>
+      <div class="card"><div class="big">41</div><p>features per record (~120 after one-hot encoding)</p></div>
+      <div class="card"><div class="big">22</div><p>attack types in 4 groups: DoS, Probe, R2L, U2R</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 3 · STEP 2 CHALLENGE -->
+<section class="slide">
+  <div class="step"><span class="num">2</span>Describe the challenge</div>
+  <h2>Two things make it hard</h2>
+  <div class="row">
+    <div class="col card" style="justify-content:flex-start;gap:12px">
+      <h3><span class="gold">A ·</span> Too big and too fast to store</h3>
+      <svg viewBox="0 0 520 210" width="100%">
+        <!-- incoming arrows -->
+        <g stroke="#08090B" stroke-opacity=".5" stroke-width="2">
+          <line x1="10" y1="60" x2="170" y2="60"/><line x1="10" y1="90" x2="170" y2="90"/>
+          <line x1="10" y1="120" x2="170" y2="120"/><line x1="10" y1="150" x2="170" y2="150"/>
+        </g>
+        <text x="10" y="40" fill="#08090B" fill-opacity=".6" font-size="14">stream: T samples</text>
+        <!-- memory box overflowing -->
+        <rect x="180" y="45" width="150" height="120" rx="10" fill="none" stroke="#FF5A4E" stroke-width="2"/>
+        <text x="255" y="100" text-anchor="middle" fill="#FF5A4E" font-size="18" font-weight="700">memory</text>
+        <text x="255" y="124" text-anchor="middle" fill="#FF5A4E" font-size="18" font-weight="700">full</text>
+        <g fill="#FF5A4E" opacity=".75"><rect x="335" y="60" width="16" height="16" rx="3"/><rect x="358" y="88" width="16" height="16" rx="3"/><rect x="342" y="118" width="16" height="16" rx="3"/><rect x="372" y="140" width="16" height="16" rx="3"/></g>
+        <text x="400" y="100" fill="#08090B" font-size="15">data</text>
+        <text x="400" y="120" fill="#08090B" font-size="15">dropped</text>
+        <text x="10" y="200" fill="#08090B" fill-opacity=".6" font-size="14">You see each sample once. You can't keep them all.</text>
+      </svg>
+    </div>
+    <div class="col card" style="justify-content:flex-start;gap:12px">
+      <h3><span class="gold">B ·</span> Extreme class imbalance</h3>
+      <svg id="imbalance" viewBox="0 0 520 210" width="100%"></svg>
+      <p class="note" style="margin-top:0">Records per class, 10% subset, log scale. U2R has only <b class="gold">52</b> examples.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 4 · STEP 3 ARGUMENT: MECHANISM -->
+<section class="slide">
+  <div class="step"><span class="num">3</span>Argue for a quantum technique</div>
+  <h2>Quantum oracle sketching: <span class="gold">each sample nudges the qubits, then it is gone</span></h2>
+  <svg viewBox="0 0 1120 330" width="100%" style="flex:1">
+    <defs>
+      <marker id="ah2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10z" fill="#FFC900"/></marker>
+    </defs>
+    <!-- stream -->
+    <text x="20" y="40" fill="#08090B" fill-opacity=".6" font-size="15">① stream of samples</text>
+    <g>
+      <rect x="20" y="70" width="44" height="40" rx="6" fill="#08090B" opacity=".8"/><text x="42" y="96" text-anchor="middle" fill="#F5F3EF" font-size="14" font-family="JetBrains Mono">x₁</text>
+      <rect x="74" y="70" width="44" height="40" rx="6" fill="#08090B" opacity=".8"/><text x="96" y="96" text-anchor="middle" fill="#F5F3EF" font-size="14" font-family="JetBrains Mono">x₂</text>
+      <rect x="128" y="70" width="44" height="40" rx="6" fill="#08090B" opacity=".8"/><text x="150" y="96" text-anchor="middle" fill="#F5F3EF" font-size="14" font-family="JetBrains Mono">x₃</text>
+      <text x="196" y="96" fill="#08090B" font-size="18">…</text>
+      <rect x="220" y="70" width="44" height="40" rx="6" fill="#08090B" opacity=".8"/><text x="242" y="96" text-anchor="middle" fill="#F5F3EF" font-size="14" font-family="JetBrains Mono">x_T</text>
+    </g>
+    <line x1="275" y1="90" x2="335" y2="90" stroke="#FFC900" stroke-width="2" marker-end="url(#ah2)"/>
+    <text x="20" y="150" fill="#08090B" fill-opacity=".55" font-size="14">read once,</text>
+    <text x="20" y="170" fill="#08090B" fill-opacity=".55" font-size="14">never stored</text>
+
+    <!-- qubit register with small rotations -->
+    <text x="345" y="40" fill="#08090B" fill-opacity=".6" font-size="15">② each sample = one small rotation on n qubits</text>
+    <g stroke="#08090B" stroke-opacity=".5" stroke-width="1.5">
+      <line x1="345" y1="80" x2="760" y2="80"/><line x1="345" y1="120" x2="760" y2="120"/><line x1="345" y1="160" x2="760" y2="160"/>
+    </g>
+    <text x="345" y="200" fill="#08090B" fill-opacity=".6" font-size="14" font-family="JetBrains Mono">n = ⌈log₂ d⌉ qubits</text>
+    <g>
+      <rect x="380" y="64" width="62" height="112" rx="8" fill="#F5F3EF" stroke="#FFC900" stroke-width="2.5"/><text x="411" y="126" text-anchor="middle" fill="#08090B" font-weight="700" font-size="15" font-family="JetBrains Mono">U(x₁)</text>
+      <rect x="462" y="64" width="62" height="112" rx="8" fill="#F5F3EF" stroke="#FFC900" stroke-width="2.5"/><text x="493" y="126" text-anchor="middle" fill="#08090B" font-weight="700" font-size="15" font-family="JetBrains Mono">U(x₂)</text>
+      <rect x="544" y="64" width="62" height="112" rx="8" fill="#F5F3EF" stroke="#FFC900" stroke-width="2.5"/><text x="575" y="126" text-anchor="middle" fill="#08090B" font-weight="700" font-size="15" font-family="JetBrains Mono">U(x₃)</text>
+      <text x="630" y="126" fill="#08090B" font-weight="700" font-size="18">…</text>
+      <rect x="660" y="64" width="62" height="112" rx="8" fill="#F5F3EF" stroke="#FFC900" stroke-width="2.5"/><text x="691" y="126" text-anchor="middle" fill="#08090B" font-weight="700" font-size="15" font-family="JetBrains Mono">U(x_T)</text>
+    </g>
+    <line x1="770" y1="120" x2="830" y2="120" stroke="#FFC900" stroke-width="2" marker-end="url(#ah2)"/>
+
+    <!-- shadows -->
+    <text x="840" y="40" fill="#08090B" fill-opacity=".6" font-size="15">③ classical shadows</text>
+    <g>
+      <rect x="840" y="64" width="110" height="112" rx="10" fill="none" stroke="#08090B" stroke-opacity=".5" stroke-width="1.5"/>
+      <text x="895" y="112" text-anchor="middle" fill="#08090B" font-size="15">random</text>
+      <text x="895" y="132" text-anchor="middle" fill="#08090B" font-size="15">measure</text>
+    </g>
+    <line x1="955" y1="120" x2="995" y2="120" stroke="#FFC900" stroke-width="2" marker-end="url(#ah2)"/>
+    <text x="1000" y="40" fill="#08090B" fill-opacity=".6" font-size="15">④ decide</text>
+    <rect x="1000" y="84" width="110" height="72" rx="10" fill="#FFC900"/>
+    <text x="1055" y="116" text-anchor="middle" fill="#08090B" font-size="15" font-weight="700">normal /</text>
+    <text x="1055" y="136" text-anchor="middle" fill="#08090B" font-size="15" font-weight="700">attack</text>
+
+    <!-- analogy -->
+    <rect x="20" y="240" width="1090" height="74" rx="12" fill="rgba(255,201,0,.07)" stroke="#FFC900" stroke-opacity=".5"/>
+    <text x="44" y="272" fill="#08090B" font-weight="700" font-size="17" font-weight="700">Analogy: a long-exposure photo.</text>
+    <text x="44" y="298" fill="#08090B" font-size="16">Every car that drives by leaves a faint light trail. You never store the cars, but the photo still shows where the traffic goes.</text>
+  </svg>
+  <p class="note">Based on Zhao, Zlokapa, Preskill &amp; Huang (2026), arXiv:2604.07639. No QRAM: the data is never loaded into quantum memory, only streamed through.</p>
+</section>
+
+<!-- 5 · STEP 3 ARGUMENT: WHY IT FITS -->
+<section class="slide">
+  <div class="step"><span class="num">3</span>Argue for a quantum technique · why it fits this data</div>
+  <h2>The win is <span class="gold">memory</span>, not speed</h2>
+  <div class="row">
+    <div class="col" style="flex:1.2">
+      <svg id="memplot" viewBox="0 0 600 340" width="100%"></svg>
+    </div>
+    <div class="col" style="gap:14px">
+      <table>
+        <tr><th>features d</th><th>classical memory</th><th>qubits ⌈log₂ d⌉</th></tr>
+        <tr><td class="n">41</td><td class="n">41 numbers</td><td class="n gold">6</td></tr>
+        <tr><td class="n">~120</td><td class="n">~120 numbers</td><td class="n gold">7</td></tr>
+        <tr><td class="n">10⁶</td><td class="n">10⁶ numbers</td><td class="n gold">20</td></tr>
+      </table>
+      <ul class="clean" style="margin-top:12px">
+        <li>Data property <b>(stream)</b> ↔ mechanism property <b>(no storage)</b></li>
+        <li>Imbalance is our <b>stress test</b>: does a tiny sketch still see 52 rare attacks?</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 6 · STEP 4 PROTOTYPE -->
+<section class="slide">
+  <div class="step"><span class="num">4</span>Build a small prototype</div>
+  <h2>Three tiers, each answering one question</h2>
+  <div class="row" style="gap:22px;align-items:stretch">
+    <div class="col card" style="justify-content:flex-start;gap:10px">
+      <span class="tag">TIER 1 · classical</span>
+      <h3 style="margin-top:10px">Streaming baseline</h3>
+      <p>How much memory does a classical streaming model need for a given accuracy?</p>
+      <p class="mono" style="font-size:14px;margin-top:auto">full 10% subset · d = 41 / ~120</p>
+    </div>
+    <div class="col card gold" style="justify-content:flex-start;gap:10px">
+      <span class="tag">TIER 2 · simulator</span>
+      <h3 style="margin-top:10px">Oracle sketching</h3>
+      <p>Comparable performance with ~log₂ d qubits? Where does it break? Also with a noise model.</p>
+      <p class="mono" style="font-size:14px;margin-top:auto">6–7 qubits · ideal + noisy</p>
+    </div>
+    <div class="col card" style="justify-content:flex-start;gap:10px">
+      <span class="tag">TIER 3 · IQM hardware</span>
+      <h3 style="margin-top:10px">Real-device toy</h3>
+      <p>Does the mechanism survive real noise? Inference only, parameters frozen from the simulator.</p>
+      <p class="mono" style="font-size:14px;margin-top:auto">2–3 qubits · T ≈ 4–16 samples</p>
+    </div>
+  </div>
+  <p class="note">Data hygiene: duplicates removed · metrics are per-class recall and AUPRC (accuracy would hide the rare classes).</p>
+</section>
+
+<!-- 7 · RESULTS: PERFORMANCE -->
+<section class="slide">
+  <div class="step"><span class="num">4</span>Prototype results · normal vs attack</div>
+  <h2>Classical stream vs quantum sketch</h2>
+  <div class="row">
+    <div class="col" style="flex:1.3"><svg id="perfplot" viewBox="0 0 640 340" width="100%"></svg></div>
+    <div class="col" style="gap:14px">
+      <table id="perftable"></table>
+      <p class="note">Goal is not to beat classical. Goal: <b class="gold">similar quality from far less memory</b>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 8 · RESULTS: WHERE IT BREAKS -->
+<section class="slide">
+  <div class="step"><span class="num">4</span>Prototype results · where it breaks</div>
+  <h2>Rare attacks: <span class="gold">the honest failure test</span></h2>
+  <div class="row">
+    <div class="col" style="flex:1.3"><svg id="rareplot" viewBox="0 0 640 340" width="100%"></svg></div>
+    <div class="col">
+      <ul class="clean">
+        <li>A sketch keeps the <b>average</b> of the stream</li>
+        <li>52 U2R records barely move that average</li>
+        <li>So we <b>expect</b> rare-class recall to drop first, and we measure how fast</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 9 · RESULTS: HARDWARE -->
+<section class="slide">
+  <div class="step"><span class="num">4</span>Prototype results · real hardware</div>
+  <h2 id="hwtitle">IQM run: does the mechanism survive noise?</h2>
+  <div class="row">
+    <div class="col" style="flex:1.3"><svg id="hwplot" viewBox="0 0 640 340" width="100%"></svg></div>
+    <div class="col card" style="justify-content:flex-start;gap:12px">
+      <h3>Our own caveat</h3>
+      <p>Each streamed sample adds gates, so <b class="gold">circuit depth grows with T</b>. On today's hardware only short streams stay faithful.</p>
+      <p>What we show: the mechanism works at small scale on a real QPU, and how the error grows with T.</p>
+      <p class="mono" style="font-size:14px">No training on hardware · inference with frozen parameters</p>
+    </div>
+  </div>
+</section>
+
+<!-- 10 · STEP 5 REAL WORLD -->
+<section class="slide">
+  <div class="step"><span class="num">5</span>Connect to the real world</div>
+  <h2>Where streams are <span class="gold">too big to keep</span></h2>
+  <div class="row" style="gap:22px;align-items:stretch">
+    <div class="col card" style="justify-content:flex-start;gap:10px">
+      <svg viewBox="0 0 60 60" width="54"><rect x="6" y="14" width="48" height="32" rx="5" fill="none" stroke="#FFC900" stroke-width="3"/><line x1="16" y1="30" x2="44" y2="30" stroke="#FFC900" stroke-width="3"/><circle cx="16" cy="30" r="4" fill="#FFC900"/><circle cx="44" cy="30" r="4" fill="#FFC900"/></svg>
+      <h3>Intrusion detection</h3>
+      <p>Backbone routers see millions of connections per second. Storing them all is not an option.</p>
+    </div>
+    <div class="col card" style="justify-content:flex-start;gap:10px">
+      <svg viewBox="0 0 60 60" width="54"><rect x="6" y="14" width="48" height="32" rx="5" fill="none" stroke="#FFC900" stroke-width="3"/><line x1="6" y1="24" x2="54" y2="24" stroke="#FFC900" stroke-width="5"/></svg>
+      <h3>Payment fraud</h3>
+      <p>Card transactions arrive continuously; fraud is ~0.17% of them. Same two properties.</p>
+    </div>
+    <div class="col card" style="justify-content:flex-start;gap:10px">
+      <svg viewBox="0 0 60 60" width="54"><circle cx="30" cy="30" r="8" fill="#FFC900"/><circle cx="30" cy="30" r="18" fill="none" stroke="#FFC900" stroke-width="3"/><circle cx="30" cy="30" r="27" fill="none" stroke="#FFC900" stroke-opacity=".5" stroke-width="2"/></svg>
+      <h3>Sensors &amp; science</h3>
+      <p>Telescopes, detectors and IoT fleets produce more data than they can write to disk.</p>
+    </div>
+  </div>
+  <div class="card gold" style="margin-top:22px;display:flex;gap:40px;align-items:center">
+    <div><div class="big gold">~20</div><p class="dim" style="font-size:16px">qubits for 10⁶ features</p></div>
+    <p style="font-size:19px;line-height:1.45">Realistic sizing: the qubit count is small. The bottleneck is <b class="gold">circuit depth over long streams</b>, so this needs error-corrected hardware to run at full scale.</p>
+  </div>
+</section>
+
+<!-- 11 · TAKEAWAY -->
+<section class="slide">
+  <div class="step">Takeaway</div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:40px">
+    <h1 style="font-size:64px">Data too big to store<br>→ stream it into <span class="gold">⌈log₂ d⌉ qubits</span>.</h1>
+    <div class="row" style="flex:none;gap:22px">
+      <div class="card col"><h3 class="gold">Works</h3><p>Memory scales with log of features, not features.</p></div>
+      <div class="card col"><h3 class="gold">Breaks</h3><p>Very rare classes, and long streams on noisy hardware.</p></div>
+      <div class="card col"><h3 class="gold">Next</h3><p>Larger d, rare-class boosting, error-mitigated hardware runs.</p></div>
+    </div>
+  </div>
+</section>
+
+</div></div>
+<div id="progress"></div>
+<div id="hint">← → to navigate · F fullscreen</div>
+
+<script>
+/* ---------- helpers ---------- */
+const C = {bg:"#F5F3EF", ink:"#08090B", gold:"#FFC900", dim:"rgba(8,9,11,.6)", faint:"rgba(8,9,11,.14)"};
+const NS = "http://www.w3.org/2000/svg";
+function el(tag, attrs, parent, text){
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (text !== undefined) e.textContent = text;
+  if (parent) parent.appendChild(e);
+  return e;
+}
+const isNum = v => typeof v === "number" && isFinite(v);
+const fmt = v => isNum(v) ? (v <= 1 ? v.toFixed(2) : v.toLocaleString()) : "pending";
+function pending(svg, w, h, msg){
+  el("rect",{x:20,y:20,width:w-40,height:h-40,rx:14,fill:"none",stroke:C.dim,"stroke-dasharray":"6 6"},svg);
+  el("text",{x:w/2,y:h/2-6,"text-anchor":"middle",fill:C.dim,"font-size":20},svg,"Results pending");
+  el("text",{x:w/2,y:h/2+22,"text-anchor":"middle",fill:C.dim,"font-size":14,"font-family":"JetBrains Mono"},svg,msg);
+}
+
+/* ---------- slide 3: class imbalance (10% subset counts, before dedup) ---------- */
+(function(){
+  const svg = document.getElementById("imbalance");
+  const data = [["Normal",97278],["DoS",391458],["Probe",4107],["R2L",1126],["U2R",52]];
+  const x0=90, w=330, top=14, bh=30, gap=10, max=Math.log10(400000);
+  data.forEach(([k,v],i)=>{
+    const y = top + i*(bh+gap);
+    const len = Math.max(4, w*Math.log10(v)/max);
+    const rare = v < 5000;
+    el("text",{x:x0-10,y:y+bh/2+5,"text-anchor":"end",fill:C.ink,"font-size":15},svg,k);
+    el("rect",{x:x0,y,width:len,height:bh,rx:4,fill:rare?C.gold:C.ink,opacity:rare?1:.55},svg);
+    el("text",{x:x0+len+8,y:y+bh/2+5,fill:rare?C.ink:C.dim,"font-size":14,"font-family":"JetBrains Mono"},svg,v.toLocaleString());
+  });
+})();
+
+/* ---------- slide 5: memory scaling (analytic) ---------- */
+(function(){
+  const svg = document.getElementById("memplot");
+  const W=600,H=340,L=70,R=20,T=20,B=56;
+  const pw=W-L-R, ph=H-T-B;
+  // x: log10 d from 1 to 6 ; y: log10 memory units from 0 to 6
+  const X = lx => L + (lx-1)/5*pw;
+  const Y = ly => T + ph - ly/6*ph;
+  for(let i=0;i<=6;i++){ el("line",{x1:L,x2:W-R,y1:Y(i),y2:Y(i),stroke:C.faint},svg);
+    el("text",{x:L-10,y:Y(i)+5,"text-anchor":"end",fill:C.dim,"font-size":13,"font-family":"JetBrains Mono"},svg,"10"+["⁰","¹","²","³","⁴","⁵","⁶"][i]); }
+  for(let i=1;i<=6;i++) el("text",{x:X(i),y:H-B+22,"text-anchor":"middle",fill:C.dim,"font-size":13,"font-family":"JetBrains Mono"},svg,"10"+["","¹","²","³","⁴","⁵","⁶"][i]);
+  el("text",{x:L+pw/2,y:H-6,"text-anchor":"middle",fill:C.dim,"font-size":14},svg,"number of features d");
+  el("text",{x:16,y:T+ph/2,"text-anchor":"middle",fill:C.dim,"font-size":14,transform:`rotate(-90 16 ${T+ph/2})`},svg,"memory (numbers / qubits)");
+  let pc="",pq="";
+  for(let lx=1;lx<=6.0001;lx+=0.05){ const d=Math.pow(10,lx);
+    pc += (pc?"L":"M")+X(lx)+","+Y(Math.log10(d));
+    pq += (pq?"L":"M")+X(lx)+","+Y(Math.log10(Math.ceil(Math.log2(d)))); }
+  el("path",{d:pc,fill:"none",stroke:C.ink,"stroke-width":3,opacity:.7},svg);
+  el("path",{d:pq,fill:"none",stroke:C.gold,"stroke-width":3.5},svg);
+  el("text",{x:X(3.6),y:Y(4.8),fill:C.ink,"font-size":16},svg,"classical: d");
+  el("text",{x:X(4.2),y:Y(1.75),fill:C.ink,"font-weight":700,"font-size":16,"font-weight":700},svg,"quantum: ⌈log₂ d⌉");
+  // KDD marker
+  const kx = Math.log10(41);
+  el("circle",{cx:X(kx),cy:Y(Math.log10(6)),r:6,fill:C.gold},svg);
+  el("text",{x:X(kx)+10,y:Y(Math.log10(6))-10,fill:C.ink,"font-weight":700,"font-size":13,"font-family":"JetBrains Mono"},svg,"KDD99: 6 qubits");
+})();
+
+/* ---------- slide 7: performance ---------- */
+(function(){
+  const P = RESULTS.performance, svg = document.getElementById("perfplot");
+  const tbl = document.getElementById("perftable");
+  tbl.innerHTML = `<tr><th>metric</th><th>classical</th><th>quantum</th></tr>
+   <tr><td>AUPRC</td><td class="n">${fmt(P.classical.auprc)}</td><td class="n gold">${fmt(P.quantum.auprc)}</td></tr>
+   <tr><td>recall · normal</td><td class="n">${fmt(P.classical.recall_normal)}</td><td class="n gold">${fmt(P.quantum.recall_normal)}</td></tr>
+   <tr><td>recall · attack</td><td class="n">${fmt(P.classical.recall_attack)}</td><td class="n gold">${fmt(P.quantum.recall_attack)}</td></tr>
+   <tr><td>memory</td><td class="n">${isNum(P.classical.memory_floats)?P.classical.memory_floats+" numbers":"pending"}</td><td class="n gold">${isNum(P.quantum.qubits)?P.quantum.qubits+" qubits":"pending"}</td></tr>`;
+  const metrics = [["AUPRC","auprc"],["recall normal","recall_normal"],["recall attack","recall_attack"]];
+  const any = metrics.some(([,k])=>isNum(P.classical[k])||isNum(P.quantum[k]));
+  if(!any){ pending(svg,640,340,"edit RESULTS.performance"); return; }
+  barGroups(svg, metrics.map(m=>m[0]), [metrics.map(([,k])=>P.classical[k]), metrics.map(([,k])=>P.quantum[k])], ["classical","quantum"]);
+})();
+
+/* ---------- slide 8: rare class ---------- */
+(function(){
+  const R = RESULTS.rareClass, svg = document.getElementById("rareplot");
+  const any = R.classical.concat(R.quantum).some(isNum);
+  if(!any){ pending(svg,640,340,"edit RESULTS.rareClass"); return; }
+  barGroups(svg, R.groups, [R.classical, R.quantum], ["classical","quantum"], "recall");
+})();
+
+/* ---------- slide 9: hardware ---------- */
+(function(){
+  const Hd = RESULTS.hardware, svg = document.getElementById("hwplot");
+  if(Hd.device) document.getElementById("hwtitle").innerHTML = `IQM <span class="gold">${Hd.device}</span>${Hd.qubits?" · "+Hd.qubits+" qubits":""}: does it survive noise?`;
+  const series = [["ideal sim",Hd.ideal,C.ink,"4 4"],["noisy sim",Hd.noisy_sim,C.dim,""],["IQM",Hd.iqm,C.gold,""]];
+  const vals = series.flatMap(s=>s[1]).filter(isNum);
+  if(!vals.length){ pending(svg,640,340,"edit RESULTS.hardware"); return; }
+  const W=640,H=340,L=70,Rr=130,T=20,B=56,pw=W-L-Rr,ph=H-T-B;
+  const ymax = Math.max(...vals)*1.15 || 1;
+  const X = i => L + (Hd.T.length===1?pw/2:i/(Hd.T.length-1)*pw);
+  const Y = v => T + ph - v/ymax*ph;
+  for(let i=0;i<=4;i++){ const v=ymax*i/4; el("line",{x1:L,x2:L+pw,y1:Y(v),y2:Y(v),stroke:C.faint},svg);
+    el("text",{x:L-10,y:Y(v)+5,"text-anchor":"end",fill:C.dim,"font-size":12,"font-family":"JetBrains Mono"},svg,v.toFixed(2)); }
+  Hd.T.forEach((t,i)=>el("text",{x:X(i),y:H-B+22,"text-anchor":"middle",fill:C.dim,"font-size":13,"font-family":"JetBrains Mono"},svg,"T="+t));
+  el("text",{x:L+pw/2,y:H-6,"text-anchor":"middle",fill:C.dim,"font-size":14},svg,"stream length T (circuit depth grows with T)");
+  el("text",{x:16,y:T+ph/2,"text-anchor":"middle",fill:C.dim,"font-size":14,transform:`rotate(-90 16 ${T+ph/2})`},svg,"error vs exact");
+  series.forEach(([name,arr,col,dash],si)=>{
+    let d=""; arr.forEach((v,i)=>{ if(isNum(v)){ d+=(d?"L":"M")+X(i)+","+Y(v); el("circle",{cx:X(i),cy:Y(v),r:5,fill:col},svg);} });
+    if(d) el("path",{d,fill:"none",stroke:col,"stroke-width":3,"stroke-dasharray":dash},svg);
+    el("rect",{x:L+pw+20,y:T+10+si*28,width:14,height:14,rx:3,fill:col},svg);
+    el("text",{x:L+pw+42,y:T+22+si*28,fill:C.ink,"font-size":14},svg,name);
+  });
+})();
+
+/* shared grouped-bar chart (values 0..1) */
+function barGroups(svg, cats, rows, names, ylab){
+  const W=640,H=340,L=60,R=20,T=40,B=50,pw=W-L-R,ph=H-T-B;
+  const cols=["#08090B",C.gold];
+  const Y = v => T + ph - v*ph;
+  for(let i=0;i<=4;i++){ const v=i/4; el("line",{x1:L,x2:W-R,y1:Y(v),y2:Y(v),stroke:C.faint},svg);
+    el("text",{x:L-10,y:Y(v)+5,"text-anchor":"end",fill:C.dim,"font-size":12,"font-family":"JetBrains Mono"},svg,v.toFixed(2)); }
+  const gw = pw/cats.length, bw = Math.min(46,(gw-30)/rows.length);
+  cats.forEach((c,i)=>{
+    const gx = L + i*gw + (gw - bw*rows.length - 6)/2;
+    rows.forEach((row,ri)=>{
+      const v=row[i], x=gx+ri*(bw+6);
+      if(isNum(v)){ el("rect",{x,y:Y(v),width:bw,height:ph-(Y(v)-T),rx:3,fill:cols[ri],opacity:ri?1:.6},svg);
+        el("text",{x:x+bw/2,y:Y(v)-6,"text-anchor":"middle",fill:C.ink,"font-size":12,"font-family":"JetBrains Mono"},svg,v.toFixed(2)); }
+      else el("rect",{x,y:Y(0)-2,width:bw,height:2,fill:C.dim},svg);
+    });
+    el("text",{x:L+i*gw+gw/2,y:H-B+22,"text-anchor":"middle",fill:C.ink,"font-size":14},svg,c);
+  });
+  names.forEach((n,i)=>{ el("rect",{x:L+i*130,y:8,width:14,height:14,rx:3,fill:cols[i],opacity:i?1:.6},svg);
+    el("text",{x:L+i*130+22,y:20,fill:C.ink,"font-size":14},svg,n); });
+  if(ylab) el("text",{x:W-R,y:20,"text-anchor":"end",fill:C.dim,"font-size":13},svg,ylab);
+}
+
+/* ---------- navigation ---------- */
+const slides=[...document.querySelectorAll(".slide")];
+let cur=0;
+slides.forEach((s,i)=>{ const f=document.createElement("div"); f.className="footer";
+  f.innerHTML=`<span>Streaming into qubits · QSIP 2026</span><span>${String(i+1).padStart(2,"0")} / ${String(slides.length).padStart(2,"0")}</span>`; s.appendChild(f); });
+function show(i){ cur=Math.max(0,Math.min(slides.length-1,i));
+  slides.forEach((s,j)=>s.classList.toggle("active",j===cur));
+  document.getElementById("progress").style.width=((cur+1)/slides.length*100)+"%";
+  try{ history.replaceState(null,"","#"+(cur+1)); }catch(e){} }
+document.addEventListener("keydown",e=>{
+  if(["ArrowRight","PageDown"," ","Enter"].includes(e.key)){e.preventDefault();show(cur+1);}
+  if(["ArrowLeft","PageUp","Backspace"].includes(e.key)){e.preventDefault();show(cur-1);}
+  if(e.key==="Home") show(0); if(e.key==="End") show(slides.length-1);
+  if(e.key==="f"||e.key==="F"){ document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen().catch(()=>{}); }
+});
+document.addEventListener("click",e=>{ if(e.clientX > innerWidth/2) show(cur+1); else show(cur-1); });
+function fit(){ const s=Math.min(innerWidth/1280, innerHeight/720); document.getElementById("stage").style.transform=`scale(${s})`; }
+addEventListener("resize",fit); fit();
+show((parseInt(location.hash.slice(1))||1)-1);
+</script>
+</body>
+</html>
