@@ -1,0 +1,354 @@
+{
+ "schema_version": 1,
+ "experiment": "e9_part_K512_deff",
+ "created_utc": "2026-11-05T18:54:08+00:00",
+ "partial": false,
+ "config": {
+  "schema_version": 1,
+  "seed": 7,
+  "data": {
+   "dataset": "pbmc3k_processed",
+   "path": "data/pbmc3k_processed.h5ad",
+   "test_frac": 0.3,
+   "min_cells_per_gene": 3
+  },
+  "tasks": {
+   "positives": [
+    "B cells",
+    "Dendritic cells",
+    "Megakaryocytes"
+   ],
+   "gene_counts": [
+    4,
+    16,
+    256,
+    1024
+   ]
+  },
+  "sketch": {
+   "stream_mode": "uniform",
+   "tau_per_gene": 1.0,
+   "phase_limit": 1.5707963267948966,
+   "M_grid": [
+    1000,
+    3000,
+    10000,
+    30000,
+    100000,
+    300000,
+    1000000
+   ],
+   "repeats": 5
+  },
+  "scaling": {
+   "gene_counts": [
+    16,
+    64,
+    256,
+    1024
+   ],
+   "positive": "B cells",
+   "classifier_N": 1024
+  },
+  "imbalance": {
+   "pis": [
+    0.5,
+    0.1,
+    0.02,
+    0.005
+   ],
+   "N": 64,
+   "synthetic_cells_per_class": 4000,
+   "M_grid": [
+    3000,
+    10000,
+    30000,
+    100000,
+    300000,
+    1000000
+   ],
+   "repeats": 5
+  },
+  "circuits": {
+   "positive": "B cells",
+   "gene_counts": [
+    4,
+    16
+   ],
+   "cells_per_class": 4,
+   "shots": 2000,
+   "mock_alias": "garnet:mock"
+  },
+  "hardware": {
+   "N": 4,
+   "positive": "B cells",
+   "cells_per_class": 4,
+   "shots": 2000,
+   "n_calibration": 4,
+   "alpha_min": 0.3,
+   "preferred": [
+    "garnet",
+    "sirius"
+   ]
+  },
+  "resources": {
+   "feature_spaces": {
+    "all genes": 32768,
+    "gene pairs": 1073741824
+   },
+   "epsilon": 0.1,
+   "queries": 1,
+   "pi_rare": 0.014,
+   "logical_gate_rate_hz": 1000000.0
+  },
+  "experiment": {
+   "K": 512,
+   "part": "deff",
+   "seeds": 5,
+   "hashing_logreg_seeds": 3,
+   "M_over_N_grid": [
+    33,
+    100,
+    300,
+    900,
+    2700,
+    8100
+   ],
+   "reservoir": true,
+   "logreg_max_iter": 300,
+   "positives": [
+    "B cells",
+    "Dendritic cells",
+    "Megakaryocytes"
+   ],
+   "split_seed": 7,
+   "test_frac": 0.3,
+   "S_grid": "powers of 2 from 8 to min(2^22, N), plus N; hashing+logreg S <= 2^16",
+   "stream": "E7 Poissonised uniform stream, simulated by Poisson splitting (total records ~ Poisson(lambda E), uniform nonzero entry)",
+   "dataset": {
+    "file": "/mnt/clarsa-fs/home/lu_jpvarkey/oracle_sketching/QSIP_Hackathon_Nov_2026_sweden/qos_cells/data/pbmc3k_processed.h5ad",
+    "sha256": "0db367b991dd9580",
+    "n_cells": 2638,
+    "n_genes": 13714,
+    "nnz": 2238732,
+    "fraction_zero": 0.9381181668224355,
+    "genes_measured_in_10x_run": 32738,
+    "class_counts": {
+     "CD4 T cells": 1144,
+     "CD14+ Monocytes": 480,
+     "B cells": 342,
+     "CD8 T cells": 316,
+     "NK cells": 154,
+     "FCGR3A+ Monocytes": 150,
+     "Dendritic cells": 37,
+     "Megakaryocytes": 15
+    }
+   }
+  }
+ },
+ "git_commit": "60624661f5332a8559ae4eb4b2df415855558915-dirty",
+ "hostname": "quant1",
+ "hardware": {
+  "hostname": "quant1",
+  "cpu_count": 128,
+  "platform": "Linux-6.8.0-142-generic-x86_64-with-glibc2.39",
+  "python": "3.12.3",
+  "cpu_model": "AMD EPYC 7542 32-Core Processor",
+  "ram_gb": 2003.9,
+  "gpus_on_node": [
+   "0, NVIDIA RTX A6000, 49140 MiB, 575.57.08",
+   "1, NVIDIA RTX A6000, 49140 MiB, 575.57.08",
+   "2, NVIDIA RTX A6000, 49140 MiB, 575.57.08",
+   "3, NVIDIA RTX A6000, 49140 MiB, 575.57.08",
+   "4, NVIDIA RTX A6000, 49140 MiB, 575.57.08",
+   "5, NVIDIA RTX A6000, 49140 MiB, 575.57.08",
+   "6, NVIDIA RTX A6000, 49140 MiB, 575.57.08",
+   "7, NVIDIA RTX A6000, 49140 MiB, 575.57.08"
+  ],
+  "CUDA_VISIBLE_DEVICES": "1"
+ },
+ "resources": {
+  "wall_seconds": 11.1,
+  "peak_ram_gb": 0.784,
+  "peak_vram_gb": 0.052
+ },
+ "tasks": [
+  {
+   "task": "K=512 B cells",
+   "positive": "B cells",
+   "K": 512,
+   "N": 131328,
+   "index_qubits": 18,
+   "n_train": 1846,
+   "n_test": 792,
+   "n_train_pos": 239,
+   "n_test_pos": 103,
+   "pi_hat": 0.1294691224268689,
+   "base_rate_test": 0.13005050505050506,
+   "abstain_rate_test": 0.0,
+   "train_density": 0.2413073090571469,
+   "nnz_train": 58500490,
+   "nnz_test": 25267088,
+   "genes_head": [
+    "CD74",
+    "HLA-DRA",
+    "HLA-DPB1",
+    "TMSB4X",
+    "S100A4",
+    "HLA-DRB1",
+    "RPL18A",
+    "HLA-DPA1",
+    "FTL",
+    "CD37",
+    "LYZ",
+    "FTH1"
+   ],
+   "S_grid": [
+    8,
+    16,
+    32,
+    64,
+    128,
+    256,
+    512,
+    1024,
+    2048,
+    4096,
+    8192,
+    16384,
+    32768,
+    65536,
+    131072,
+    131328
+   ],
+   "exact_centroid": {
+    "balanced_accuracy": 0.9589879803288852,
+    "auprc": 0.9593003222551553,
+    "floats": 131328,
+    "ints": 0,
+    "seeds": 0,
+    "bytes": 1050624
+   },
+   "d_eff": 365.0592507592089,
+   "delta_norm2": 2.7863672597092907e-05
+  },
+  {
+   "task": "K=512 Dendritic cells",
+   "positive": "Dendritic cells",
+   "K": 512,
+   "N": 131328,
+   "index_qubits": 18,
+   "n_train": 1846,
+   "n_test": 792,
+   "n_train_pos": 26,
+   "n_test_pos": 11,
+   "pi_hat": 0.014084507042253521,
+   "base_rate_test": 0.013888888888888888,
+   "abstain_rate_test": 0.0,
+   "train_density": 0.24510559040911387,
+   "nnz_train": 59421313,
+   "nnz_test": 25948302,
+   "genes_head": [
+    "MALAT1",
+    "B2M",
+    "LYZ",
+    "CD74",
+    "HLA-DRA",
+    "CST3",
+    "TMSB4X",
+    "HLA-DPB1",
+    "HLA-DPA1",
+    "RPS27",
+    "HLA-DRB1",
+    "RPL13A"
+   ],
+   "S_grid": [
+    8,
+    16,
+    32,
+    64,
+    128,
+    256,
+    512,
+    1024,
+    2048,
+    4096,
+    8192,
+    16384,
+    32768,
+    65536,
+    131072,
+    131328
+   ],
+   "exact_centroid": {
+    "balanced_accuracy": 0.9193341869398207,
+    "auprc": 0.48191590708086307,
+    "floats": 131328,
+    "ints": 0,
+    "seeds": 0,
+    "bytes": 1050624
+   },
+   "d_eff": 414.87946587866804,
+   "delta_norm2": 3.117906513862595e-05
+  },
+  {
+   "task": "K=512 Megakaryocytes",
+   "positive": "Megakaryocytes",
+   "K": 512,
+   "N": 131328,
+   "index_qubits": 18,
+   "n_train": 1846,
+   "n_test": 792,
+   "n_train_pos": 10,
+   "n_test_pos": 5,
+   "pi_hat": 0.005417118093174431,
+   "base_rate_test": 0.006313131313131313,
+   "abstain_rate_test": 0.0,
+   "train_density": 0.2260343714097073,
+   "nnz_train": 54797849,
+   "nnz_test": 23245071,
+   "genes_head": [
+    "PPBP",
+    "TMSB4X",
+    "ACTB",
+    "PF4",
+    "GPX1",
+    "OAZ1",
+    "GNG11",
+    "SDPR",
+    "CLU",
+    "MALAT1",
+    "CCL5",
+    "RPL13"
+   ],
+   "S_grid": [
+    8,
+    16,
+    32,
+    64,
+    128,
+    256,
+    512,
+    1024,
+    2048,
+    4096,
+    8192,
+    16384,
+    32768,
+    65536,
+    131072,
+    131328
+   ],
+   "exact_centroid": {
+    "balanced_accuracy": 0.8961880559085134,
+    "auprc": 0.6916279069767441,
+    "floats": 131328,
+    "ints": 0,
+    "seeds": 0,
+    "bytes": 1050624
+   },
+   "d_eff": 90.81492683908998,
+   "delta_norm2": 0.00028955688084315656
+  }
+ ]
+}
