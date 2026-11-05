@@ -284,6 +284,39 @@ def evaluate_columns(P_thr, y_thr, P_test, y_test, D, abstain_thr=None, abstain_
     return out
 
 
+def _make_hash_kernel():
+    import numba
+
+    @numba.njit(parallel=True, cache=True)
+    def k(indptr, indices, data, hb, sg, out):
+        for i in numba.prange(len(indptr) - 1):
+            for a in range(indptr[i], indptr[i + 1]):
+                j = indices[a]
+                out[i, hb[j]] += sg[j] * data[a]
+    return k
+
+
+_HK = None
+
+
+def hashed_max(P, seeds, Smax):
+    """Signed feature hashing of every row of P into Smax buckets (E7 hbucket/hsign with seeds[0], seeds[1])."""
+    global _HK
+    if _HK is None:
+        _HK = _make_hash_kernel()
+    j = np.arange(P.shape[1])
+    hb, sg = E7.hbucket(j, seeds[0], Smax), E7.hsign(j, seeds[1])
+    out = np.zeros((P.shape[0], Smax), dtype=np.float64)
+    _HK(P.indptr, P.indices, P.data, hb, sg, out)
+    return out
+
+
+def fold(H, S):
+    """Features at S buckets from those at Smax (powers of 2): mix(j) % S == (mix(j) % Smax) % S."""
+    n, Smax = H.shape
+    return H.reshape(n, Smax // S, S).sum(1).astype(np.float32) if S < Smax else H.astype(np.float32)
+
+
 def d_eff(D):
     D = np.asarray(D, dtype=np.float64)
     return float(np.sum(D**2) ** 2 / np.sum(D**4))
@@ -398,12 +431,9 @@ def run_task(name, d, N, S_grid, n_seeds, base_seed, hash_logreg_max_S, logreg_m
                 metrics = {}
                 if key == "hashing_logreg":
                     scale = 1.0 / float(P_train.data.mean())
-                    j = np.arange(N)
+                    Htr_max, Hte_max = hashed_max(P_train, seeds, max(grid)), hashed_max(P_test, seeds, max(grid))
                     for S in grid:
-                        h, sg = E7.hbucket(j, seeds[0], S), E7.hsign(j, seeds[1])
-                        Hm = sp.csr_matrix((sg.astype(np.float32), (j, h)), shape=(N, S))
-                        Htr = np.asarray((P_train @ Hm).todense())
-                        Hte = np.asarray((P_test @ Hm).todense())
+                        Htr, Hte = fold(Htr_max, S), fold(Hte_max, S)       # == E7's hbucket(j, seed, S) features
                         ev_ = E7.logreg_balanced(Htr, y_train, Hte, y_test, scale, max_iter=logreg_max_iter)
                         metrics[S] = dict(balanced_accuracy=ev_["balanced_accuracy"], auprc=ev_["auprc"], mem=E7.ledger(floats=S + 1, seeds=2))
                     per_seed.append(metrics)
@@ -451,6 +481,7 @@ def finalise_task(tk):
         for nm, target, k, fn, tl in [("S_star", ex_ba, "balanced_accuracy_mean", E7.s_star_stable, tol),
                                       ("S_star_first", ex_ba, "balanced_accuracy_mean", E7.s_star, tol),
                                       ("S_star_tol001", ex_ba, "balanced_accuracy_mean", E7.s_star_stable, 0.01),
+                                      ("S_star_tol002", ex_ba, "balanced_accuracy_mean", E7.s_star_stable, max(0.02, tol)),
                                       ("S_star_stream", st_ba, "balanced_accuracy_mean", E7.s_star_stable, tol),
                                       ("S_star_auprc", ex_ap, "auprc_mean", E7.s_star_stable, 0.01)]:
             S, B = fn(rows, target, key=k, tol=tl)
@@ -486,7 +517,7 @@ def best_one_pass(tk):
 _CACHE = {}
 
 
-def job(dataset, feat, K, positive, split, n_seeds, out, test_frac=0.3, min_cells=3, logreg_full=True):
+def job(dataset, feat, K, positive, split, n_seeds, out, test_frac=0.3, min_cells=3, logreg_full=True, rec_cap=3e9):
     t0 = time.time()
     cfg = load_config()
     base_seed = int(cfg["seed"])
@@ -509,11 +540,11 @@ def job(dataset, feat, K, positive, split, n_seeds, out, test_frac=0.3, min_cell
                 logreg="sklearn LogisticRegression(class_weight='balanced', C=1, lbfgs), max_iter 300 (200 if N > 1e6)",
                 S_star_rule="smallest S with mean BA within tol of the exact centroid for this and all larger S; tol = max(0.01, 0.5/n_test_pos)",
                 bytes_rule="8 B per float64 counter, 4 B per int32 index, 8 B per 64-bit hash seed",
-                logreg_full_all_N=logreg_full, stream="Poissonised uniform stream, importance weights +1/pi_hat, -1/(1-pi_hat); compound-Poisson sampler")
+                logreg_full_all_N=logreg_full, record_cap_per_seed=rec_cap, stream="Poissonised uniform stream, importance weights +1/pi_hat, -1/(1-pi_hat); compound-Poisson sampler")
     name = f"{dataset} {feat} K={K} {positive} split{split}"
     r = run_task(name, d, N, S_grid, n_seeds, base_seed * 100000 + K * 10 + ti + 977 * split,
                  hash_logreg_max_S=jcfg["hash_logreg_max_S"], logreg_max_iter=(200 if N > 1e6 else 300),
-                 do_logreg_full=logreg_full)
+                 do_logreg_full=logreg_full, m_cap_records=rec_cap)
     r.update(positive=positive, dataset=dataset, feature_set=feat, K=K, split=split, genes_head=d["genes"][:12],
              build_seconds=round(build_s, 1), best_one_pass=best_one_pass(r))
     body = dict(schema_version=1, experiment="e13_job", created_utc=dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"),
@@ -538,5 +569,6 @@ if __name__ == "__main__":
     ap.add_argument("--seeds", type=int, default=3)
     ap.add_argument("--out", required=True)
     ap.add_argument("--no-logreg-full", action="store_true")
+    ap.add_argument("--rec-cap", type=float, default=3e9)
     a = ap.parse_args()
-    job(a.dataset, a.feat, a.K, a.task, a.split, a.seeds, a.out, logreg_full=not a.no_logreg_full)
+    job(a.dataset, a.feat, a.K, a.task, a.split, a.seeds, a.out, logreg_full=not a.no_logreg_full, rec_cap=a.rec_cap)

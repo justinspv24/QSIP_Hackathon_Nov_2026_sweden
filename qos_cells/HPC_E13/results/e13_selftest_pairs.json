@@ -6,7 +6,8 @@
  "nnz": 88587709,
  "same_structure": true,
  "max_abs_value_diff": 1.4551915228366852e-11,
- "seconds_e7": 1.242337942123413,
- "seconds_fast": 5.127847194671631,
- "pass": true
+ "seconds_e7": 1.5274286270141602,
+ "seconds_fast": 5.175554037094116,
+ "pass": true,
+ "hash_fold_max_abs_diff": 6.845220923423767e-08
 }
