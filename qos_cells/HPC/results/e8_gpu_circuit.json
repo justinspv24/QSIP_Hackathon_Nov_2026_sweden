@@ -1,0 +1,887 @@
+{
+ "schema_version": 1,
+ "experiment": "e8_gpu_circuit",
+ "created_utc": "2026-11-05T18:53:31+00:00",
+ "partial": false,
+ "config": {
+  "schema_version": 1,
+  "seed": 7,
+  "data": {
+   "dataset": "pbmc3k_processed",
+   "path": "data/pbmc3k_processed.h5ad",
+   "test_frac": 0.3,
+   "min_cells_per_gene": 3
+  },
+  "tasks": {
+   "positives": [
+    "B cells",
+    "Dendritic cells",
+    "Megakaryocytes"
+   ],
+   "gene_counts": [
+    4,
+    16,
+    256,
+    1024
+   ]
+  },
+  "sketch": {
+   "stream_mode": "uniform",
+   "tau_per_gene": 1.0,
+   "phase_limit": 1.5707963267948966,
+   "M_grid": [
+    1000,
+    3000,
+    10000,
+    30000,
+    100000,
+    300000,
+    1000000
+   ],
+   "repeats": 5
+  },
+  "scaling": {
+   "gene_counts": [
+    16,
+    64,
+    256,
+    1024
+   ],
+   "positive": "B cells",
+   "classifier_N": 1024
+  },
+  "imbalance": {
+   "pis": [
+    0.5,
+    0.1,
+    0.02,
+    0.005
+   ],
+   "N": 64,
+   "synthetic_cells_per_class": 4000,
+   "M_grid": [
+    3000,
+    10000,
+    30000,
+    100000,
+    300000,
+    1000000
+   ],
+   "repeats": 5
+  },
+  "circuits": {
+   "positive": "B cells",
+   "gene_counts": [
+    4,
+    16
+   ],
+   "cells_per_class": 4,
+   "shots": 2000,
+   "mock_alias": "garnet:mock"
+  },
+  "hardware": {
+   "N": 4,
+   "positive": "B cells",
+   "cells_per_class": 4,
+   "shots": 2000,
+   "n_calibration": 4,
+   "alpha_min": 0.3,
+   "preferred": [
+    "garnet",
+    "sirius"
+   ]
+  },
+  "resources": {
+   "feature_spaces": {
+    "all genes": 32768,
+    "gene pairs": 1073741824
+   },
+   "epsilon": 0.1,
+   "queries": 1,
+   "pi_rare": 0.014,
+   "logical_gate_rate_hz": 1000000.0
+  },
+  "experiment": {
+   "n_values": [
+    10,
+    14,
+    18,
+    22,
+    26,
+    30
+   ],
+   "dtype": "complex128",
+   "M_records": 4194304,
+   "pi_rare": 0.02,
+   "record_model": "50 % of records on the 'cell' support (4096 genes or N), 50 % heavy-tailed over all N (g = floor(N u^3), then a fixed random affine scramble); label y ~ Bernoulli(pi); weight = value * (+1/pi if y else -1/(1-pi)), value ~ U(0,1)",
+   "tau_rule": "tau fixed from a pilot (first M/8 records): tau = (pi/2) * M / (2 * 8 * max_g |pilot sum_g|); then assert max|phi| <= pi/2 on the full stream",
+   "cell_support": 4096,
+   "shots": [
+    100,
+    1000,
+    10000,
+    100000,
+    1000000
+   ],
+   "shot_repeats": 200,
+   "seed": 8,
+   "state_prep_B": "direct initialisation of the statevector (not gate-decomposed)",
+   "gpu": "NVIDIA RTX A6000"
+  }
+ },
+ "git_commit": "60624661f5332a8559ae4eb4b2df415855558915-dirty",
+ "hostname": "quant1",
+ "hardware": {
+  "hostname": "quant1",
+  "cpu_count": 128,
+  "platform": "Linux-6.8.0-142-generic-x86_64-with-glibc2.39",
+  "python": "3.12.3",
+  "cpu_model": "AMD EPYC 7542 32-Core Processor",
+  "ram_gb": 2003.9,
+  "gpus_on_node": [
+   "0, NVIDIA RTX A6000, 49140 MiB, 575.57.08",
+   "1, NVIDIA RTX A6000, 49140 MiB, 575.57.08",
+   "2, NVIDIA RTX A6000, 49140 MiB, 575.57.08",
+   "3, NVIDIA RTX A6000, 49140 MiB, 575.57.08",
+   "4, NVIDIA RTX A6000, 49140 MiB, 575.57.08",
+   "5, NVIDIA RTX A6000, 49140 MiB, 575.57.08",
+   "6, NVIDIA RTX A6000, 49140 MiB, 575.57.08",
+   "7, NVIDIA RTX A6000, 49140 MiB, 575.57.08"
+  ],
+  "CUDA_VISIBLE_DEVICES": "0"
+ },
+ "resources": {
+  "wall_seconds": 50.4,
+  "peak_ram_gb": 9.621,
+  "peak_vram_gb": 40.5
+ },
+ "caveat": "The sketch circuit is diagonal (H layer + commuting phase gates + Hadamard test) and classically easy to simulate; this is a correctness and scaling check of the simulator vs the formula, not evidence of quantum advantage.",
+ "sizes": [
+  {
+   "n": 10,
+   "N": 1024,
+   "M": 4194304,
+   "tau": 943.510382583817,
+   "max_abs_phi": 0.3686759912444807,
+   "n_rounds": 209455,
+   "n_distinct_targets": 1024,
+   "statevector_bytes": 32768,
+   "qubits": 11,
+   "states": {
+    "uniform": {
+     "H_layer_s": 0.0001,
+     "phase_gates_s": 2.8803,
+     "max_phase_dev": 6.716849298982197e-15,
+     "readout_s": 0.0002,
+     "z_circuit": 0.0027508387295729353,
+     "z_formula": 0.0027508387295728295,
+     "abs_err": 1.0581813203458523e-16,
+     "norm_err": 6.661338147750939e-16,
+     "P0": 0.5013754193647868,
+     "wall_s": 2.881,
+     "shot_noise": {
+      "100": {
+       "shots": 100,
+       "sigma": 0.09999962164359844,
+       "mean_abs_err": 0.0902825251618872,
+       "frac_within_3sigma": 0.985,
+       "rms_err": 0.11259289081426153
+      },
+      "1000": {
+       "shots": 1000,
+       "sigma": 0.03162265695488417,
+       "mean_abs_err": 0.026377441288929927,
+       "frac_within_3sigma": 0.995,
+       "rms_err": 0.03314760792185309
+      },
+      "10000": {
+       "shots": 10000,
+       "sigma": 0.009999962164359843,
+       "mean_abs_err": 0.007799016774591458,
+       "frac_within_3sigma": 1.0,
+       "rms_err": 0.009835378238505303
+      },
+      "100000": {
+       "shots": 100000,
+       "sigma": 0.0031622656954884165,
+       "mean_abs_err": 0.0026847083872957337,
+       "frac_within_3sigma": 1.0,
+       "rms_err": 0.0033596156826037026
+      },
+      "1000000": {
+       "shots": 1000000,
+       "sigma": 0.0009999962164359843,
+       "mean_abs_err": 0.0007441167745914623,
+       "frac_within_3sigma": 0.995,
+       "rms_err": 0.0009325337480093176
+      }
+     }
+    },
+    "cell": {
+     "H_layer_s": null,
+     "phase_gates_s": 3.0753,
+     "max_phase_dev": 6.938893903907228e-15,
+     "readout_s": 0.0002,
+     "z_circuit": 0.0036025210420548293,
+     "z_formula": 0.0036025210420549438,
+     "abs_err": 1.1449174941446927e-16,
+     "norm_err": 4.440892098500626e-16,
+     "P0": 0.5018012605210277,
+     "wall_s": 3.084,
+     "shot_noise": {
+      "100": {
+       "shots": 100,
+       "sigma": 0.09999935109000166,
+       "mean_abs_err": 0.07368012605210277,
+       "frac_within_3sigma": 0.995,
+       "rms_err": 0.09232293617639852
+      },
+      "1000": {
+       "shots": 1000,
+       "sigma": 0.031622571398324674,
+       "mean_abs_err": 0.025343974789579473,
+       "frac_within_3sigma": 1.0,
+       "rms_err": 0.032171504270036295
+      },
+      "10000": {
+       "shots": 10000,
+       "sigma": 0.009999935109000165,
+       "mean_abs_err": 0.007875798316635612,
+       "frac_within_3sigma": 1.0,
+       "rms_err": 0.010023601872981073
+      },
+      "100000": {
+       "shots": 100000,
+       "sigma": 0.003162257139832467,
+       "mean_abs_err": 0.0023856512625232956,
+       "frac_within_3sigma": 1.0,
+       "rms_err": 0.002898091611545376
+      },
+      "1000000": {
+       "shots": 1000000,
+       "sigma": 0.0009999935109000165,
+       "mean_abs_err": 0.0008160452104205418,
+       "frac_within_3sigma": 0.995,
+       "rms_err": 0.0010077166618662854
+      }
+     }
+    }
+   },
+   "max_abs_circuit_minus_formula": 1.1449174941446927e-16,
+   "max_phase_dev": 6.938893903907228e-15,
+   "wall_s": 7.333,
+   "timing": {
+    "records_and_formula_s": 1.358
+   },
+   "peak_vram_pool_gb": 0.743,
+   "peak_vram_device_gb": 1.015
+  },
+  {
+   "n": 14,
+   "N": 16384,
+   "M": 4194304,
+   "tau": 1733.6862864913467,
+   "max_abs_phi": 0.25176046134638963,
+   "n_rounds": 82429,
+   "n_distinct_targets": 16384,
+   "statevector_bytes": 524288,
+   "qubits": 15,
+   "states": {
+    "uniform": {
+     "H_layer_s": 0.0001,
+     "phase_gates_s": 1.132,
+     "max_phase_dev": 6.8833827526759706e-15,
+     "readout_s": 0.0002,
+     "z_circuit": 1.461871303176654e-05,
+     "z_formula": 1.461871303169959e-05,
+     "abs_err": 6.69494841509799e-17,
+     "norm_err": 8.881784197001252e-16,
+     "P0": 0.5000073093565163,
+     "wall_s": 1.133,
+     "shot_noise": {
+      "100": {
+       "shots": 100,
+       "sigma": 0.09999999998931466,
+       "mean_abs_err": 0.08040116949704255,
+       "frac_within_3sigma": 0.995,
+       "rms_err": 0.0979798892046674
+      },
+      "1000": {
+       "shots": 1000,
+       "sigma": 0.03162277659830479,
+       "mean_abs_err": 0.025430146187130336,
+       "frac_within_3sigma": 1.0,
+       "rms_err": 0.03105445759603587
+      },
+      "10000": {
+       "shots": 10000,
+       "sigma": 0.009999999998931466,
+       "mean_abs_err": 0.00809124575443619,
+       "frac_within_3sigma": 0.995,
+       "rms_err": 0.009918575860897725
+      },
+      "100000": {
+       "shots": 100000,
+       "sigma": 0.0031622776598304795,
+       "mean_abs_err": 0.002651838561390957,
+       "frac_within_3sigma": 1.0,
+       "rms_err": 0.0033156465011854623
+      },
+      "1000000": {
+       "shots": 1000000,
+       "sigma": 0.0009999999998931467,
+       "mean_abs_err": 0.0007416423742606357,
+       "frac_within_3sigma": 0.995,
+       "rms_err": 0.0009617819238255948
+      }
+     }
+    },
+    "cell": {
+     "H_layer_s": null,
+     "phase_gates_s": 1.1554,
+     "max_phase_dev": 1.0850695342234928e-15,
+     "readout_s": 0.0002,
+     "z_circuit": 0.0015483149168015187,
+     "z_formula": 0.001548314916801587,
+     "abs_err": 6.830473686658678e-17,
+     "norm_err": 0.0,
+     "P0": 0.5007741574584008,
+     "wall_s": 1.158,
+     "shot_noise": {
+      "100": {
+       "shots": 100,
+       "sigma": 0.09999988013597408,
+       "mean_abs_err": 0.07628579779001622,
+       "frac_within_3sigma": 1.0,
+       "rms_err": 0.0952732438109705
+      },
+      "1000": {
+       "shots": 1000,
+       "sigma": 0.031622738697350654,
+       "mean_abs_err": 0.025598382044176127,
+       "frac_within_3sigma": 0.995,
+       "rms_err": 0.03279673695309628
+      },
+      "10000": {
+       "shots": 10000,
+       "sigma": 0.009999988013597408,
+       "mean_abs_err": 0.00762851685083199,
+       "frac_within_3sigma": 1.0,
+       "rms_err": 0.009536721054708357
+      },
+      "100000": {
+       "shots": 100000,
+       "sigma": 0.003162273869735065,
+       "mean_abs_err": 0.002605767403327944,
+       "frac_within_3sigma": 0.99,
+       "rms_err": 0.003329975244994362
+      },
+      "1000000": {
+       "shots": 1000000,
+       "sigma": 0.0009999988013597407,
+       "mean_abs_err": 0.0007686025966720661,
+       "frac_within_3sigma": 0.995,
+       "rms_err": 0.0009818103052519395
+      }
+     }
+    }
+   },
+   "max_abs_circuit_minus_formula": 6.830473686658678e-17,
+   "max_phase_dev": 6.8833827526759706e-15,
+   "wall_s": 2.692,
+   "timing": {
+    "records_and_formula_s": 0.393
+   },
+   "peak_vram_pool_gb": 0.509,
+   "peak_vram_device_gb": 0.78
+  },
+  {
+   "n": 18,
+   "N": 262144,
+   "M": 4194304,
+   "tau": 1328.8911353067376,
+   "max_abs_phi": 0.1736582711854757,
+   "n_rounds": 32695,
+   "n_distinct_targets": 256591,
+   "statevector_bytes": 8388608,
+   "qubits": 19,
+   "states": {
+    "uniform": {
+     "H_layer_s": 0.0005,
+     "phase_gates_s": 0.4438,
+     "max_phase_dev": 3.774758283725532e-15,
+     "readout_s": 0.0002,
+     "z_circuit": 6.0216951143221564e-06,
+     "z_formula": 6.02169511433024e-06,
+     "abs_err": 8.083235415647788e-18,
+     "norm_err": 6.661338147750939e-16,
+     "P0": 0.5000030108475575,
+     "wall_s": 0.45,
+     "shot_noise": {
+      "100": {
+       "shots": 100,
+       "sigma": 0.09999999999818697,
+       "mean_abs_err": 0.07600060216951145,
+       "frac_within_3sigma": 0.995,
+       "rms_err": 0.09606265537529896
+      },
+      "1000": {
+       "shots": 1000,
+       "sigma": 0.03162277660111046,
+       "mean_abs_err": 0.02635006021695116,
+       "frac_within_3sigma": 0.995,
+       "rms_err": 0.032460183746306485
+      },
+      "10000": {
+       "shots": 10000,
+       "sigma": 0.009999999999818696,
+       "mean_abs_err": 0.00830618065085343,
+       "frac_within_3sigma": 1.0,
+       "rms_err": 0.010258933414713884
+      },
+      "100000": {
+       "shots": 100000,
+       "sigma": 0.003162277660111046,
+       "mean_abs_err": 0.002481301084755714,
+       "frac_within_3sigma": 1.0,
+       "rms_err": 0.0030550014317696954
+      },
+      "1000000": {
+       "shots": 1000000,
+       "sigma": 0.0009999999999818696,
+       "mean_abs_err": 0.0007544728203648581,
+       "frac_within_3sigma": 0.995,
+       "rms_err": 0.000976903996970496
+      }
+     }
+    },
+    "cell": {
+     "H_layer_s": null,
+     "phase_gates_s": 0.4458,
+     "max_phase_dev": 3.0531133177191805e-16,
+     "readout_s": 0.0002,
+     "z_circuit": -9.098550507224967e-05,
+     "z_formula": -9.098550507221189e-05,
+     "abs_err": 3.778444571111983e-17,
+     "norm_err": 4.440892098500626e-16,
+     "P0": 0.49995450724746404,
+     "wall_s": 0.449,
+     "shot_noise": {
+      "100": {
+       "shots": 100,
+       "sigma": 0.09999999958608188,
+       "mean_abs_err": 0.09240636898535506,
+       "frac_within_3sigma": 1.0,
+       "rms_err": 0.11211069953758548
+      },
+      "1000": {
+       "shots": 1000,
+       "sigma": 0.0316227764707914,
+       "mean_abs_err": 0.025827278840405796,
+       "frac_within_3sigma": 0.99,
+       "rms_err": 0.032736543832876046
+      },
+      "10000": {
+       "shots": 10000,
+       "sigma": 0.00999999995860819,
+       "mean_abs_err": 0.008247909855050726,
+       "frac_within_3sigma": 0.995,
+       "rms_err": 0.010366876629891473
+      },
+      "100000": {
+       "shots": 100000,
+       "sigma": 0.0031622776470791396,
+       "mean_abs_err": 0.0028133872459637187,
+       "frac_within_3sigma": 0.99,
+       "rms_err": 0.0035230341542724893
+      },
+      "1000000": {
+       "shots": 1000000,
+       "sigma": 0.0009999999958608188,
+       "mean_abs_err": 0.0007836408696956659,
+       "frac_within_3sigma": 1.0,
+       "rms_err": 0.0009761772378775909
+      }
+     }
+    }
+   },
+   "max_abs_circuit_minus_formula": 3.778444571111983e-17,
+   "max_phase_dev": 3.774758283725532e-15,
+   "wall_s": 1.232,
+   "timing": {
+    "records_and_formula_s": 0.325
+   },
+   "peak_vram_pool_gb": 0.416,
+   "peak_vram_device_gb": 0.687
+  },
+  {
+   "n": 22,
+   "N": 4194304,
+   "M": 4194304,
+   "tau": 2445.6913622463308,
+   "max_abs_phi": 0.2793983925129352,
+   "n_rounds": 13050,
+   "n_distinct_targets": 1259798,
+   "statevector_bytes": 134217728,
+   "qubits": 23,
+   "states": {
+    "uniform": {
+     "H_layer_s": 0.0087,
+     "phase_gates_s": 0.1802,
+     "max_phase_dev": 1.9984014443252818e-15,
+     "readout_s": 0.0009,
+     "z_circuit": -3.2842521129339275e-06,
+     "z_formula": -3.284252112811067e-06,
+     "abs_err": 1.2286043493334176e-16,
+     "norm_err": 4.440892098500626e-16,
+     "P0": 0.49999835787394376,
+     "wall_s": 0.276,
+     "shot_noise": {
+      "100": {
+       "shots": 100,
+       "sigma": 0.09999999999946069,
+       "mean_abs_err": 0.0779003284252113,
+       "frac_within_3sigma": 1.0,
+       "rms_err": 0.09673673248995623
+      },
+      "1000": {
+       "shots": 1000,
+       "sigma": 0.03162277660151325,
+       "mean_abs_err": 0.026530295582690173,
+       "frac_within_3sigma": 0.995,
+       "rms_err": 0.03262967778922512
+      },
+      "10000": {
+       "shots": 10000,
+       "sigma": 0.00999999999994607,
+       "mean_abs_err": 0.00700780294487323,
+       "frac_within_3sigma": 1.0,
+       "rms_err": 0.009144801463487277
+      },
+      "100000": {
+       "shots": 100000,
+       "sigma": 0.003162277660151325,
+       "mean_abs_err": 0.0027373000000000015,
+       "frac_within_3sigma": 1.0,
+       "rms_err": 0.003293587675480452
+      },
+      "1000000": {
+       "shots": 1000000,
+       "sigma": 0.000999999999994607,
+       "mean_abs_err": 0.0007872701023521003,
+       "frac_within_3sigma": 1.0,
+       "rms_err": 0.0009767546497486022
+      }
+     }
+    },
+    "cell": {
+     "H_layer_s": null,
+     "phase_gates_s": 0.1838,
+     "max_phase_dev": 5.551115123125783e-16,
+     "readout_s": 0.0009,
+     "z_circuit": -0.0005254451531275239,
+     "z_formula": -0.0005254451531275974,
+     "abs_err": 7.35089072945172e-17,
+     "norm_err": 2.220446049250313e-16,
+     "P0": 0.4997372774234364,
+     "wall_s": 0.189,
+     "shot_noise": {
+      "100": {
+       "shots": 100,
+       "sigma": 0.0999999861953686,
+       "mean_abs_err": 0.0799262722576564,
+       "frac_within_3sigma": 0.995,
+       "rms_err": 0.10250996358744609
+      },
+      "1000": {
+       "shots": 1000,
+       "sigma": 0.03162277223627604,
+       "mean_abs_err": 0.02608050890306257,
+       "frac_within_3sigma": 0.995,
+       "rms_err": 0.03266285228153333
+      },
+      "10000": {
+       "shots": 10000,
+       "sigma": 0.009999998619536859,
+       "mean_abs_err": 0.008408508903062552,
+       "frac_within_3sigma": 0.995,
+       "rms_err": 0.010635800273407627
+      },
+      "100000": {
+       "shots": 100000,
+       "sigma": 0.0031622772236276045,
+       "mean_abs_err": 0.0024988643877497923,
+       "frac_within_3sigma": 0.995,
+       "rms_err": 0.003164890180884971
+      },
+      "1000000": {
+       "shots": 1000000,
+       "sigma": 0.0009999998619536858,
+       "mean_abs_err": 0.0007900622576563824,
+       "frac_within_3sigma": 1.0,
+       "rms_err": 0.0009517420929617509
+      }
+     }
+    }
+   },
+   "max_abs_circuit_minus_formula": 1.2286043493334176e-16,
+   "max_phase_dev": 1.9984014443252818e-15,
+   "wall_s": 0.855,
+   "timing": {
+    "records_and_formula_s": 0.382
+   },
+   "peak_vram_pool_gb": 0.532,
+   "peak_vram_device_gb": 0.802
+  },
+  {
+   "n": 26,
+   "N": 67108864,
+   "M": 4194304,
+   "tau": 2261.492893860563,
+   "max_abs_phi": 0.22679302562062395,
+   "n_rounds": 5352,
+   "n_distinct_targets": 1858894,
+   "statevector_bytes": 2147483648,
+   "qubits": 27,
+   "states": {
+    "uniform": {
+     "H_layer_s": 0.1634,
+     "phase_gates_s": 0.074,
+     "max_phase_dev": 4.996003610813204e-16,
+     "readout_s": 0.0127,
+     "z_circuit": -5.5568241674741614e-08,
+     "z_formula": -5.5568241638759694e-08,
+     "abs_err": 3.5981919894693276e-17,
+     "norm_err": 4.440892098500626e-16,
+     "P0": 0.49999997221587933,
+     "wall_s": 1.526,
+     "shot_noise": {
+      "100": {
+       "shots": 100,
+       "sigma": 0.09999999999999984,
+       "mean_abs_err": 0.08370000889091866,
+       "frac_within_3sigma": 0.995,
+       "rms_err": 0.1051380135842263
+      },
+      "1000": {
+       "shots": 1000,
+       "sigma": 0.03162277660168374,
+       "mean_abs_err": 0.022960005001141766,
+       "frac_within_3sigma": 1.0,
+       "rms_err": 0.02827012746158236
+      },
+      "10000": {
+       "shots": 10000,
+       "sigma": 0.009999999999999985,
+       "mean_abs_err": 0.00811199722158792,
+       "frac_within_3sigma": 1.0,
+       "rms_err": 0.010124701608728847
+      },
+      "100000": {
+       "shots": 100000,
+       "sigma": 0.003162277660168374,
+       "mean_abs_err": 0.0025148044454593277,
+       "frac_within_3sigma": 1.0,
+       "rms_err": 0.0032345488694276556
+      },
+      "1000000": {
+       "shots": 1000000,
+       "sigma": 0.0009999999999999985,
+       "mean_abs_err": 0.0007416661102230867,
+       "frac_within_3sigma": 1.0,
+       "rms_err": 0.0009252501334717791
+      }
+     }
+    },
+    "cell": {
+     "H_layer_s": null,
+     "phase_gates_s": 0.0785,
+     "max_phase_dev": 5.551115123125783e-16,
+     "readout_s": 0.0126,
+     "z_circuit": -0.0007415662756278252,
+     "z_formula": -0.0007415662756278263,
+     "abs_err": 1.0842021724855044e-18,
+     "norm_err": 2.220446049250313e-16,
+     "P0": 0.4996292168621862,
+     "wall_s": 0.106,
+     "shot_noise": {
+      "100": {
+       "shots": 100,
+       "sigma": 0.09999997250396916,
+       "mean_abs_err": 0.07178898795307537,
+       "frac_within_3sigma": 1.0,
+       "rms_err": 0.08811627541412417
+      },
+      "1000": {
+       "shots": 1000,
+       "sigma": 0.031622767906675384,
+       "mean_abs_err": 0.025754493976537694,
+       "frac_within_3sigma": 0.99,
+       "rms_err": 0.03283788628947533
+      },
+      "10000": {
+       "shots": 10000,
+       "sigma": 0.009999997250396917,
+       "mean_abs_err": 0.008210921686218602,
+       "frac_within_3sigma": 0.995,
+       "rms_err": 0.010156789766080275
+      },
+      "100000": {
+       "shots": 100000,
+       "sigma": 0.0031622767906675387,
+       "mean_abs_err": 0.0027960156627562806,
+       "frac_within_3sigma": 0.995,
+       "rms_err": 0.00348771215749893
+      },
+      "1000000": {
+       "shots": 1000000,
+       "sigma": 0.0009999997250396916,
+       "mean_abs_err": 0.000752547348974885,
+       "frac_within_3sigma": 1.0,
+       "rms_err": 0.0009559861369780597
+      }
+     }
+    }
+   },
+   "max_abs_circuit_minus_formula": 3.5981919894693276e-17,
+   "max_phase_dev": 5.551115123125783e-16,
+   "wall_s": 2.372,
+   "timing": {
+    "records_and_formula_s": 0.733
+   },
+   "peak_vram_pool_gb": 3.067,
+   "peak_vram_device_gb": 3.335
+  },
+  {
+   "n": 30,
+   "N": 1073741824,
+   "M": 4194304,
+   "tau": 2095.0687783276953,
+   "max_abs_phi": 0.1845144842892578,
+   "n_rounds": 2097,
+   "n_distinct_targets": 2038306,
+   "statevector_bytes": 34359738368,
+   "qubits": 31,
+   "states": {
+    "uniform": {
+     "H_layer_s": 3.02,
+     "phase_gates_s": 0.0294,
+     "max_phase_dev": 5.689893001203927e-16,
+     "readout_s": 0.2017,
+     "z_circuit": -5.262178637277515e-09,
+     "z_formula": -5.262178793499791e-09,
+     "abs_err": 1.5622227595420495e-16,
+     "norm_err": 2.220446049250313e-16,
+     "P0": 0.4999999973689108,
+     "wall_s": 25.205,
+     "shot_noise": {
+      "100": {
+       "shots": 100,
+       "sigma": 0.1,
+       "mean_abs_err": 0.08030000015786537,
+       "frac_within_3sigma": 0.995,
+       "rms_err": 0.10120276654741293
+      },
+      "1000": {
+       "shots": 1000,
+       "sigma": 0.03162277660168379,
+       "mean_abs_err": 0.02749999978951287,
+       "frac_within_3sigma": 0.995,
+       "rms_err": 0.03455777756014767
+      },
+      "10000": {
+       "shots": 10000,
+       "sigma": 0.01,
+       "mean_abs_err": 0.007932000526217876,
+       "frac_within_3sigma": 1.0,
+       "rms_err": 0.010019940550222886
+      },
+      "100000": {
+       "shots": 100000,
+       "sigma": 0.0031622776601683794,
+       "mean_abs_err": 0.002623699421160328,
+       "frac_within_3sigma": 1.0,
+       "rms_err": 0.0032998651927300957
+      },
+      "1000000": {
+       "shots": 1000000,
+       "sigma": 0.001,
+       "mean_abs_err": 0.0007720794211603349,
+       "frac_within_3sigma": 1.0,
+       "rms_err": 0.0009727570841118386
+      }
+     }
+    },
+    "cell": {
+     "H_layer_s": null,
+     "phase_gates_s": 0.029,
+     "max_phase_dev": 5.828670879282072e-16,
+     "readout_s": 0.2002,
+     "z_circuit": -0.00019018126244518818,
+     "z_formula": -0.00019018126244487344,
+     "abs_err": 3.1474389067254194e-16,
+     "norm_err": 0.0,
+     "P0": 0.4999049093687774,
+     "wall_s": 2.748,
+     "shot_noise": {
+      "100": {
+       "shots": 100,
+       "sigma": 0.09999999819155436,
+       "mean_abs_err": 0.08942852718936674,
+       "frac_within_3sigma": 0.995,
+       "rms_err": 0.11100936478113772
+      },
+      "1000": {
+       "shots": 1000,
+       "sigma": 0.03162277602980307,
+       "mean_abs_err": 0.023477116313620056,
+       "frac_within_3sigma": 0.995,
+       "rms_err": 0.031142483873023995
+      },
+      "10000": {
+       "shots": 10000,
+       "sigma": 0.009999999819155435,
+       "mean_abs_err": 0.0077246873116288564,
+       "frac_within_3sigma": 1.0,
+       "rms_err": 0.009752704685192914
+      },
+      "100000": {
+       "shots": 100000,
+       "sigma": 0.0031622776029803065,
+       "mean_abs_err": 0.0025614981873755462,
+       "frac_within_3sigma": 1.0,
+       "rms_err": 0.0031215133320399773
+      },
+      "1000000": {
+       "shots": 1000000,
+       "sigma": 0.0009999999819155436,
+       "mean_abs_err": 0.0008160172504977928,
+       "frac_within_3sigma": 1.0,
+       "rms_err": 0.0010040907303561493
+      }
+     }
+    }
+   },
+   "max_abs_circuit_minus_formula": 3.1474389067254194e-16,
+   "max_phase_dev": 5.828670879282072e-16,
+   "wall_s": 31.483,
+   "timing": {
+    "records_and_formula_s": 3.483
+   },
+   "peak_vram_pool_gb": 40.5,
+   "peak_vram_device_gb": 40.767
+  }
+ ],
+ "summary": {
+  "max_abs_circuit_minus_formula_all_sizes": 3.1474389067254194e-16,
+  "largest_n": 30,
+  "frac_within_3sigma_min_by_shots": {
+   "100": 0.985,
+   "1000": 0.99,
+   "10000": 0.995,
+   "100000": 0.99,
+   "1000000": 0.995
+  },
+  "verdict": "circuit == formula to 3.1e-16 for n up to 30 index qubits; shot noise matches the binomial law. Correctness/scaling check only: the circuit is diagonal and classically easy."
+ }
+}

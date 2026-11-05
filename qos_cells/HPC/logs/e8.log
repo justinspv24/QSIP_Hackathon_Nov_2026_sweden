@@ -1,0 +1,26 @@
+[e8 18:52:44] warm-up done
+[e8 18:52:44] n = 10: statevector 2^11 complex128 = 0.000 GiB
+[e8 18:52:48] n=10 uniform Z_circ=+2.750839e-03 Z_formula=+2.750839e-03 |diff|=1.06e-16 phase dev=6.7e-15 wall=2.881s
+[e8 18:52:52] n=10 cell    Z_circ=+3.602521e-03 Z_formula=+3.602521e-03 |diff|=1.14e-16 phase dev=6.9e-15 wall=3.084s
+[e8 18:52:52] n=10: max|circuit-formula| = 1.14e-16  wall 7.333 s  peak VRAM 1.015 GB
+[e8 18:52:52] n = 14: statevector 2^15 complex128 = 0.000 GiB
+[e8 18:52:53] n=14 uniform Z_circ=+1.461871e-05 Z_formula=+1.461871e-05 |diff|=6.69e-17 phase dev=6.9e-15 wall=1.133s
+[e8 18:52:54] n=14 cell    Z_circ=+1.548315e-03 Z_formula=+1.548315e-03 |diff|=6.83e-17 phase dev=1.1e-15 wall=1.158s
+[e8 18:52:54] n=14: max|circuit-formula| = 6.83e-17  wall 2.692 s  peak VRAM 0.78 GB
+[e8 18:52:55] n = 18: statevector 2^19 complex128 = 0.008 GiB
+[e8 18:52:55] n=18 uniform Z_circ=+6.021695e-06 Z_formula=+6.021695e-06 |diff|=8.08e-18 phase dev=3.8e-15 wall=0.45s
+[e8 18:52:56] n=18 cell    Z_circ=-9.098551e-05 Z_formula=-9.098551e-05 |diff|=3.78e-17 phase dev=3.1e-16 wall=0.449s
+[e8 18:52:56] n=18: max|circuit-formula| = 3.78e-17  wall 1.232 s  peak VRAM 0.687 GB
+[e8 18:52:56] n = 22: statevector 2^23 complex128 = 0.125 GiB
+[e8 18:52:57] n=22 uniform Z_circ=-3.284252e-06 Z_formula=-3.284252e-06 |diff|=1.23e-16 phase dev=2.0e-15 wall=0.276s
+[e8 18:52:57] n=22 cell    Z_circ=-5.254452e-04 Z_formula=-5.254452e-04 |diff|=7.35e-17 phase dev=5.6e-16 wall=0.189s
+[e8 18:52:57] n=22: max|circuit-formula| = 1.23e-16  wall 0.855 s  peak VRAM 0.802 GB
+[e8 18:52:57] n = 26: statevector 2^27 complex128 = 2.000 GiB
+[e8 18:52:59] n=26 uniform Z_circ=-5.556824e-08 Z_formula=-5.556824e-08 |diff|=3.60e-17 phase dev=5.0e-16 wall=1.526s
+[e8 18:52:59] n=26 cell    Z_circ=-7.415663e-04 Z_formula=-7.415663e-04 |diff|=1.08e-18 phase dev=5.6e-16 wall=0.106s
+[e8 18:52:59] n=26: max|circuit-formula| = 3.60e-17  wall 2.372 s  peak VRAM 3.335 GB
+[e8 18:53:00] n = 30: statevector 2^31 complex128 = 32.000 GiB
+[e8 18:53:28] n=30 uniform Z_circ=-5.262179e-09 Z_formula=-5.262179e-09 |diff|=1.56e-16 phase dev=5.7e-16 wall=25.205s
+[e8 18:53:31] n=30 cell    Z_circ=-1.901813e-04 Z_formula=-1.901813e-04 |diff|=3.15e-16 phase dev=5.8e-16 wall=2.748s
+[e8 18:53:31] n=30: max|circuit-formula| = 3.15e-16  wall 31.483 s  peak VRAM 40.767 GB
+[e8 18:53:32] done
