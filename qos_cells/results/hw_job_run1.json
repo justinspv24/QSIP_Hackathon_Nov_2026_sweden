@@ -1,0 +1,71 @@
+{
+ "alias": "garnet",
+ "backend": "garnet",
+ "job_id": "01a1ac10-173d-7033-b4a9-e227387dfc13",
+ "submitted_utc": "2026-11-05T14:14:58+00:00",
+ "shots": 2000,
+ "n_circuits": 12,
+ "n_qubits": 3,
+ "transpiled_test": {
+  "ops": {
+   "r": 25,
+   "cz": 11,
+   "measure": 1
+  },
+  "depth": 25,
+  "two_qubit": 11,
+  "n_qubits": 19
+ },
+ "transpiled_calibration": [
+  {
+   "ops": {
+    "r": 9,
+    "cz": 1,
+    "measure": 1
+   },
+   "depth": 5,
+   "two_qubit": 1,
+   "n_qubits": 19
+  },
+  {
+   "ops": {
+    "r": 22,
+    "cz": 11,
+    "measure": 1
+   },
+   "depth": 24,
+   "two_qubit": 11,
+   "n_qubits": 19
+  },
+  {
+   "ops": {
+    "r": 25,
+    "cz": 11,
+    "measure": 1
+   },
+   "depth": 25,
+   "two_qubit": 11,
+   "n_qubits": 19
+  },
+  {
+   "ops": {
+    "r": 22,
+    "cz": 9,
+    "measure": 1
+   },
+   "depth": 21,
+   "two_qubit": 9,
+   "n_qubits": 19
+  }
+ ],
+ "mock": false,
+ "frozen_sha256": "d5701e5e6ef0bd0c",
+ "machine_state": {
+  "alias": "garnet",
+  "mock": false,
+  "qubits": 20,
+  "price": 0.5,
+  "queue": 0,
+  "ready": true
+ }
+}

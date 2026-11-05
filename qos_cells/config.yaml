@@ -1,0 +1,57 @@
+# qos_cells — single source of truth for every experiment.
+# Every script reads this file; every results/*.json records the values it used.
+schema_version: 1
+seed: 7
+
+data:
+  dataset: pbmc3k_processed            # cellxgene example h5ad (louvain labels + log1p-normalised raw)
+  path: data/pbmc3k_processed.h5ad
+  test_frac: 0.30
+  min_cells_per_gene: 3
+
+tasks:
+  positives: ["B cells", "Dendritic cells", "Megakaryocytes"]   # rare-class positives
+  gene_counts: [4, 16, 256, 1024]                                 # N must be a power of 2
+
+sketch:
+  stream_mode: uniform        # uniform: records over all (cell, gene) pairs (paper-faithful N/M law);
+                              # nonzero: records only over nonzero entries (sparsity benefit)
+  tau_per_gene: 1.0           # tau = tau_per_gene * N  ->  E[phi_g] = Delta_g = mu1_g - mu0_g
+  phase_limit: 1.5707963267948966   # pi/2: keep sin monotone (asserted)
+  M_grid: [1000, 3000, 10000, 30000, 100000, 300000, 1000000]
+  repeats: 5
+
+scaling:                      # E2
+  gene_counts: [16, 64, 256, 1024]
+  positive: "B cells"
+  classifier_N: 1024
+
+imbalance:                    # E3
+  pis: [0.5, 0.1, 0.02, 0.005]
+  N: 64
+  synthetic_cells_per_class: 4000
+  M_grid: [3000, 10000, 30000, 100000, 300000, 1000000]
+  repeats: 5
+
+circuits:                     # E4
+  positive: "B cells"
+  gene_counts: [4, 16]
+  cells_per_class: 4
+  shots: 2000
+  mock_alias: "garnet:mock"
+
+hardware:                     # E5 (inference only, frozen phases)
+  N: 4
+  positive: "B cells"
+  cells_per_class: 4
+  shots: 2000
+  n_calibration: 4            # training cells with the frozen oracle (+1 zero-sketch circuit)
+  alpha_min: 0.3
+  preferred: ["garnet", "sirius"]
+
+resources:                    # E6
+  feature_spaces: {"all genes": 32768, "gene pairs": 1073741824}
+  epsilon: 0.1
+  queries: 1
+  pi_rare: 0.014              # dendritic cells
+  logical_gate_rate_hz: 1000000.0

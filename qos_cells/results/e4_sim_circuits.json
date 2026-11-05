@@ -1,0 +1,392 @@
+{
+ "schema_version": 1,
+ "experiment": "e4_sim_circuits",
+ "created_utc": "2026-11-05T14:17:49+00:00",
+ "config": {
+  "schema_version": 1,
+  "seed": 7,
+  "data": {
+   "dataset": "pbmc3k_processed",
+   "path": "data/pbmc3k_processed.h5ad",
+   "test_frac": 0.3,
+   "min_cells_per_gene": 3
+  },
+  "tasks": {
+   "positives": [
+    "B cells",
+    "Dendritic cells",
+    "Megakaryocytes"
+   ],
+   "gene_counts": [
+    4,
+    16,
+    256,
+    1024
+   ]
+  },
+  "sketch": {
+   "stream_mode": "uniform",
+   "tau_per_gene": 1.0,
+   "phase_limit": 1.5707963267948966,
+   "M_grid": [
+    1000,
+    3000,
+    10000,
+    30000,
+    100000,
+    300000,
+    1000000
+   ],
+   "repeats": 5
+  },
+  "scaling": {
+   "gene_counts": [
+    16,
+    64,
+    256,
+    1024
+   ],
+   "positive": "B cells",
+   "classifier_N": 1024
+  },
+  "imbalance": {
+   "pis": [
+    0.5,
+    0.1,
+    0.02,
+    0.005
+   ],
+   "N": 64,
+   "synthetic_cells_per_class": 4000,
+   "M_grid": [
+    3000,
+    10000,
+    30000,
+    100000,
+    300000,
+    1000000
+   ],
+   "repeats": 5
+  },
+  "circuits": {
+   "positive": "B cells",
+   "gene_counts": [
+    4,
+    16
+   ],
+   "cells_per_class": 4,
+   "shots": 2000,
+   "mock_alias": "garnet:mock"
+  },
+  "hardware": {
+   "N": 4,
+   "positive": "B cells",
+   "cells_per_class": 4,
+   "shots": 2000,
+   "n_calibration": 4,
+   "alpha_min": 0.3,
+   "preferred": [
+    "garnet",
+    "sirius"
+   ]
+  },
+  "resources": {
+   "feature_spaces": {
+    "all genes": 32768,
+    "gene pairs": 1073741824
+   },
+   "epsilon": 0.1,
+   "queries": 1,
+   "pi_rare": 0.014,
+   "logical_gate_rate_hz": "1.0e6"
+  }
+ },
+ "positive": "B cells",
+ "shots": 2000,
+ "by_N": [
+  {
+   "N": 4,
+   "n_qubits": 3,
+   "genes": [
+    "CD74",
+    "HLA-DRA",
+    "HLA-DPB1",
+    "TMSB4X"
+   ],
+   "threshold": -0.14405464887446162,
+   "sketch_M": 100000,
+   "sketch_rel_error": 0.013817310833470167,
+   "scale_c": 2.9320805941770334,
+   "test_eval_full": {
+    "balanced_accuracy": 0.9467005791424183,
+    "auprc": 0.9392145847518953,
+    "recall_pos": 0.9514563106796117,
+    "recall_neg": 0.941944847605225,
+    "n_test": 792,
+    "n_test_pos": 103,
+    "base_rate": 0.13005050505050506
+   },
+   "phi": [
+    0.7272929715895906,
+    0.5632882544486008,
+    0.28067290238570075,
+    -1.5707963267948966
+   ],
+   "phi_exact": [
+    0.7074287704245595,
+    0.5782727348881308,
+    0.2850948214822059,
+    -1.5707963267948966
+   ],
+   "cells": [
+    {
+     "test_index": 5,
+     "label": 1,
+     "formula": 0.20013752508869964,
+     "statevector": 0.20013752508869953,
+     "shots_ideal": 0.219,
+     "shots_fake_noisy": 0.166,
+     "shots_remote_mock": 0.014
+    },
+    {
+     "test_index": 6,
+     "label": 1,
+     "formula": 0.10427940293349541,
+     "statevector": 0.10427940293349555,
+     "shots_ideal": 0.109,
+     "shots_fake_noisy": 0.078,
+     "shots_remote_mock": 0.02
+    },
+    {
+     "test_index": 7,
+     "label": 1,
+     "formula": 0.21296515500541718,
+     "statevector": 0.21296515500541827,
+     "shots_ideal": 0.247,
+     "shots_fake_noisy": 0.205,
+     "shots_remote_mock": 0.017
+    },
+    {
+     "test_index": 9,
+     "label": 1,
+     "formula": 0.21657339034572345,
+     "statevector": 0.21657339034572362,
+     "shots_ideal": 0.241,
+     "shots_fake_noisy": 0.17,
+     "shots_remote_mock": 0.028
+    },
+    {
+     "test_index": 0,
+     "label": 0,
+     "formula": -0.9036262366006692,
+     "statevector": -0.9036262366006688,
+     "shots_ideal": -0.905,
+     "shots_fake_noisy": -0.623,
+     "shots_remote_mock": 0.022
+    },
+    {
+     "test_index": 1,
+     "label": 0,
+     "formula": -0.8134526332185369,
+     "statevector": -0.8134526332185354,
+     "shots_ideal": -0.83,
+     "shots_fake_noisy": -0.548,
+     "shots_remote_mock": -0.001
+    },
+    {
+     "test_index": 2,
+     "label": 0,
+     "formula": -0.9028532308947242,
+     "statevector": -0.9028532308947238,
+     "shots_ideal": -0.9,
+     "shots_fake_noisy": -0.653,
+     "shots_remote_mock": 0.015
+    },
+    {
+     "test_index": 3,
+     "label": 0,
+     "formula": -0.4878995836923321,
+     "statevector": -0.4878995836923318,
+     "shots_ideal": -0.495,
+     "shots_fake_noisy": -0.326,
+     "shots_remote_mock": -0.004
+    }
+   ],
+   "transpiled": {
+    "ops": {
+     "r": 29,
+     "cz": 13,
+     "measure": 1
+    },
+    "depth": 24,
+    "two_qubit": 13,
+    "n_qubits": 20
+   },
+   "remote_mock": {
+    "alias": "garnet:mock",
+    "job_id": "01a1ac12-889e-759c-ab4b-41d4336e5eff",
+    "backend": "garnet:mock"
+   }
+  },
+  {
+   "N": 16,
+   "n_qubits": 5,
+   "genes": [
+    "CD74",
+    "HLA-DRA",
+    "HLA-DPB1",
+    "TMSB4X",
+    "S100A4",
+    "HLA-DRB1",
+    "RPL18A",
+    "HLA-DPA1",
+    "FTL",
+    "CD37",
+    "LYZ",
+    "FTH1",
+    "CD79A",
+    "RPL13A",
+    "CD79B",
+    "ACTB"
+   ],
+   "threshold": -0.18608768177068774,
+   "sketch_M": 100000,
+   "sketch_rel_error": 0.06373098247838282,
+   "scale_c": 13.906744298577348,
+   "test_eval_full": {
+    "balanced_accuracy": 0.9677455718855243,
+    "auprc": 0.982516088703612,
+    "recall_pos": 0.9514563106796117,
+    "recall_neg": 0.9840348330914369,
+    "n_test": 792,
+    "n_test_pos": 103,
+    "base_rate": 0.13005050505050506
+   },
+   "phi": [
+    1.5707963267948966,
+    1.112035973978996,
+    0.6143758999875906,
+    -1.5107395900698297,
+    -0.6918247640819254,
+    0.49104552514100813,
+    -0.20849162451101907,
+    0.44808571977044337,
+    -0.6086889187257237,
+    0.35866038743699513,
+    -0.4041150103886911,
+    -0.6482155031538549,
+    0.4140419412095383,
+    -0.5854549918677683,
+    0.34973490132911406,
+    -0.9090608810312433
+   ],
+   "phi_exact": [
+    1.521940185143727,
+    1.2182609576629821,
+    0.6086610268202011,
+    -1.5707963267948966,
+    -0.658449403823006,
+    0.4652316764438818,
+    -0.13711337687890832,
+    0.42123703205020935,
+    -0.621097199660392,
+    0.3666165685278685,
+    -0.3815767210586714,
+    -0.6101083488116643,
+    0.3980215937014434,
+    -0.5471277360761246,
+    0.33955332440892666,
+    -0.8132532516555874
+   ],
+   "cells": [
+    {
+     "test_index": 5,
+     "label": 1,
+     "formula": 0.05685129043593286,
+     "statevector": 0.056851290435932844,
+     "shots_ideal": 0.051,
+     "shots_fake_noisy": 0.05,
+     "shots_remote_mock": 0.023
+    },
+    {
+     "test_index": 6,
+     "label": 1,
+     "formula": 0.03937563068655953,
+     "statevector": 0.0393756306866392,
+     "shots_ideal": 0.054,
+     "shots_fake_noisy": 0.048,
+     "shots_remote_mock": 0.012
+    },
+    {
+     "test_index": 7,
+     "label": 1,
+     "formula": 0.00826350402255066,
+     "statevector": 0.00826350402255055,
+     "shots_ideal": 0.014,
+     "shots_fake_noisy": 0.001,
+     "shots_remote_mock": -0.004
+    },
+    {
+     "test_index": 9,
+     "label": 1,
+     "formula": 0.046614522886102155,
+     "statevector": 0.04661452288609931,
+     "shots_ideal": 0.091,
+     "shots_fake_noisy": -0.009,
+     "shots_remote_mock": -0.029
+    },
+    {
+     "test_index": 0,
+     "label": 0,
+     "formula": -0.6115961081238698,
+     "statevector": -0.6115961081238713,
+     "shots_ideal": -0.604,
+     "shots_fake_noisy": -0.242,
+     "shots_remote_mock": -0.001
+    },
+    {
+     "test_index": 1,
+     "label": 0,
+     "formula": -0.5422030775745421,
+     "statevector": -0.5422030775745394,
+     "shots_ideal": -0.537,
+     "shots_fake_noisy": -0.193,
+     "shots_remote_mock": 0.013
+    },
+    {
+     "test_index": 2,
+     "label": 0,
+     "formula": -0.6265527619045024,
+     "statevector": -0.6265527619045012,
+     "shots_ideal": -0.626,
+     "shots_fake_noisy": -0.265,
+     "shots_remote_mock": 0.005
+    },
+    {
+     "test_index": 3,
+     "label": 0,
+     "formula": -0.47434527126376214,
+     "statevector": -0.4743452712637595,
+     "shots_ideal": -0.495,
+     "shots_fake_noisy": -0.219,
+     "shots_remote_mock": 0.001
+    }
+   ],
+   "transpiled": {
+    "ops": {
+     "r": 82,
+     "cz": 53,
+     "measure": 1
+    },
+    "depth": 108,
+    "two_qubit": 53,
+    "n_qubits": 20
+   },
+   "remote_mock": {
+    "alias": "garnet:mock",
+    "job_id": "01a1ac12-a276-7458-8b83-b7d42d114f95",
+    "backend": "garnet:mock"
+   }
+  }
+ ]
+}

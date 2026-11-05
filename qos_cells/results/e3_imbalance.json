@@ -1,0 +1,444 @@
+{
+ "schema_version": 1,
+ "experiment": "e3_imbalance",
+ "created_utc": "2026-11-05T14:11:29+00:00",
+ "config": {
+  "schema_version": 1,
+  "seed": 7,
+  "data": {
+   "dataset": "pbmc3k_processed",
+   "path": "data/pbmc3k_processed.h5ad",
+   "test_frac": 0.3,
+   "min_cells_per_gene": 3
+  },
+  "tasks": {
+   "positives": [
+    "B cells",
+    "Dendritic cells",
+    "Megakaryocytes"
+   ],
+   "gene_counts": [
+    4,
+    16,
+    256,
+    1024
+   ]
+  },
+  "sketch": {
+   "stream_mode": "uniform",
+   "tau_per_gene": 1.0,
+   "phase_limit": 1.5707963267948966,
+   "M_grid": [
+    1000,
+    3000,
+    10000,
+    30000,
+    100000,
+    300000,
+    1000000
+   ],
+   "repeats": 5
+  },
+  "scaling": {
+   "gene_counts": [
+    16,
+    64,
+    256,
+    1024
+   ],
+   "positive": "B cells",
+   "classifier_N": 1024
+  },
+  "imbalance": {
+   "pis": [
+    0.5,
+    0.1,
+    0.02,
+    0.005
+   ],
+   "N": 64,
+   "synthetic_cells_per_class": 4000,
+   "M_grid": [
+    3000,
+    10000,
+    30000,
+    100000,
+    300000,
+    1000000
+   ],
+   "repeats": 5
+  },
+  "circuits": {
+   "positive": "B cells",
+   "gene_counts": [
+    4,
+    16
+   ],
+   "cells_per_class": 4,
+   "shots": 2000,
+   "mock_alias": "garnet:mock"
+  },
+  "hardware": {
+   "N": 4,
+   "positive": "B cells",
+   "cells_per_class": 4,
+   "shots": 2000,
+   "n_calibration": 4,
+   "alpha_min": 0.3,
+   "preferred": [
+    "garnet",
+    "sirius"
+   ]
+  },
+  "resources": {
+   "feature_spaces": {
+    "all genes": 32768,
+    "gene pairs": 1073741824
+   },
+   "epsilon": 0.1,
+   "queries": 1,
+   "pi_rare": 0.014,
+   "logical_gate_rate_hz": "1.0e6"
+  }
+ },
+ "N": 64,
+ "synthetic": [
+  {
+   "pi": 0.5,
+   "pi_realised": 0.5,
+   "n_pos": 4000,
+   "n_cells": 8000,
+   "rows": [
+    {
+     "M": 3000,
+     "rel_error_mean": 0.5289343965302354,
+     "rel_error_std": 0.08399995661273164,
+     "rel_error_predicted": 0.5483954924503659
+    },
+    {
+     "M": 10000,
+     "rel_error_mean": 0.26448475304500285,
+     "rel_error_std": 0.02934448540377303,
+     "rel_error_predicted": 0.3003685816492195
+    },
+    {
+     "M": 30000,
+     "rel_error_mean": 0.15371722009440242,
+     "rel_error_std": 0.029469280990013016,
+     "rel_error_predicted": 0.17341788147128295
+    },
+    {
+     "M": 100000,
+     "rel_error_mean": 0.08802592179548879,
+     "rel_error_std": 0.012351354790046147,
+     "rel_error_predicted": 0.09498488555657886
+    },
+    {
+     "M": 300000,
+     "rel_error_mean": 0.05662470451105356,
+     "rel_error_std": 0.013626252766108547,
+     "rel_error_predicted": 0.054839549245036597
+    },
+    {
+     "M": 1000000,
+     "rel_error_mean": 0.030916598300967275,
+     "rel_error_std": 0.007713995125614764,
+     "rel_error_predicted": 0.030036858164921944
+    }
+   ],
+   "M_for_err_0p1": 82338.42726041442,
+   "M_for_err_0p1_predicted": 90221.28484196382,
+   "law_factor": 4.0,
+   "cost_ratio_vs_balanced_measured": 1.0,
+   "cost_ratio_vs_balanced_law": 1.0
+  },
+  {
+   "pi": 0.1,
+   "pi_realised": 0.1,
+   "n_pos": 800,
+   "n_cells": 8000,
+   "rows": [
+    {
+     "M": 3000,
+     "rel_error_mean": 0.9987836048497474,
+     "rel_error_std": 0.13526685111251951,
+     "rel_error_predicted": 0.9778072139878657
+    },
+    {
+     "M": 10000,
+     "rel_error_mean": 0.5707431697859826,
+     "rel_error_std": 0.06135950412111067,
+     "rel_error_predicted": 0.5355670679924351
+    },
+    {
+     "M": 30000,
+     "rel_error_mean": 0.30943286574654066,
+     "rel_error_std": 0.056254355321457,
+     "rel_error_predicted": 0.30920979087453104
+    },
+    {
+     "M": 100000,
+     "rel_error_mean": 0.1405844047456299,
+     "rel_error_std": 0.027213279948241218,
+     "rel_error_predicted": 0.1693611774634357
+    },
+    {
+     "M": 300000,
+     "rel_error_mean": 0.08442656874108716,
+     "rel_error_std": 0.011262649573044306,
+     "rel_error_predicted": 0.09778072139878659
+    },
+    {
+     "M": 1000000,
+     "rel_error_mean": 0.043406369172008775,
+     "rel_error_std": 0.008077618980122724,
+     "rel_error_predicted": 0.053556706799243514
+    }
+   ],
+   "M_for_err_0p1": 252025.14503216758,
+   "M_for_err_0p1_predicted": 286832.0843180136,
+   "law_factor": 11.111111111111109,
+   "cost_ratio_vs_balanced_measured": 3.0608447770696356,
+   "cost_ratio_vs_balanced_law": 2.7777777777777772
+  },
+  {
+   "pi": 0.02,
+   "pi_realised": 0.02,
+   "n_pos": 160,
+   "n_cells": 8000,
+   "rows": [
+    {
+     "M": 3000,
+     "rel_error_mean": 1.99057809869274,
+     "rel_error_std": 0.32071138529256465,
+     "rel_error_predicted": 2.057543708069964
+    },
+    {
+     "M": 10000,
+     "rel_error_mean": 1.106415492456023,
+     "rel_error_std": 0.16830258346321877,
+     "rel_error_predicted": 1.1269631019627437
+    },
+    {
+     "M": 30000,
+     "rel_error_mean": 0.6233796115905827,
+     "rel_error_std": 0.17170973417720073,
+     "rel_error_predicted": 0.6506524502849658
+    },
+    {
+     "M": 100000,
+     "rel_error_mean": 0.3400672706449291,
+     "rel_error_std": 0.08875405953057193,
+     "rel_error_predicted": 0.3563770241170844
+    },
+    {
+     "M": 300000,
+     "rel_error_mean": 0.1524181720546378,
+     "rel_error_std": 0.011643371729781435,
+     "rel_error_predicted": 0.2057543708069964
+    },
+    {
+     "M": 1000000,
+     "rel_error_mean": 0.1108816012422297,
+     "rel_error_std": 0.020903780322706497,
+     "rel_error_predicted": 0.11269631019627437
+    }
+   ],
+   "M_for_err_0p1": 1110258.5704505092,
+   "M_for_err_0p1_predicted": 1270045.8331854893,
+   "law_factor": 51.02040816326531,
+   "cost_ratio_vs_balanced_measured": 13.48408765373983,
+   "cost_ratio_vs_balanced_law": 12.755102040816327
+  },
+  {
+   "pi": 0.005,
+   "pi_realised": 0.005,
+   "n_pos": 40,
+   "n_cells": 8000,
+   "rows": [
+    {
+     "M": 3000,
+     "rel_error_mean": 3.9097979061293855,
+     "rel_error_std": 2.217211798476775,
+     "rel_error_predicted": 4.189425419535662
+    },
+    {
+     "M": 10000,
+     "rel_error_mean": 2.6075183528738153,
+     "rel_error_std": 1.1206420177910759,
+     "rel_error_predicted": 2.294642805265227
+    },
+    {
+     "M": 30000,
+     "rel_error_mean": 1.3674986416241641,
+     "rel_error_std": 0.17636862261819383,
+     "rel_error_predicted": 1.3248126413139165
+    },
+    {
+     "M": 100000,
+     "rel_error_mean": 0.7392913601774624,
+     "rel_error_std": 0.21960784896998034,
+     "rel_error_predicted": 0.7256297681156326
+    },
+    {
+     "M": 300000,
+     "rel_error_mean": 0.4100394378872695,
+     "rel_error_std": 0.08075015295577989,
+     "rel_error_predicted": 0.4189425419535663
+    },
+    {
+     "M": 1000000,
+     "rel_error_mean": 0.27681752101739115,
+     "rel_error_std": 0.029180401697059166,
+     "rel_error_predicted": 0.22946428052652265
+    }
+   ],
+   "M_for_err_0p1": 5861257.8050627895,
+   "M_for_err_0p1_predicted": 5265385.6037554685,
+   "law_factor": 201.00502512562812,
+   "cost_ratio_vs_balanced_measured": 71.18496187114674,
+   "cost_ratio_vs_balanced_law": 50.25125628140703
+  }
+ ],
+ "real": [
+  {
+   "positive": "B cells",
+   "pi_hat": 0.1294691224268689,
+   "n_train_pos": 239,
+   "rows": [
+    {
+     "M": 3000,
+     "rel_error_mean": 1.0944104171507543,
+     "rel_error_std": 0.2000753999035841,
+     "rel_error_predicted": 1.160106809809489
+    },
+    {
+     "M": 10000,
+     "rel_error_mean": 0.6304624774094638,
+     "rel_error_std": 0.05324532815096601,
+     "rel_error_predicted": 0.6354166688480128
+    },
+    {
+     "M": 30000,
+     "rel_error_mean": 0.3573582939429897,
+     "rel_error_std": 0.05829168994017956,
+     "rel_error_predicted": 0.3668579848069754
+    },
+    {
+     "M": 100000,
+     "rel_error_mean": 0.21547054163559864,
+     "rel_error_std": 0.026507717108144348,
+     "rel_error_predicted": 0.20093639367966798
+    },
+    {
+     "M": 300000,
+     "rel_error_mean": 0.11559745095338618,
+     "rel_error_std": 0.03038303941470483,
+     "rel_error_predicted": 0.11601068098094894
+    },
+    {
+     "M": 1000000,
+     "rel_error_mean": 0.06622414570100404,
+     "rel_error_std": 0.012927814274448755,
+     "rel_error_predicted": 0.06354166688480127
+    }
+   ],
+   "M_for_err_0p1": 407273.40750650293,
+   "M_for_err_0p1_predicted": 403754.34304990515,
+   "law_factor": 8.872573703436588
+  },
+  {
+   "positive": "Dendritic cells",
+   "pi_hat": 0.014084507042253521,
+   "n_train_pos": 26,
+   "rows": [
+    {
+     "M": 3000,
+     "rel_error_mean": 2.6859354830887647,
+     "rel_error_std": 0.291537138261924,
+     "rel_error_predicted": 2.9181576412724595
+    },
+    {
+     "M": 10000,
+     "rel_error_mean": 1.4716068159156808,
+     "rel_error_std": 0.19051599665834945,
+     "rel_error_predicted": 1.5983407664809948
+    },
+    {
+     "M": 30000,
+     "rel_error_mean": 0.9666499811050526,
+     "rel_error_std": 0.03479032561145255,
+     "rel_error_predicted": 0.9228024717845551
+    },
+    {
+     "M": 100000,
+     "rel_error_mean": 0.4571478330965794,
+     "rel_error_std": 0.053851271181921,
+     "rel_error_predicted": 0.5054397299179254
+    },
+    {
+     "M": 300000,
+     "rel_error_mean": 0.28788020958667804,
+     "rel_error_std": 0.03248962016724937,
+     "rel_error_predicted": 0.29181576412724597
+    },
+    {
+     "M": 1000000,
+     "rel_error_mean": 0.1699002897198765,
+     "rel_error_std": 0.017609600948454297,
+     "rel_error_predicted": 0.15983407664809945
+    }
+   ],
+   "M_for_err_0p1": 2432640.119040689,
+   "M_for_err_0p1_predicted": 2554693.205795054,
+   "law_factor": 72.01428571428572
+  },
+  {
+   "positive": "Megakaryocytes",
+   "pi_hat": 0.005417118093174431,
+   "n_train_pos": 10,
+   "rows": [
+    {
+     "M": 3000,
+     "rel_error_mean": 1.5757075541980918,
+     "rel_error_std": 0.32281980820108985,
+     "rel_error_predicted": 2.3383311485316725
+    },
+    {
+     "M": 10000,
+     "rel_error_mean": 1.3264948722137677,
+     "rel_error_std": 0.22766380907518985,
+     "rel_error_predicted": 1.2807567169677603
+    },
+    {
+     "M": 30000,
+     "rel_error_mean": 0.6960001498011599,
+     "rel_error_std": 0.10790452929824226,
+     "rel_error_predicted": 0.7394452353077576
+    },
+    {
+     "M": 100000,
+     "rel_error_mean": 0.3769716819943393,
+     "rel_error_std": 0.07804401231858572,
+     "rel_error_predicted": 0.4050108354177744
+    },
+    {
+     "M": 300000,
+     "rel_error_mean": 0.2603063046242286,
+     "rel_error_std": 0.06167921499268677,
+     "rel_error_predicted": 0.23383311485316727
+    },
+    {
+     "M": 1000000,
+     "rel_error_mean": 0.1305784384029153,
+     "rel_error_std": 0.01893037377717678,
+     "rel_error_predicted": 0.128075671696776
+    }
+   ],
+   "M_for_err_0p1": 1519437.3458551117,
+   "M_for_err_0p1_predicted": 1640337.7680580353,
+   "law_factor": 185.60544662309368
+  }
+ ],
+ "law": "samples for fixed error \u221d 1/(pi(1-pi))"
+}

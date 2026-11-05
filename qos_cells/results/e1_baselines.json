@@ -1,0 +1,701 @@
+{
+ "schema_version": 1,
+ "experiment": "e1_baselines",
+ "created_utc": "2026-11-05T14:10:13+00:00",
+ "config": {
+  "schema_version": 1,
+  "seed": 7,
+  "data": {
+   "dataset": "pbmc3k_processed",
+   "path": "data/pbmc3k_processed.h5ad",
+   "test_frac": 0.3,
+   "min_cells_per_gene": 3
+  },
+  "tasks": {
+   "positives": [
+    "B cells",
+    "Dendritic cells",
+    "Megakaryocytes"
+   ],
+   "gene_counts": [
+    4,
+    16,
+    256,
+    1024
+   ]
+  },
+  "sketch": {
+   "stream_mode": "uniform",
+   "tau_per_gene": 1.0,
+   "phase_limit": 1.5707963267948966,
+   "M_grid": [
+    1000,
+    3000,
+    10000,
+    30000,
+    100000,
+    300000,
+    1000000
+   ],
+   "repeats": 5
+  },
+  "scaling": {
+   "gene_counts": [
+    16,
+    64,
+    256,
+    1024
+   ],
+   "positive": "B cells",
+   "classifier_N": 1024
+  },
+  "imbalance": {
+   "pis": [
+    0.5,
+    0.1,
+    0.02,
+    0.005
+   ],
+   "N": 64,
+   "synthetic_cells_per_class": 4000,
+   "M_grid": [
+    3000,
+    10000,
+    30000,
+    100000,
+    300000,
+    1000000
+   ],
+   "repeats": 5
+  },
+  "circuits": {
+   "positive": "B cells",
+   "gene_counts": [
+    4,
+    16
+   ],
+   "cells_per_class": 4,
+   "shots": 2000,
+   "mock_alias": "garnet:mock"
+  },
+  "hardware": {
+   "N": 4,
+   "positive": "B cells",
+   "cells_per_class": 4,
+   "shots": 2000,
+   "n_calibration": 4,
+   "alpha_min": 0.3,
+   "preferred": [
+    "garnet",
+    "sirius"
+   ]
+  },
+  "resources": {
+   "feature_spaces": {
+    "all genes": 32768,
+    "gene pairs": 1073741824
+   },
+   "epsilon": 0.1,
+   "queries": 1,
+   "pi_rare": 0.014,
+   "logical_gate_rate_hz": "1.0e6"
+  }
+ },
+ "dataset": {
+  "file": "/home/claude/qsip/qos_cells/data/pbmc3k_processed.h5ad",
+  "sha256": "0db367b991dd9580",
+  "n_cells": 2638,
+  "n_genes": 13714,
+  "nnz": 2238732,
+  "fraction_zero": 0.9381181668224355,
+  "genes_measured_in_10x_run": 32738,
+  "class_counts": {
+   "CD4 T cells": 1144,
+   "CD14+ Monocytes": 480,
+   "B cells": 342,
+   "CD8 T cells": 316,
+   "NK cells": 154,
+   "FCGR3A+ Monocytes": 150,
+   "Dendritic cells": 37,
+   "Megakaryocytes": 15
+  }
+ },
+ "tasks": [
+  {
+   "positive": "B cells",
+   "base_rate": 0.12964366944655042,
+   "n_pos": 342,
+   "logreg_all_genes": {
+    "balanced_accuracy": 0.9742767765299365,
+    "auprc": 0.9982062136841867,
+    "recall_pos": 0.9514563106796117,
+    "recall_neg": 0.9970972423802612,
+    "n_test": 792,
+    "n_test_pos": 103,
+    "base_rate": 0.13005050505050506
+   },
+   "by_N": [
+    {
+     "N": 4,
+     "genes": [
+      "CD74",
+      "HLA-DRA",
+      "HLA-DPB1",
+      "TMSB4X"
+     ],
+     "n_train_pos": 239,
+     "n_test_pos": 103,
+     "pi_hat": 0.1294691224268689,
+     "abstain_rate_test": 0.0,
+     "abstain_rate_test_pos": 0.0,
+     "logreg_p": {
+      "balanced_accuracy": 0.9515549480744572,
+      "auprc": 0.9479430716918257,
+      "recall_pos": 0.9611650485436893,
+      "recall_neg": 0.941944847605225,
+      "n_test": 792,
+      "n_test_pos": 103,
+      "base_rate": 0.13005050505050506
+     },
+     "exact_centroid": {
+      "balanced_accuracy": 0.9459748897374836,
+      "auprc": 0.9384201941714565,
+      "recall_pos": 0.9514563106796117,
+      "recall_neg": 0.9404934687953556,
+      "n_test": 792,
+      "n_test_pos": 103,
+      "base_rate": 0.13005050505050506
+     },
+     "threshold": -0.14491874749264505,
+     "phase_scale_c": 2.9339177354867947,
+     "stream_density": 0.7307692307692307
+    },
+    {
+     "N": 16,
+     "genes": [
+      "CD74",
+      "HLA-DRA",
+      "HLA-DPB1",
+      "TMSB4X",
+      "S100A4",
+      "HLA-DRB1",
+      "RPL18A",
+      "HLA-DPA1",
+      "FTL",
+      "CD37",
+      "LYZ",
+      "FTH1",
+      "CD79A",
+      "RPL13A",
+      "CD79B",
+      "ACTB"
+     ],
+     "n_train_pos": 239,
+     "n_test_pos": 103,
+     "pi_hat": 0.1294691224268689,
+     "abstain_rate_test": 0.0,
+     "abstain_rate_test_pos": 0.0,
+     "logreg_p": {
+      "balanced_accuracy": 0.9755026984373019,
+      "auprc": 0.9930883801633168,
+      "recall_pos": 0.9611650485436893,
+      "recall_neg": 0.9898403483309144,
+      "n_test": 792,
+      "n_test_pos": 103,
+      "base_rate": 0.13005050505050506
+     },
+     "exact_centroid": {
+      "balanced_accuracy": 0.9677455718855243,
+      "auprc": 0.9834570868511375,
+      "recall_pos": 0.9514563106796117,
+      "recall_neg": 0.9840348330914369,
+      "n_test": 792,
+      "n_test_pos": 103,
+      "base_rate": 0.13005050505050506
+     },
+     "threshold": -0.16468753760495636,
+     "phase_scale_c": 13.593195520504354,
+     "stream_density": 0.7142470205850487
+    },
+    {
+     "N": 256,
+     "genes": [
+      "CD74",
+      "HLA-DRA",
+      "HLA-DPB1",
+      "TMSB4X",
+      "S100A4",
+      "HLA-DRB1",
+      "RPL18A",
+      "HLA-DPA1",
+      "FTL",
+      "CD37",
+      "LYZ",
+      "FTH1",
+      "CD79A",
+      "RPL13A",
+      "CD79B",
+      "ACTB"
+     ],
+     "n_train_pos": 239,
+     "n_test_pos": 103,
+     "pi_hat": 0.1294691224268689,
+     "abstain_rate_test": 0.0,
+     "abstain_rate_test_pos": 0.0,
+     "logreg_p": {
+      "balanced_accuracy": 0.9859371257063142,
+      "auprc": 0.9886299270266575,
+      "recall_pos": 0.9805825242718447,
+      "recall_neg": 0.9912917271407837,
+      "n_test": 792,
+      "n_test_pos": 103,
+      "base_rate": 0.13005050505050506
+     },
+     "exact_centroid": {
+      "balanced_accuracy": 0.9755026984373019,
+      "auprc": 0.975398017257196,
+      "recall_pos": 0.9611650485436893,
+      "recall_neg": 0.9898403483309144,
+      "n_test": 792,
+      "n_test_pos": 103,
+      "base_rate": 0.13005050505050506
+     },
+     "threshold": 0.05102164559765911,
+     "phase_scale_c": 92.33507899732798,
+     "stream_density": 0.6338768790628385
+    },
+    {
+     "N": 1024,
+     "genes": [
+      "CD74",
+      "HLA-DRA",
+      "HLA-DPB1",
+      "TMSB4X",
+      "S100A4",
+      "HLA-DRB1",
+      "RPL18A",
+      "HLA-DPA1",
+      "FTL",
+      "CD37",
+      "LYZ",
+      "FTH1",
+      "CD79A",
+      "RPL13A",
+      "CD79B",
+      "ACTB"
+     ],
+     "n_train_pos": 239,
+     "n_test_pos": 103,
+     "pi_hat": 0.1294691224268689,
+     "abstain_rate_test": 0.0,
+     "abstain_rate_test_pos": 0.0,
+     "logreg_p": {
+      "balanced_accuracy": 0.9589879803288852,
+      "auprc": 0.9678553731171097,
+      "recall_pos": 0.9223300970873787,
+      "recall_neg": 0.9956458635703919,
+      "n_test": 792,
+      "n_test_pos": 103,
+      "base_rate": 0.13005050505050506
+     },
+     "exact_centroid": {
+      "balanced_accuracy": 0.9575366015190159,
+      "auprc": 0.9514486184449916,
+      "recall_pos": 0.9223300970873787,
+      "recall_neg": 0.9927431059506531,
+      "n_test": 792,
+      "n_test_pos": 103,
+      "base_rate": 0.13005050505050506
+     },
+     "threshold": 0.06130368679142993,
+     "phase_scale_c": 120.5267980322385,
+     "stream_density": 0.3477128546519502
+    }
+   ]
+  },
+  {
+   "positive": "Dendritic cells",
+   "base_rate": 0.014025777103866566,
+   "n_pos": 37,
+   "logreg_all_genes": {
+    "balanced_accuracy": 0.8636363636363636,
+    "auprc": 0.9590909090909091,
+    "recall_pos": 0.7272727272727273,
+    "recall_neg": 1.0,
+    "n_test": 792,
+    "n_test_pos": 11,
+    "base_rate": 0.013888888888888888
+   },
+   "by_N": [
+    {
+     "N": 4,
+     "genes": [
+      "MALAT1",
+      "B2M",
+      "LYZ",
+      "CD74"
+     ],
+     "n_train_pos": 26,
+     "n_test_pos": 11,
+     "pi_hat": 0.014084507042253521,
+     "abstain_rate_test": 0.0,
+     "abstain_rate_test_pos": 0.0,
+     "logreg_p": {
+      "balanced_accuracy": 0.912932138284251,
+      "auprc": 0.4749573597134573,
+      "recall_pos": 0.9090909090909091,
+      "recall_neg": 0.9167733674775929,
+      "n_test": 792,
+      "n_test_pos": 11,
+      "base_rate": 0.013888888888888888
+     },
+     "exact_centroid": {
+      "balanced_accuracy": 0.8994878361075545,
+      "auprc": 0.19808338929699548,
+      "recall_pos": 0.9090909090909091,
+      "recall_neg": 0.8898847631241997,
+      "n_test": 792,
+      "n_test_pos": 11,
+      "base_rate": 0.013888888888888888
+     },
+     "threshold": -0.033600925313865174,
+     "phase_scale_c": 7.229834867591492,
+     "stream_density": 0.8626760563380281
+    },
+    {
+     "N": 16,
+     "genes": [
+      "MALAT1",
+      "B2M",
+      "LYZ",
+      "CD74",
+      "HLA-DRA",
+      "CST3",
+      "TMSB4X",
+      "HLA-DPB1",
+      "HLA-DPA1",
+      "RPS27",
+      "HLA-DRB1",
+      "RPL13A",
+      "RPL13",
+      "RPS27A",
+      "RPS6",
+      "RPL21"
+     ],
+     "n_train_pos": 26,
+     "n_test_pos": 11,
+     "pi_hat": 0.014084507042253521,
+     "abstain_rate_test": 0.0,
+     "abstain_rate_test_pos": 0.0,
+     "logreg_p": {
+      "balanced_accuracy": 0.970550576184379,
+      "auprc": 0.832471051983247,
+      "recall_pos": 1.0,
+      "recall_neg": 0.941101152368758,
+      "n_test": 792,
+      "n_test_pos": 11,
+      "base_rate": 0.013888888888888888
+     },
+     "exact_centroid": {
+      "balanced_accuracy": 0.9756722151088348,
+      "auprc": 0.7496825396825397,
+      "recall_pos": 1.0,
+      "recall_neg": 0.9513444302176697,
+      "n_test": 792,
+      "n_test_pos": 11,
+      "base_rate": 0.013888888888888888
+     },
+     "threshold": -0.0807694398785761,
+     "phase_scale_c": 20.834264824521973,
+     "stream_density": 0.7997020585048754
+    },
+    {
+     "N": 256,
+     "genes": [
+      "MALAT1",
+      "B2M",
+      "LYZ",
+      "CD74",
+      "HLA-DRA",
+      "CST3",
+      "TMSB4X",
+      "HLA-DPB1",
+      "HLA-DPA1",
+      "RPS27",
+      "HLA-DRB1",
+      "RPL13A",
+      "RPL13",
+      "RPS27A",
+      "RPS6",
+      "RPL21"
+     ],
+     "n_train_pos": 26,
+     "n_test_pos": 11,
+     "pi_hat": 0.014084507042253521,
+     "abstain_rate_test": 0.0,
+     "abstain_rate_test_pos": 0.0,
+     "logreg_p": {
+      "balanced_accuracy": 0.9487836107554417,
+      "auprc": 0.5612775217613928,
+      "recall_pos": 1.0,
+      "recall_neg": 0.8975672215108835,
+      "n_test": 792,
+      "n_test_pos": 11,
+      "base_rate": 0.013888888888888888
+     },
+     "exact_centroid": {
+      "balanced_accuracy": 0.9462227912932138,
+      "auprc": 0.36983355325601314,
+      "recall_pos": 1.0,
+      "recall_neg": 0.8924455825864277,
+      "n_test": 792,
+      "n_test_pos": 11,
+      "base_rate": 0.013888888888888888
+     },
+     "threshold": -0.05689240567535923,
+     "phase_scale_c": 117.32987730727285,
+     "stream_density": 0.6489982563651138
+    },
+    {
+     "N": 1024,
+     "genes": [
+      "MALAT1",
+      "B2M",
+      "LYZ",
+      "CD74",
+      "HLA-DRA",
+      "CST3",
+      "TMSB4X",
+      "HLA-DPB1",
+      "HLA-DPA1",
+      "RPS27",
+      "HLA-DRB1",
+      "RPL13A",
+      "RPL13",
+      "RPS27A",
+      "RPS6",
+      "RPL21"
+     ],
+     "n_train_pos": 26,
+     "n_test_pos": 11,
+     "pi_hat": 0.014084507042253521,
+     "abstain_rate_test": 0.0,
+     "abstain_rate_test_pos": 0.0,
+     "logreg_p": {
+      "balanced_accuracy": 0.9238156209987196,
+      "auprc": 0.4904481096276328,
+      "recall_pos": 1.0,
+      "recall_neg": 0.8476312419974392,
+      "n_test": 792,
+      "n_test_pos": 11,
+      "base_rate": 0.013888888888888888
+     },
+     "exact_centroid": {
+      "balanced_accuracy": 0.910371318822023,
+      "auprc": 0.3787340000769361,
+      "recall_pos": 1.0,
+      "recall_neg": 0.8207426376440461,
+      "n_test": 792,
+      "n_test_pos": 11,
+      "base_rate": 0.013888888888888888
+     },
+     "threshold": -0.07939248466910499,
+     "phase_scale_c": 142.87657855479046,
+     "stream_density": 0.348342912039545
+    }
+   ]
+  },
+  {
+   "positive": "Megakaryocytes",
+   "base_rate": 0.005686125852918878,
+   "n_pos": 15,
+   "logreg_all_genes": {
+    "balanced_accuracy": 0.8,
+    "auprc": 0.7669172932330828,
+    "recall_pos": 0.6,
+    "recall_neg": 1.0,
+    "n_test": 792,
+    "n_test_pos": 5,
+    "base_rate": 0.006313131313131313
+   },
+   "by_N": [
+    {
+     "N": 4,
+     "genes": [
+      "PPBP",
+      "TMSB4X",
+      "ACTB",
+      "PF4"
+     ],
+     "n_train_pos": 10,
+     "n_test_pos": 5,
+     "pi_hat": 0.005417118093174431,
+     "abstain_rate_test": 0.0,
+     "abstain_rate_test_pos": 0.0,
+     "logreg_p": {
+      "balanced_accuracy": 1.0,
+      "auprc": 1.0,
+      "recall_pos": 1.0,
+      "recall_neg": 1.0,
+      "n_test": 792,
+      "n_test_pos": 5,
+      "base_rate": 0.006313131313131313
+     },
+     "exact_centroid": {
+      "balanced_accuracy": 0.9993646759847522,
+      "auprc": 1.0,
+      "recall_pos": 1.0,
+      "recall_neg": 0.9987293519695044,
+      "n_test": 792,
+      "n_test_pos": 5,
+      "base_rate": 0.006313131313131313
+     },
+     "threshold": -0.4480483761524795,
+     "phase_scale_c": 4.714582795296963,
+     "stream_density": 0.5104279523293608
+    },
+    {
+     "N": 16,
+     "genes": [
+      "PPBP",
+      "TMSB4X",
+      "ACTB",
+      "PF4",
+      "GPX1",
+      "OAZ1",
+      "GNG11",
+      "SDPR",
+      "CLU",
+      "MALAT1",
+      "CCL5",
+      "RPL13",
+      "RPL10",
+      "SH3BGRL3",
+      "B2M",
+      "RPS2"
+     ],
+     "n_train_pos": 10,
+     "n_test_pos": 5,
+     "pi_hat": 0.005417118093174431,
+     "abstain_rate_test": 0.0,
+     "abstain_rate_test_pos": 0.0,
+     "logreg_p": {
+      "balanced_accuracy": 1.0,
+      "auprc": 1.0,
+      "recall_pos": 1.0,
+      "recall_neg": 1.0,
+      "n_test": 792,
+      "n_test_pos": 5,
+      "base_rate": 0.006313131313131313
+     },
+     "exact_centroid": {
+      "balanced_accuracy": 0.9955527318932655,
+      "auprc": 1.0,
+      "recall_pos": 1.0,
+      "recall_neg": 0.9911054637865311,
+      "n_test": 792,
+      "n_test_pos": 5,
+      "base_rate": 0.006313131313131313
+     },
+     "threshold": -0.2782221584505432,
+     "phase_scale_c": 10.97638972749049,
+     "stream_density": 0.5993364030335862
+    },
+    {
+     "N": 256,
+     "genes": [
+      "PPBP",
+      "TMSB4X",
+      "ACTB",
+      "PF4",
+      "GPX1",
+      "OAZ1",
+      "GNG11",
+      "SDPR",
+      "CLU",
+      "MALAT1",
+      "CCL5",
+      "RPL13",
+      "RPL10",
+      "SH3BGRL3",
+      "B2M",
+      "RPS2"
+     ],
+     "n_train_pos": 10,
+     "n_test_pos": 5,
+     "pi_hat": 0.005417118093174431,
+     "abstain_rate_test": 0.0,
+     "abstain_rate_test_pos": 0.0,
+     "logreg_p": {
+      "balanced_accuracy": 0.7993646759847521,
+      "auprc": 0.6978571428571428,
+      "recall_pos": 0.6,
+      "recall_neg": 0.9987293519695044,
+      "n_test": 792,
+      "n_test_pos": 5,
+      "base_rate": 0.006313131313131313
+     },
+     "exact_centroid": {
+      "balanced_accuracy": 0.8822109275730623,
+      "auprc": 0.6832535885167464,
+      "recall_pos": 0.8,
+      "recall_neg": 0.9644218551461246,
+      "n_test": 792,
+      "n_test_pos": 5,
+      "base_rate": 0.006313131313131313
+     },
+     "threshold": -0.07518027640275207,
+     "phase_scale_c": 36.0033454726652,
+     "stream_density": 0.5973494210455038
+    },
+    {
+     "N": 1024,
+     "genes": [
+      "PPBP",
+      "TMSB4X",
+      "ACTB",
+      "PF4",
+      "GPX1",
+      "OAZ1",
+      "GNG11",
+      "SDPR",
+      "CLU",
+      "MALAT1",
+      "CCL5",
+      "RPL13",
+      "RPL10",
+      "SH3BGRL3",
+      "B2M",
+      "RPS2"
+     ],
+     "n_train_pos": 10,
+     "n_test_pos": 5,
+     "pi_hat": 0.005417118093174431,
+     "abstain_rate_test": 0.0,
+     "abstain_rate_test_pos": 0.0,
+     "logreg_p": {
+      "balanced_accuracy": 0.7993646759847521,
+      "auprc": 0.6858851674641149,
+      "recall_pos": 0.6,
+      "recall_neg": 0.9987293519695044,
+      "n_test": 792,
+      "n_test_pos": 5,
+      "base_rate": 0.006313131313131313
+     },
+     "exact_centroid": {
+      "balanced_accuracy": 0.8790343074968234,
+      "auprc": 0.6621052631578948,
+      "recall_pos": 0.8,
+      "recall_neg": 0.9580686149936468,
+      "n_test": 792,
+      "n_test_pos": 5,
+      "base_rate": 0.006313131313131313
+     },
+     "threshold": -0.05728300757092736,
+     "phase_scale_c": 46.174956238569095,
+     "stream_density": 0.3362633735102925
+    }
+   ]
+  }
+ ]
+}

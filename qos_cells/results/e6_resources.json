@@ -1,0 +1,169 @@
+{
+ "schema_version": 1,
+ "experiment": "e6_resources",
+ "created_utc": "2026-11-05T14:18:48+00:00",
+ "config": {
+  "schema_version": 1,
+  "seed": 7,
+  "data": {
+   "dataset": "pbmc3k_processed",
+   "path": "data/pbmc3k_processed.h5ad",
+   "test_frac": 0.3,
+   "min_cells_per_gene": 3
+  },
+  "tasks": {
+   "positives": [
+    "B cells",
+    "Dendritic cells",
+    "Megakaryocytes"
+   ],
+   "gene_counts": [
+    4,
+    16,
+    256,
+    1024
+   ]
+  },
+  "sketch": {
+   "stream_mode": "uniform",
+   "tau_per_gene": 1.0,
+   "phase_limit": 1.5707963267948966,
+   "M_grid": [
+    1000,
+    3000,
+    10000,
+    30000,
+    100000,
+    300000,
+    1000000
+   ],
+   "repeats": 5
+  },
+  "scaling": {
+   "gene_counts": [
+    16,
+    64,
+    256,
+    1024
+   ],
+   "positive": "B cells",
+   "classifier_N": 1024
+  },
+  "imbalance": {
+   "pis": [
+    0.5,
+    0.1,
+    0.02,
+    0.005
+   ],
+   "N": 64,
+   "synthetic_cells_per_class": 4000,
+   "M_grid": [
+    3000,
+    10000,
+    30000,
+    100000,
+    300000,
+    1000000
+   ],
+   "repeats": 5
+  },
+  "circuits": {
+   "positive": "B cells",
+   "gene_counts": [
+    4,
+    16
+   ],
+   "cells_per_class": 4,
+   "shots": 2000,
+   "mock_alias": "garnet:mock"
+  },
+  "hardware": {
+   "N": 4,
+   "positive": "B cells",
+   "cells_per_class": 4,
+   "shots": 2000,
+   "n_calibration": 4,
+   "alpha_min": 0.3,
+   "preferred": [
+    "garnet",
+    "sirius"
+   ]
+  },
+  "resources": {
+   "feature_spaces": {
+    "all genes": 32768,
+    "gene pairs": 1073741824
+   },
+   "epsilon": 0.1,
+   "queries": 1,
+   "pi_rare": 0.014,
+   "logical_gate_rate_hz": 1000000.0
+  }
+ },
+ "ledger": [
+  {
+   "N": 32768,
+   "index_qubits": 15,
+   "logical_qubits": 30,
+   "samples_balanced": 327680.0,
+   "imbalance_factor": 72.44277021153289,
+   "samples_rare": 23738046.942915097,
+   "gates_per_sketch": 688403361.3445379,
+   "seconds_per_sketch": 688.4033613445379,
+   "years_per_sketch": 2.181418616575842e-05,
+   "classical_floats": 32768,
+   "classical_bytes": 131072,
+   "eps": 0.1,
+   "Q": 1,
+   "pi": 0.014,
+   "gate_rate_hz": 1000000.0,
+   "feature_space": "all genes"
+  },
+  {
+   "N": 1073741824,
+   "index_qubits": 30,
+   "logical_qubits": 60,
+   "samples_balanced": 10737418240.0,
+   "imbalance_factor": 72.44277021153289,
+   "samples_rare": 777848322225.4419,
+   "gates_per_sketch": 45893051011301.07,
+   "seconds_per_sketch": 45893051.01130107,
+   "years_per_sketch": 1.4542630304998185,
+   "classical_floats": 1073741824,
+   "classical_bytes": 4294967296,
+   "eps": 0.1,
+   "Q": 1,
+   "pi": 0.014,
+   "gate_rate_hz": 1000000.0,
+   "feature_space": "gene pairs"
+  }
+ ],
+ "measured_imbalance": {
+  "B cells": {
+   "pi": 0.1294691224268689,
+   "law_factor": 8.872573703436588,
+   "M_for_err_0p1": 407273.40750650293
+  },
+  "Dendritic cells": {
+   "pi": 0.014084507042253521,
+   "law_factor": 72.01428571428572,
+   "M_for_err_0p1": 2432640.119040689
+  },
+  "Megakaryocytes": {
+   "pi": 0.005417118093174431,
+   "law_factor": 185.60544662309368,
+   "M_for_err_0p1": 1519437.3458551117
+  }
+ },
+ "assumptions": {
+  "eps": 0.1,
+  "Q": 1,
+  "pi_rare": 0.014,
+  "logical_gate_rate_hz": 1000000.0,
+  "gates_per_record": "2n-1 (n-controlled phase with ancillas)",
+  "logical_qubits": "2n (index + Hadamard ancilla + work)",
+  "samples": "N Q^2 / eps (paper) x 1/(pi(1-pi)) (ours)",
+  "classical_lower_bound": "M*S >= Omega(N*Q_C) for the paper's task families; not proven for the centroid task"
+ }
+}

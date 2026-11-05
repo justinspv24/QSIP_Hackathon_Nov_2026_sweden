@@ -1,0 +1,368 @@
+{
+ "schema_version": 1,
+ "experiment": "e5_hardware",
+ "created_utc": "2026-11-05T14:15:10+00:00",
+ "config": {
+  "schema_version": 1,
+  "seed": 7,
+  "data": {
+   "dataset": "pbmc3k_processed",
+   "path": "data/pbmc3k_processed.h5ad",
+   "test_frac": 0.3,
+   "min_cells_per_gene": 3
+  },
+  "tasks": {
+   "positives": [
+    "B cells",
+    "Dendritic cells",
+    "Megakaryocytes"
+   ],
+   "gene_counts": [
+    4,
+    16,
+    256,
+    1024
+   ]
+  },
+  "sketch": {
+   "stream_mode": "uniform",
+   "tau_per_gene": 1.0,
+   "phase_limit": 1.5707963267948966,
+   "M_grid": [
+    1000,
+    3000,
+    10000,
+    30000,
+    100000,
+    300000,
+    1000000
+   ],
+   "repeats": 5
+  },
+  "scaling": {
+   "gene_counts": [
+    16,
+    64,
+    256,
+    1024
+   ],
+   "positive": "B cells",
+   "classifier_N": 1024
+  },
+  "imbalance": {
+   "pis": [
+    0.5,
+    0.1,
+    0.02,
+    0.005
+   ],
+   "N": 64,
+   "synthetic_cells_per_class": 4000,
+   "M_grid": [
+    3000,
+    10000,
+    30000,
+    100000,
+    300000,
+    1000000
+   ],
+   "repeats": 5
+  },
+  "circuits": {
+   "positive": "B cells",
+   "gene_counts": [
+    4,
+    16
+   ],
+   "cells_per_class": 4,
+   "shots": 2000,
+   "mock_alias": "garnet:mock"
+  },
+  "hardware": {
+   "N": 4,
+   "positive": "B cells",
+   "cells_per_class": 4,
+   "shots": 2000,
+   "n_calibration": 4,
+   "alpha_min": 0.3,
+   "preferred": [
+    "garnet",
+    "sirius"
+   ]
+  },
+  "resources": {
+   "feature_spaces": {
+    "all genes": 32768,
+    "gene pairs": 1073741824
+   },
+   "epsilon": 0.1,
+   "queries": 1,
+   "pi_rare": 0.014,
+   "logical_gate_rate_hz": "1.0e6"
+  }
+ },
+ "meta": {
+  "alias": "garnet",
+  "backend": "garnet",
+  "job_id": "01a1ac10-173d-7033-b4a9-e227387dfc13",
+  "submitted_utc": "2026-11-05T14:14:58+00:00",
+  "shots": 2000,
+  "n_circuits": 12,
+  "n_qubits": 3,
+  "transpiled_test": {
+   "ops": {
+    "r": 25,
+    "cz": 11,
+    "measure": 1
+   },
+   "depth": 25,
+   "two_qubit": 11,
+   "n_qubits": 19
+  },
+  "transpiled_calibration": [
+   {
+    "ops": {
+     "r": 9,
+     "cz": 1,
+     "measure": 1
+    },
+    "depth": 5,
+    "two_qubit": 1,
+    "n_qubits": 19
+   },
+   {
+    "ops": {
+     "r": 22,
+     "cz": 11,
+     "measure": 1
+    },
+    "depth": 24,
+    "two_qubit": 11,
+    "n_qubits": 19
+   },
+   {
+    "ops": {
+     "r": 25,
+     "cz": 11,
+     "measure": 1
+    },
+    "depth": 25,
+    "two_qubit": 11,
+    "n_qubits": 19
+   },
+   {
+    "ops": {
+     "r": 22,
+     "cz": 9,
+     "measure": 1
+    },
+    "depth": 21,
+    "two_qubit": 9,
+    "n_qubits": 19
+   }
+  ],
+  "mock": false,
+  "frozen_sha256": "d5701e5e6ef0bd0c",
+  "machine_state": {
+   "alias": "garnet",
+   "mock": false,
+   "qubits": 20,
+   "price": 0.5,
+   "queue": 0,
+   "ready": true
+  },
+  "collected_utc": "2026-11-05T14:15:10+00:00"
+ },
+ "frozen_sha256": "d5701e5e6ef0bd0c",
+ "N": 4,
+ "genes": [
+  "CD74",
+  "HLA-DRA",
+  "HLA-DPB1",
+  "TMSB4X"
+ ],
+ "inference_only": true,
+ "cells": [
+  {
+   "test_index": 5,
+   "label": 1,
+   "ideal": 0.20013752508869964,
+   "raw": 0.098,
+   "calibrated": 0.03887222404100361,
+   "err_raw": 0.10213752508869964,
+   "err_calibrated": 0.16126530104769604,
+   "pred_raw": 1,
+   "pred_cal": 1,
+   "pred_ideal": 1
+  },
+  {
+   "test_index": 6,
+   "label": 1,
+   "ideal": 0.10427940293349541,
+   "raw": 0.215,
+   "calibrated": 0.25189213311709563,
+   "err_raw": 0.11072059706650458,
+   "err_calibrated": 0.14761273018360022,
+   "pred_raw": 1,
+   "pred_cal": 1,
+   "pred_ideal": 1
+  },
+  {
+   "test_index": 7,
+   "label": 1,
+   "ideal": 0.21296515500541718,
+   "raw": 0.18,
+   "calibrated": 0.18816822869262365,
+   "err_raw": 0.03296515500541719,
+   "err_calibrated": 0.024796926312793538,
+   "pred_raw": 1,
+   "pred_cal": 1,
+   "pred_ideal": 1
+  },
+  {
+   "test_index": 9,
+   "label": 1,
+   "ideal": 0.21657339034572345,
+   "raw": 0.152,
+   "calibrated": 0.13718910515304605,
+   "err_raw": 0.06457339034572346,
+   "err_calibrated": 0.0793842851926774,
+   "pred_raw": 1,
+   "pred_cal": 1,
+   "pred_ideal": 1
+  },
+  {
+   "test_index": 0,
+   "label": 0,
+   "ideal": -0.9036262366006692,
+   "raw": -0.645,
+   "calibrated": -1.3138952327413587,
+   "err_raw": 0.2586262366006692,
+   "err_calibrated": 0.41026899614068946,
+   "pred_raw": 0,
+   "pred_cal": 0,
+   "pred_ideal": 0
+  },
+  {
+   "test_index": 1,
+   "label": 0,
+   "ideal": -0.8134526332185369,
+   "raw": -0.482,
+   "calibrated": -1.0171239064216748,
+   "err_raw": 0.3314526332185369,
+   "err_calibrated": 0.20367127320313794,
+   "pred_raw": 0,
+   "pred_cal": 0,
+   "pred_ideal": 0
+  },
+  {
+   "test_index": 2,
+   "label": 0,
+   "ideal": -0.9028532308947242,
+   "raw": -0.711,
+   "calibrated": -1.4340603096560771,
+   "err_raw": 0.19185323089472428,
+   "err_calibrated": 0.5312070787613529,
+   "pred_raw": 0,
+   "pred_cal": 0,
+   "pred_ideal": 0
+  },
+  {
+   "test_index": 3,
+   "label": 0,
+   "ideal": -0.4878995836923321,
+   "raw": -0.324,
+   "calibrated": -0.7294559950197728,
+   "err_raw": 0.1638995836923321,
+   "err_calibrated": 0.24155641132744066,
+   "pred_raw": 0,
+   "pred_cal": 0,
+   "pred_ideal": 0
+  }
+ ],
+ "calibration_circuits": [
+  {
+   "ideal": 0.0,
+   "measured": 0.12
+  },
+  {
+   "ideal": 0.07240529975672749,
+   "measured": 0.096
+  },
+  {
+   "ideal": 0.48324769869679063,
+   "measured": 0.357
+  },
+  {
+   "ideal": 0.1515028417280681,
+   "measured": 0.122
+  }
+ ],
+ "summary": {
+  "calibration": {
+   "alpha": 0.5492444368578098,
+   "beta": 0.07664964719718836,
+   "rms_residual": 0.031434597019637404,
+   "n": 4
+  },
+  "threshold": -0.14405464887446162,
+  "shot_sigma": 0.022360679774997897,
+  "mean_abs_err_raw": 0.1570285439890759,
+  "mean_abs_err_calibrated": 0.22497037527117353,
+  "sign_agreement_raw": 1.0,
+  "sign_agreement_calibrated": 1.0,
+  "balanced_accuracy_raw": 1.0,
+  "balanced_accuracy_calibrated": 1.0,
+  "balanced_accuracy_ideal": 1.0
+ },
+ "raw_counts": [
+  {
+   "1": 902,
+   "0": 1098
+  },
+  {
+   "0": 1215,
+   "1": 785
+  },
+  {
+   "1": 820,
+   "0": 1180
+  },
+  {
+   "0": 1152,
+   "1": 848
+  },
+  {
+   "0": 355,
+   "1": 1645
+  },
+  {
+   "1": 1482,
+   "0": 518
+  },
+  {
+   "1": 1711,
+   "0": 289
+  },
+  {
+   "0": 676,
+   "1": 1324
+  },
+  {
+   "1": 880,
+   "0": 1120
+  },
+  {
+   "1": 904,
+   "0": 1096
+  },
+  {
+   "0": 1357,
+   "1": 643
+  },
+  {
+   "1": 878,
+   "0": 1122
+  }
+ ]
+}

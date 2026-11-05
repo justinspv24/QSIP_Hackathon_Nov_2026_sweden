@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Streaming Cells Into Qubits</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F5F3EF;--ink:#08090B;--gold:#FFC900;--dim:rgba(8,9,11,.55);--faint:rgba(8,9,11,.14);--line:rgba(8,9,11,.25);--red:#FF5A4E}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--ink);font-family:"Space Grotesk",system-ui,sans-serif;overflow:hidden}
+#viewport{position:fixed;inset:0;display:grid;place-items:center}
+#stage{width:1280px;height:720px;position:relative;transform-origin:center center}
+.slide{position:absolute;inset:0;padding:56px 80px 66px;display:none;flex-direction:column}
+.slide.active{display:flex;animation:in .35s ease}
+@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.step{font-family:"JetBrains Mono",monospace;font-size:14px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink);margin-bottom:12px;display:flex;gap:14px;align-items:center}
+.step .num{background:var(--gold);border-radius:999px;width:28px;height:28px;display:grid;place-items:center;letter-spacing:0}
+.step.backup .num{background:var(--faint)}
+h1{font-size:68px;line-height:1.04;font-weight:700;letter-spacing:-.02em}
+h2{font-size:38px;line-height:1.08;font-weight:700;letter-spacing:-.015em;margin-bottom:16px;max-width:1120px}
+:not(.card).gold{color:var(--ink);background:linear-gradient(transparent 58%,var(--gold) 58%,var(--gold) 92%,transparent 92%);padding:0 .08em}
+.card.gold{background:rgba(255,201,0,.10);border-color:var(--gold)}
+h3.gold{background:none;padding:0;border-bottom:3px solid var(--gold);align-self:flex-start}
+td.gold,.n.gold{font-weight:700;background:none}
+.dim{color:var(--dim)}
+p.lead{font-size:24px;line-height:1.4;color:var(--dim);max-width:960px}
+.mono{font-family:"JetBrains Mono",monospace}
+.row{display:flex;gap:28px;flex:1;min-height:0}
+.col{flex:1;display:flex;flex-direction:column;justify-content:center;min-width:0}
+.card{border:1.5px solid var(--line);border-radius:14px;padding:18px 22px}
+.card h3{font-size:20px;margin-bottom:6px}
+.card p{font-size:17px;line-height:1.42;color:var(--dim)}
+.big{font-size:56px;font-weight:700;line-height:1}
+.tag{align-self:flex-start;display:inline-block;font-family:"JetBrains Mono",monospace;font-size:12px;padding:3px 10px;border-radius:999px;border:1.5px solid var(--gold);background:rgba(255,201,0,.18);color:var(--ink)}
+ul.clean{list-style:none;display:flex;flex-direction:column;gap:12px}
+ul.clean li{font-size:20px;line-height:1.35;padding-left:26px;position:relative}
+ul.clean li::before{content:"";position:absolute;left:0;top:10px;width:11px;height:11px;background:var(--gold);outline:1px solid rgba(8,9,11,.25);border-radius:3px}
+table{border-collapse:collapse;width:100%;font-size:17px}
+th,td{text-align:left;padding:8px 12px;border-bottom:1px solid var(--faint);vertical-align:top}
+th{font-family:"JetBrains Mono",monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);font-weight:400}
+td.n{font-family:"JetBrains Mono",monospace}
+svg text{font-family:"Space Grotesk",sans-serif}
+.footer{position:absolute;left:80px;right:80px;bottom:24px;display:flex;justify-content:space-between;font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--dim);letter-spacing:.06em}
+#progress{position:fixed;left:0;bottom:0;height:4px;background:var(--gold);transition:width .3s}
+#hint{position:fixed;left:50%;transform:translateX(-50%);bottom:12px;font:12px "JetBrains Mono",monospace;color:var(--dim);opacity:.6}
+.pipeline{display:flex;align-items:stretch;gap:0;margin-top:6px}
+.pipeline .pstep{flex:1;border:1.5px solid var(--line);padding:14px 14px;border-radius:12px}
+.pipeline .arrow{width:30px;display:grid;place-items:center;color:var(--ink);font-size:22px}
+.pipeline .pstep b{display:inline-block;font-size:12px;font-family:"JetBrains Mono",monospace;color:var(--ink);background:var(--gold);padding:1px 6px;border-radius:4px;margin-bottom:6px}
+.pipeline .pstep span{display:block;font-size:16px;line-height:1.3;margin-top:4px}
+.note{font-size:14px;color:var(--dim);margin-top:8px;line-height:1.38}
+.eq{font-family:"JetBrains Mono",monospace;font-size:19px;background:rgba(255,201,0,.12);border-left:4px solid var(--gold);padding:10px 14px;border-radius:0 8px 8px 0;line-height:1.5}
+.kpi{display:flex;gap:18px;margin-top:10px}
+.kpi .card{flex:1;padding:12px 16px}
+.kpi .big{font-size:40px}
+.kpi p{font-size:14px}
+@media print{html,body{overflow:visible}#viewport{position:static;display:block}#stage{transform:none!important}.slide{display:flex!important;position:relative;page-break-after:always;height:720px;animation:none}#progress,#hint{display:none}}
+</style>
+</head>
+<body>
+<script>
+/* ===== RESULTS: generated by scripts/08_slides.py from results/*.json — never edited by hand ===== */
+const RESULTS = {"generated_from":["e1_baselines.json","e2_scaling.json","e3_imbalance.json","e4_sim_circuits.json","e5_hardware.json","e5_hardware_N16.json","e5_hardware_run1_randomcal.json","e6_resources.json"],"dataset":{"file":"/home/claude/qsip/qos_cells/data/pbmc3k_processed.h5ad","sha256":"0db367b991dd9580","n_cells":2638,"n_genes":13714,"nnz":2238732,"fraction_zero":0.9381181668224355,"genes_measured_in_10x_run":32738,"class_counts":{"CD4 T cells":1144,"CD14+ Monocytes":480,"B cells":342,"CD8 T cells":316,"NK cells":154,"FCGR3A+ Monocytes":150,"Dendritic cells":37,"Megakaryocytes":15}},"e1":{"tasks":[{"positive":"B cells","base_rate":0.12964366944655042,"logreg_all_genes":{"balanced_accuracy":0.9742767765299365,"auprc":0.9982062136841867,"recall_pos":0.9514563106796117,"recall_neg":0.9970972423802612,"n_test":792,"n_test_pos":103,"base_rate":0.13005050505050506},"by_N":[{"N":4,"exact_centroid":{"balanced_accuracy":0.9459748897374836,"auprc":0.9384201941714565,"recall_pos":0.9514563106796117,"recall_neg":0.9404934687953556,"n_test":792,"n_test_pos":103,"base_rate":0.13005050505050506},"logreg_p":{"balanced_accuracy":0.9515549480744572,"auprc":0.9479430716918257,"recall_pos":0.9611650485436893,"recall_neg":0.941944847605225,"n_test":792,"n_test_pos":103,"base_rate":0.13005050505050506},"abstain_rate_test":0.0},{"N":16,"exact_centroid":{"balanced_accuracy":0.9677455718855243,"auprc":0.9834570868511375,"recall_pos":0.9514563106796117,"recall_neg":0.9840348330914369,"n_test":792,"n_test_pos":103,"base_rate":0.13005050505050506},"logreg_p":{"balanced_accuracy":0.9755026984373019,"auprc":0.9930883801633168,"recall_pos":0.9611650485436893,"recall_neg":0.9898403483309144,"n_test":792,"n_test_pos":103,"base_rate":0.13005050505050506},"abstain_rate_test":0.0},{"N":256,"exact_centroid":{"balanced_accuracy":0.9755026984373019,"auprc":0.975398017257196,"recall_pos":0.9611650485436893,"recall_neg":0.9898403483309144,"n_test":792,"n_test_pos":103,"base_rate":0.13005050505050506},"logreg_p":{"balanced_accuracy":0.9859371257063142,"auprc":0.9886299270266575,"recall_pos":0.9805825242718447,"recall_neg":0.9912917271407837,"n_test":792,"n_test_pos":103,"base_rate":0.13005050505050506},"abstain_rate_test":0.0},{"N":1024,"exact_centroid":{"balanced_accuracy":0.9575366015190159,"auprc":0.9514486184449916,"recall_pos":0.9223300970873787,"recall_neg":0.9927431059506531,"n_test":792,"n_test_pos":103,"base_rate":0.13005050505050506},"logreg_p":{"balanced_accuracy":0.9589879803288852,"auprc":0.9678553731171097,"recall_pos":0.9223300970873787,"recall_neg":0.9956458635703919,"n_test":792,"n_test_pos":103,"base_rate":0.13005050505050506},"abstain_rate_test":0.0}]},{"positive":"Dendritic cells","base_rate":0.014025777103866566,"logreg_all_genes":{"balanced_accuracy":0.8636363636363636,"auprc":0.9590909090909091,"recall_pos":0.7272727272727273,"recall_neg":1.0,"n_test":792,"n_test_pos":11,"base_rate":0.013888888888888888},"by_N":[{"N":4,"exact_centroid":{"balanced_accuracy":0.8994878361075545,"auprc":0.19808338929699548,"recall_pos":0.9090909090909091,"recall_neg":0.8898847631241997,"n_test":792,"n_test_pos":11,"base_rate":0.013888888888888888},"logreg_p":{"balanced_accuracy":0.912932138284251,"auprc":0.4749573597134573,"recall_pos":0.9090909090909091,"recall_neg":0.9167733674775929,"n_test":792,"n_test_pos":11,"base_rate":0.013888888888888888},"abstain_rate_test":0.0},{"N":16,"exact_centroid":{"balanced_accuracy":0.9756722151088348,"auprc":0.7496825396825397,"recall_pos":1.0,"recall_neg":0.9513444302176697,"n_test":792,"n_test_pos":11,"base_rate":0.013888888888888888},"logreg_p":{"balanced_accuracy":0.970550576184379,"auprc":0.832471051983247,"recall_pos":1.0,"recall_neg":0.941101152368758,"n_test":792,"n_test_pos":11,"base_rate":0.013888888888888888},"abstain_rate_test":0.0},{"N":256,"exact_centroid":{"balanced_accuracy":0.9462227912932138,"auprc":0.36983355325601314,"recall_pos":1.0,"recall_neg":0.8924455825864277,"n_test":792,"n_test_pos":11,"base_rate":0.013888888888888888},"logreg_p":{"balanced_accuracy":0.9487836107554417,"auprc":0.5612775217613928,"recall_pos":1.0,"recall_neg":0.8975672215108835,"n_test":792,"n_test_pos":11,"base_rate":0.013888888888888888},"abstain_rate_test":0.0},{"N":1024,"exact_centroid":{"balanced_accuracy":0.910371318822023,"auprc":0.3787340000769361,"recall_pos":1.0,"recall_neg":0.8207426376440461,"n_test":792,"n_test_pos":11,"base_rate":0.013888888888888888},"logreg_p":{"balanced_accuracy":0.9238156209987196,"auprc":0.4904481096276328,"recall_pos":1.0,"recall_neg":0.8476312419974392,"n_test":792,"n_test_pos":11,"base_rate":0.013888888888888888},"abstain_rate_test":0.0}]},{"positive":"Megakaryocytes","base_rate":0.005686125852918878,"logreg_all_genes":{"balanced_accuracy":0.8,"auprc":0.7669172932330828,"recall_pos":0.6,"recall_neg":1.0,"n_test":792,"n_test_pos":5,"base_rate":0.006313131313131313},"by_N":[{"N":4,"exact_centroid":{"balanced_accuracy":0.9993646759847522,"auprc":1.0,"recall_pos":1.0,"recall_neg":0.9987293519695044,"n_test":792,"n_test_pos":5,"base_rate":0.006313131313131313},"logreg_p":{"balanced_accuracy":1.0,"auprc":1.0,"recall_pos":1.0,"recall_neg":1.0,"n_test":792,"n_test_pos":5,"base_rate":0.006313131313131313},"abstain_rate_test":0.0},{"N":16,"exact_centroid":{"balanced_accuracy":0.9955527318932655,"auprc":1.0,"recall_pos":1.0,"recall_neg":0.9911054637865311,"n_test":792,"n_test_pos":5,"base_rate":0.006313131313131313},"logreg_p":{"balanced_accuracy":1.0,"auprc":1.0,"recall_pos":1.0,"recall_neg":1.0,"n_test":792,"n_test_pos":5,"base_rate":0.006313131313131313},"abstain_rate_test":0.0},{"N":256,"exact_centroid":{"balanced_accuracy":0.8822109275730623,"auprc":0.6832535885167464,"recall_pos":0.8,"recall_neg":0.9644218551461246,"n_test":792,"n_test_pos":5,"base_rate":0.006313131313131313},"logreg_p":{"balanced_accuracy":0.7993646759847521,"auprc":0.6978571428571428,"recall_pos":0.6,"recall_neg":0.9987293519695044,"n_test":792,"n_test_pos":5,"base_rate":0.006313131313131313},"abstain_rate_test":0.0},{"N":1024,"exact_centroid":{"balanced_accuracy":0.8790343074968234,"auprc":0.6621052631578948,"recall_pos":0.8,"recall_neg":0.9580686149936468,"n_test":792,"n_test_pos":5,"base_rate":0.006313131313131313},"logreg_p":{"balanced_accuracy":0.7993646759847521,"auprc":0.6858851674641149,"recall_pos":0.6,"recall_neg":0.9987293519695044,"n_test":792,"n_test_pos":5,"base_rate":0.006313131313131313},"abstain_rate_test":0.0}]}]},"e2":{"curves":[{"N":16,"C_fit":19.094805538218594,"rows":[{"M":1000,"rel_error_mean":0.46736228283730474,"rel_error_std":0.16896256643032345,"rel_error_predicted":0.5415924843385737},{"M":3000,"rel_error_mean":0.26138115628459163,"rel_error_std":0.0643692631855024,"rel_error_predicted":0.3126885666239537},{"M":10000,"rel_error_mean":0.1991933159041554,"rel_error_std":0.08169637610382505,"rel_error_predicted":0.17126658141389645},{"M":30000,"rel_error_mean":0.09320044115529183,"rel_error_std":0.029821902769032828,"rel_error_predicted":0.09888080688250007},{"M":100000,"rel_error_mean":0.05656454891470426,"rel_error_std":0.016769288531748836,"rel_error_predicted":0.054159248433857374},{"M":300000,"rel_error_mean":0.03702385410429518,"rel_error_std":0.009377414356250576,"rel_error_predicted":0.03126885666239537},{"M":1000000,"rel_error_mean":0.01807419157559144,"rel_error_std":0.004495566859880467,"rel_error_predicted":0.017126658141389646}]},{"N":64,"C_fit":59.16350765983253,"rows":[{"M":1000,"rel_error_mean":1.8849709011957771,"rel_error_std":0.2319723160262773,"rel_error_predicted":2.00936393679668},{"M":3000,"rel_error_mean":1.1058921087248728,"rel_error_std":0.07577728607544357,"rel_error_predicted":1.160106809809489},{"M":10000,"rel_error_mean":0.6442473000363192,"rel_error_std":0.05252422740408152,"rel_error_predicted":0.6354166688480128},{"M":30000,"rel_error_mean":0.3432089597019517,"rel_error_std":0.02982853470585664,"rel_error_predicted":0.3668579848069754},{"M":100000,"rel_error_mean":0.19568858948858345,"rel_error_std":0.02823522627299939,"rel_error_predicted":0.20093639367966798},{"M":300000,"rel_error_mean":0.11399180104878874,"rel_error_std":0.011354431257182355,"rel_error_predicted":0.11601068098094894},{"M":1000000,"rel_error_mean":0.06221884690904711,"rel_error_std":0.009157891356162958,"rel_error_predicted":0.06354166688480127}]},{"N":256,"C_fit":88.32833329149818,"rows":[{"M":1000,"rel_error_mean":4.557811158531051,"rel_error_std":0.7243109227254577,"rel_error_predicted":4.8231413044004015},{"M":3000,"rel_error_mean":2.8459504503826114,"rel_error_std":0.3436237886512678,"rel_error_predicted":2.7846419304351744},{"M":10000,"rel_error_mean":1.4622171827948645,"rel_error_std":0.21251295524057975,"rel_error_predicted":1.5252111998740765},{"M":30000,"rel_error_mean":0.8613604743714521,"rel_error_std":0.06268012752111368,"rel_error_predicted":0.8805810968183302},{"M":100000,"rel_error_mean":0.48401863431335534,"rel_error_std":0.04182486384286204,"rel_error_predicted":0.4823141304400402},{"M":300000,"rel_error_mean":0.28067691290637253,"rel_error_std":0.020277904032021617,"rel_error_predicted":0.27846419304351744},{"M":1000000,"rel_error_mean":0.150040392010604,"rel_error_std":0.006509559214462646,"rel_error_predicted":0.15252111998740764}]},{"N":1024,"C_fit":93.16013285902912,"rows":[{"M":1000,"rel_error_mean":8.885985627998505,"rel_error_std":1.6398150190632783,"rel_error_predicted":10.175194558777951},{"M":3000,"rel_error_mean":5.4241193357685615,"rel_error_std":0.5586098246144706,"rel_error_predicted":5.874651317567266},{"M":10000,"rel_error_mean":3.1399516966404377,"rel_error_std":0.35481672597037045,"rel_error_predicted":3.2176790441090364},{"M":30000,"rel_error_mean":1.9017030448196153,"rel_error_std":0.29983250306245557,"rel_error_predicted":1.85772786228217},{"M":100000,"rel_error_mean":1.026178745848605,"rel_error_std":0.11441648064259856,"rel_error_predicted":1.0175194558777951},{"M":300000,"rel_error_mean":0.553622911167707,"rel_error_std":0.025572364671150514,"rel_error_predicted":0.5874651317567264},{"M":1000000,"rel_error_mean":0.31017237011028,"rel_error_std":0.019752987925011914,"rel_error_predicted":0.32176790441090364}]}],"classifier":{"N":1024,"rows":[{"M":1000,"balanced_accuracy_mean":0.681940902109431,"balanced_accuracy_std":0.12820257561715756,"auprc_mean":0.3138715641088308,"auprc_std":0.2340287509382512},{"M":3000,"balanced_accuracy_mean":0.6985274846055208,"balanced_accuracy_std":0.06164318611599028,"auprc_mean":0.24906717118703417,"auprc_std":0.058517012005168206},{"M":10000,"balanced_accuracy_mean":0.8279157918469148,"balanced_accuracy_std":0.04190891123616386,"auprc_mean":0.661065003631026,"auprc_std":0.13587637452017562},{"M":30000,"balanced_accuracy_mean":0.9176194569306861,"balanced_accuracy_std":0.028579684236138873,"auprc_mean":0.858838759177863,"auprc_std":0.10519879706915441},{"M":100000,"balanced_accuracy_mean":0.9433835444643286,"balanced_accuracy_std":0.010384193090558888,"auprc_mean":0.9227326661449695,"auprc_std":0.021224874624934505},{"M":300000,"balanced_accuracy_mean":0.9604139952372229,"balanced_accuracy_std":0.009911024033933576,"auprc_mean":0.9549162066287625,"auprc_std":0.02574019500931784},{"M":1000000,"balanced_accuracy_mean":0.9541434751363308,"balanced_accuracy_std":0.0015284971007217092,"auprc_mean":0.9463777407682361,"auprc_std":0.015065131821695034}],"exact_centroid":{"balanced_accuracy":0.9575366015190159,"auprc":0.9514486184449916,"recall_pos":0.9223300970873787,"recall_neg":0.9927431059506531,"n_test":792,"n_test_pos":103,"base_rate":0.13005050505050506},"n_train_cells":1846},"sparsity":{"stream_density":0.3477128546519502}},"e3":{"N":64,"synthetic":[{"pi":0.5,"pi_realised":0.5,"n_pos":4000,"n_cells":8000,"rows":[{"M":3000,"rel_error_mean":0.5289343965302354,"rel_error_std":0.08399995661273164,"rel_error_predicted":0.5483954924503659},{"M":10000,"rel_error_mean":0.26448475304500285,"rel_error_std":0.02934448540377303,"rel_error_predicted":0.3003685816492195},{"M":30000,"rel_error_mean":0.15371722009440242,"rel_error_std":0.029469280990013016,"rel_error_predicted":0.17341788147128295},{"M":100000,"rel_error_mean":0.08802592179548879,"rel_error_std":0.012351354790046147,"rel_error_predicted":0.09498488555657886},{"M":300000,"rel_error_mean":0.05662470451105356,"rel_error_std":0.013626252766108547,"rel_error_predicted":0.054839549245036597},{"M":1000000,"rel_error_mean":0.030916598300967275,"rel_error_std":0.007713995125614764,"rel_error_predicted":0.030036858164921944}],"M_for_err_0p1":82338.42726041442,"M_for_err_0p1_predicted":90221.28484196382,"law_factor":4.0,"cost_ratio_vs_balanced_measured":1.0,"cost_ratio_vs_balanced_law":1.0},{"pi":0.1,"pi_realised":0.1,"n_pos":800,"n_cells":8000,"rows":[{"M":3000,"rel_error_mean":0.9987836048497474,"rel_error_std":0.13526685111251951,"rel_error_predicted":0.9778072139878657},{"M":10000,"rel_error_mean":0.5707431697859826,"rel_error_std":0.06135950412111067,"rel_error_predicted":0.5355670679924351},{"M":30000,"rel_error_mean":0.30943286574654066,"rel_error_std":0.056254355321457,"rel_error_predicted":0.30920979087453104},{"M":100000,"rel_error_mean":0.1405844047456299,"rel_error_std":0.027213279948241218,"rel_error_predicted":0.1693611774634357},{"M":300000,"rel_error_mean":0.08442656874108716,"rel_error_std":0.011262649573044306,"rel_error_predicted":0.09778072139878659},{"M":1000000,"rel_error_mean":0.043406369172008775,"rel_error_std":0.008077618980122724,"rel_error_predicted":0.053556706799243514}],"M_for_err_0p1":252025.14503216758,"M_for_err_0p1_predicted":286832.0843180136,"law_factor":11.111111111111109,"cost_ratio_vs_balanced_measured":3.0608447770696356,"cost_ratio_vs_balanced_law":2.7777777777777772},{"pi":0.02,"pi_realised":0.02,"n_pos":160,"n_cells":8000,"rows":[{"M":3000,"rel_error_mean":1.99057809869274,"rel_error_std":0.32071138529256465,"rel_error_predicted":2.057543708069964},{"M":10000,"rel_error_mean":1.106415492456023,"rel_error_std":0.16830258346321877,"rel_error_predicted":1.1269631019627437},{"M":30000,"rel_error_mean":0.6233796115905827,"rel_error_std":0.17170973417720073,"rel_error_predicted":0.6506524502849658},{"M":100000,"rel_error_mean":0.3400672706449291,"rel_error_std":0.08875405953057193,"rel_error_predicted":0.3563770241170844},{"M":300000,"rel_error_mean":0.1524181720546378,"rel_error_std":0.011643371729781435,"rel_error_predicted":0.2057543708069964},{"M":1000000,"rel_error_mean":0.1108816012422297,"rel_error_std":0.020903780322706497,"rel_error_predicted":0.11269631019627437}],"M_for_err_0p1":1110258.5704505092,"M_for_err_0p1_predicted":1270045.8331854893,"law_factor":51.02040816326531,"cost_ratio_vs_balanced_measured":13.48408765373983,"cost_ratio_vs_balanced_law":12.755102040816327},{"pi":0.005,"pi_realised":0.005,"n_pos":40,"n_cells":8000,"rows":[{"M":3000,"rel_error_mean":3.9097979061293855,"rel_error_std":2.217211798476775,"rel_error_predicted":4.189425419535662},{"M":10000,"rel_error_mean":2.6075183528738153,"rel_error_std":1.1206420177910759,"rel_error_predicted":2.294642805265227},{"M":30000,"rel_error_mean":1.3674986416241641,"rel_error_std":0.17636862261819383,"rel_error_predicted":1.3248126413139165},{"M":100000,"rel_error_mean":0.7392913601774624,"rel_error_std":0.21960784896998034,"rel_error_predicted":0.7256297681156326},{"M":300000,"rel_error_mean":0.4100394378872695,"rel_error_std":0.08075015295577989,"rel_error_predicted":0.4189425419535663},{"M":1000000,"rel_error_mean":0.27681752101739115,"rel_error_std":0.029180401697059166,"rel_error_predicted":0.22946428052652265}],"M_for_err_0p1":5861257.8050627895,"M_for_err_0p1_predicted":5265385.6037554685,"law_factor":201.00502512562812,"cost_ratio_vs_balanced_measured":71.18496187114674,"cost_ratio_vs_balanced_law":50.25125628140703}],"real":[{"positive":"B cells","pi_hat":0.1294691224268689,"n_train_pos":239,"rows":[{"M":3000,"rel_error_mean":1.0944104171507543,"rel_error_std":0.2000753999035841,"rel_error_predicted":1.160106809809489},{"M":10000,"rel_error_mean":0.6304624774094638,"rel_error_std":0.05324532815096601,"rel_error_predicted":0.6354166688480128},{"M":30000,"rel_error_mean":0.3573582939429897,"rel_error_std":0.05829168994017956,"rel_error_predicted":0.3668579848069754},{"M":100000,"rel_error_mean":0.21547054163559864,"rel_error_std":0.026507717108144348,"rel_error_predicted":0.20093639367966798},{"M":300000,"rel_error_mean":0.11559745095338618,"rel_error_std":0.03038303941470483,"rel_error_predicted":0.11601068098094894},{"M":1000000,"rel_error_mean":0.06622414570100404,"rel_error_std":0.012927814274448755,"rel_error_predicted":0.06354166688480127}],"M_for_err_0p1":407273.40750650293,"M_for_err_0p1_predicted":403754.34304990515,"law_factor":8.872573703436588},{"positive":"Dendritic cells","pi_hat":0.014084507042253521,"n_train_pos":26,"rows":[{"M":3000,"rel_error_mean":2.6859354830887647,"rel_error_std":0.291537138261924,"rel_error_predicted":2.9181576412724595},{"M":10000,"rel_error_mean":1.4716068159156808,"rel_error_std":0.19051599665834945,"rel_error_predicted":1.5983407664809948},{"M":30000,"rel_error_mean":0.9666499811050526,"rel_error_std":0.03479032561145255,"rel_error_predicted":0.9228024717845551},{"M":100000,"rel_error_mean":0.4571478330965794,"rel_error_std":0.053851271181921,"rel_error_predicted":0.5054397299179254},{"M":300000,"rel_error_mean":0.28788020958667804,"rel_error_std":0.03248962016724937,"rel_error_predicted":0.29181576412724597},{"M":1000000,"rel_error_mean":0.1699002897198765,"rel_error_std":0.017609600948454297,"rel_error_predicted":0.15983407664809945}],"M_for_err_0p1":2432640.119040689,"M_for_err_0p1_predicted":2554693.205795054,"law_factor":72.01428571428572},{"positive":"Megakaryocytes","pi_hat":0.005417118093174431,"n_train_pos":10,"rows":[{"M":3000,"rel_error_mean":1.5757075541980918,"rel_error_std":0.32281980820108985,"rel_error_predicted":2.3383311485316725},{"M":10000,"rel_error_mean":1.3264948722137677,"rel_error_std":0.22766380907518985,"rel_error_predicted":1.2807567169677603},{"M":30000,"rel_error_mean":0.6960001498011599,"rel_error_std":0.10790452929824226,"rel_error_predicted":0.7394452353077576},{"M":100000,"rel_error_mean":0.3769716819943393,"rel_error_std":0.07804401231858572,"rel_error_predicted":0.4050108354177744},{"M":300000,"rel_error_mean":0.2603063046242286,"rel_error_std":0.06167921499268677,"rel_error_predicted":0.23383311485316727},{"M":1000000,"rel_error_mean":0.1305784384029153,"rel_error_std":0.01893037377717678,"rel_error_predicted":0.128075671696776}],"M_for_err_0p1":1519437.3458551117,"M_for_err_0p1_predicted":1640337.7680580353,"law_factor":185.60544662309368}]},"e4":[{"N":4,"n_qubits":3,"transpiled":{"ops":{"r":29,"cz":13,"measure":1},"depth":24,"two_qubit":13,"n_qubits":20},"sketch_rel_error":0.013817310833470167,"test_eval_full":{"balanced_accuracy":0.9467005791424183,"auprc":0.9392145847518953,"recall_pos":0.9514563106796117,"recall_neg":0.941944847605225,"n_test":792,"n_test_pos":103,"base_rate":0.13005050505050506},"cells":[{"test_index":5,"formula":0.20013752508869964,"shots_ideal":0.219},{"test_index":6,"formula":0.10427940293349541,"shots_ideal":0.109},{"test_index":7,"formula":0.21296515500541718,"shots_ideal":0.247},{"test_index":9,"formula":0.21657339034572345,"shots_ideal":0.241},{"test_index":0,"formula":-0.9036262366006692,"shots_ideal":-0.905},{"test_index":1,"formula":-0.8134526332185369,"shots_ideal":-0.83},{"test_index":2,"formula":-0.9028532308947242,"shots_ideal":-0.9},{"test_index":3,"formula":-0.4878995836923321,"shots_ideal":-0.495}]},{"N":16,"n_qubits":5,"transpiled":{"ops":{"r":82,"cz":53,"measure":1},"depth":108,"two_qubit":53,"n_qubits":20},"sketch_rel_error":0.06373098247838282,"test_eval_full":{"balanced_accuracy":0.9677455718855243,"auprc":0.982516088703612,"recall_pos":0.9514563106796117,"recall_neg":0.9840348330914369,"n_test":792,"n_test_pos":103,"base_rate":0.13005050505050506},"cells":[{"test_index":5,"formula":0.05685129043593286,"shots_ideal":0.051},{"test_index":6,"formula":0.03937563068655953,"shots_ideal":0.054},{"test_index":7,"formula":0.00826350402255066,"shots_ideal":0.014},{"test_index":9,"formula":0.046614522886102155,"shots_ideal":0.091},{"test_index":0,"formula":-0.6115961081238698,"shots_ideal":-0.604},{"test_index":1,"formula":-0.5422030775745421,"shots_ideal":-0.537},{"test_index":2,"formula":-0.6265527619045024,"shots_ideal":-0.626},{"test_index":3,"formula":-0.47434527126376214,"shots_ideal":-0.495}]}],"e5":{"N4":{"N":4,"meta":{"alias":"garnet","job_id":"01a1ac11-9106-73d2-9760-b430c7575476","submitted_utc":"2026-11-05T14:16:34+00:00","shots":2000,"transpiled_test":{"ops":{"r":22,"cz":11,"measure":1},"depth":24,"two_qubit":11,"n_qubits":19},"n_qubits":3},"summary":{"calibration":{"alpha":0.776452100756471,"beta":0.03995177900154865,"rms_residual":0.06556557989483404,"n":5},"threshold":-0.14405464887446162,"shot_sigma":0.022360679774997897,"mean_abs_err_raw":0.1267785439890759,"mean_abs_err_calibrated":0.04620778462174753,"sign_agreement_raw":1.0,"sign_agreement_calibrated":1.0,"balanced_accuracy_raw":1.0,"balanced_accuracy_calibrated":1.0,"balanced_accuracy_ideal":1.0},"cells":[{"test_index":5,"label":1,"ideal":0.20013752508869964,"raw":0.163,"calibrated":0.15847496694074192,"err_raw":0.037137525088699636,"err_calibrated":0.04166255814795772,"pred_raw":1,"pred_cal":1,"pred_ideal":1},{"test_index":6,"label":1,"ideal":0.10427940293349541,"raw":0.14,"calibrated":0.1288530495325826,"err_raw":0.0357205970665046,"err_calibrated":0.024573646599087173,"pred_raw":1,"pred_cal":1,"pred_ideal":1},{"test_index":7,"label":1,"ideal":0.21296515500541718,"raw":0.152,"calibrated":0.14430796296292658,"err_raw":0.06096515500541719,"err_calibrated":0.0686571920424906,"pred_raw":1,"pred_cal":1,"pred_ideal":1},{"test_index":9,"label":1,"ideal":0.21657339034572345,"raw":0.171,"calibrated":0.1687782425609713,"err_raw":0.04557339034572344,"err_calibrated":0.04779514778475216,"pred_raw":1,"pred_cal":1,"pred_ideal":1},{"test_index":0,"label":0,"ideal":-0.9036262366006692,"raw":-0.684,"calibrated":-0.9323843393510393,"err_raw":0.21962623660066916,"err_calibrated":0.02875810275037005,"pred_raw":0,"pred_cal":0,"pred_ideal":0},{"test_index":1,"label":0,"ideal":-0.8134526332185369,"raw":-0.566,"calibrated":-0.7804110239526564,"err_raw":0.24745263321853694,"err_calibrated":0.03304160926588051,"pred_raw":0,"pred_cal":0,"pred_ideal":0},{"test_index":2,"label":0,"ideal":-0.9028532308947242,"raw":-0.624,"calibrated":-0.8551097721993192,"err_raw":0.27885323089472425,"err_calibrated":0.04774345869540508,"pred_raw":0,"pred_cal":0,"pred_ideal":0},{"test_index":3,"label":0,"ideal":-0.4878995836923321,"raw":-0.399,"calibrated":-0.5653301453803691,"err_raw":0.08889958369233208,"err_calibrated":0.07743056168803697,"pred_raw":0,"pred_cal":0,"pred_ideal":0}],"calibration_circuits":[{"kind":"zero","ideal":0.0,"measured":0.125},{"kind":"train_rare","ideal":0.04597890269284788,"measured":0.015},{"kind":"train_rare","ideal":0.004574645939639799,"measured":-0.029},{"kind":"train_common","ideal":-0.9161580142337193,"measured":-0.693},{"kind":"train_common","ideal":-0.2391113232697854,"measured":-0.076}],"frozen_sha256":"ba9392464723329c"},"N16":{"N":16,"meta":{"alias":"garnet","job_id":"01a1ac12-f993-75ba-9166-23625a6bf9f9","submitted_utc":"2026-11-05T14:18:07+00:00","shots":2000,"transpiled_test":{"ops":{"r":80,"cz":53,"measure":1},"depth":108,"two_qubit":53,"n_qubits":19},"n_qubits":5},"summary":{"calibration":{"alpha":0.43087238081627544,"beta":0.0950441076602589,"rms_residual":0.04830420066404371,"n":5},"threshold":-0.18608768177068774,"shot_sigma":0.022360679774997897,"mean_abs_err_raw":0.2576990338544414,"mean_abs_err_calibrated":0.09404608879249209,"sign_agreement_raw":0.625,"sign_agreement_calibrated":1.0,"balanced_accuracy_raw":0.625,"balanced_accuracy_calibrated":1.0,"balanced_accuracy_ideal":1.0},"cells":[{"test_index":5,"label":1,"ideal":0.05685129043593286,"raw":0.116,"calibrated":0.048635961070516424,"err_raw":0.05914870956406715,"err_calibrated":0.008215329365416434,"pred_raw":1,"pred_cal":1,"pred_ideal":1},{"test_index":6,"label":1,"ideal":0.03937563068655953,"raw":0.05,"calibrated":-0.10454164542857011,"err_raw":0.01062436931344047,"err_calibrated":0.14391727611512964,"pred_raw":1,"pred_cal":1,"pred_ideal":1},{"test_index":7,"label":1,"ideal":0.00826350402255066,"raw":0.206,"calibrated":0.25751451538745257,"err_raw":0.19773649597744933,"err_calibrated":0.2492510113649019,"pred_raw":1,"pred_cal":1,"pred_ideal":1},{"test_index":9,"label":1,"ideal":0.046614522886102155,"raw":0.172,"calibrated":0.17860483931216556,"err_raw":0.12538547711389783,"err_calibrated":0.1319903164260634,"pred_raw":1,"pred_cal":1,"pred_ideal":1},{"test_index":0,"label":0,"ideal":-0.6115961081238698,"raw":-0.213,"calibrated":-0.7149311985991725,"err_raw":0.3985961081238698,"err_calibrated":0.10333509047530276,"pred_raw":0,"pred_cal":0,"pred_ideal":0},{"test_index":1,"label":0,"ideal":-0.5422030775745421,"raw":-0.132,"calibrated":-0.52694049971393,"err_raw":0.4102030775745421,"err_calibrated":0.015262577860612137,"pred_raw":1,"pred_cal":0,"pred_ideal":0},{"test_index":2,"label":0,"ideal":-0.6265527619045024,"raw":-0.158,"calibrated":-0.5872831931832672,"err_raw":0.46855276190450235,"err_calibrated":0.039269568721235215,"pred_raw":1,"pred_cal":0,"pred_ideal":0},{"test_index":3,"label":0,"ideal":-0.47434527126376214,"raw":-0.083,"calibrated":-0.41321773125248695,"err_raw":0.3913452712637621,"err_calibrated":0.06112754001127518,"pred_raw":1,"pred_cal":0,"pred_ideal":0}],"calibration_circuits":[{"kind":"zero","ideal":0.0,"measured":0.011},{"kind":"train_rare","ideal":-0.06078401552595014,"measured":0.105},{"kind":"train_rare","ideal":-0.11548132204779338,"measured":0.087},{"kind":"train_common","ideal":-0.676328012452023,"measured":-0.221},{"kind":"train_common","ideal":-0.3129966498480987,"measured":-0.009}],"frozen_sha256":"21688fe9828a7de2"},"run1":{"job_id":"01a1ac10-173d-7033-b4a9-e227387dfc13","alpha":0.5492444368578098,"err_raw":0.1570285439890759,"err_cal":0.22497037527117353,"cal_ideals":[0.0,0.07240529975672749,0.48324769869679063,0.1515028417280681]}},"e6":{"ledger":[{"N":32768,"index_qubits":15,"logical_qubits":30,"samples_balanced":327680.0,"imbalance_factor":72.44277021153289,"samples_rare":23738046.942915097,"gates_per_sketch":688403361.3445379,"seconds_per_sketch":688.4033613445379,"years_per_sketch":2.181418616575842e-05,"classical_floats":32768,"classical_bytes":131072,"eps":0.1,"Q":1,"pi":0.014,"gate_rate_hz":1000000.0,"feature_space":"all genes"},{"N":1073741824,"index_qubits":30,"logical_qubits":60,"samples_balanced":10737418240.0,"imbalance_factor":72.44277021153289,"samples_rare":777848322225.4419,"gates_per_sketch":45893051011301.07,"seconds_per_sketch":45893051.01130107,"years_per_sketch":1.4542630304998185,"classical_floats":1073741824,"classical_bytes":4294967296,"eps":0.1,"Q":1,"pi":0.014,"gate_rate_hz":1000000.0,"feature_space":"gene pairs"}],"assumptions":{"eps":0.1,"Q":1,"pi_rare":0.014,"logical_gate_rate_hz":1000000.0,"gates_per_record":"2n-1 (n-controlled phase with ancillas)","logical_qubits":"2n (index + Hadamard ancilla + work)","samples":"N Q^2 / eps (paper) x 1/(pi(1-pi)) (ours)","classical_lower_bound":"M*S >= Omega(N*Q_C) for the paper's task families; not proven for the centroid task"}}};
+</script>
+<div id="viewport"><div id="stage">
+
+<!-- 1 · HOOK -->
+<section class="slide">
+  <div class="step">QSIP Hackathon · ExtremeData4QML · Stockholm · 6 Nov 2026</div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:28px">
+    <h1 style="font-size:54px">1 in 70 blood cells is a dendritic cell.<br>1 in a million is a tumour cell.<br><span class="gold">Can qubits learn them from a stream too big to store?</span></h1>
+    <p class="lead">Quantum oracle sketching on single-cell RNA-seq: each streamed record is one phase gate, the register keeps log₂(genes) qubits, and we measure exactly what rare classes cost.</p>
+  </div>
+  <div class="pipeline">
+    <div class="pstep"><b>01</b><span>Dataset: PBMC3k</span></div><div class="arrow">→</div>
+    <div class="pstep"><b>02</b><span>Challenge: huge, sparse, rare</span></div><div class="arrow">→</div>
+    <div class="pstep"><b>03</b><span>Technique: oracle sketching</span></div><div class="arrow">→</div>
+    <div class="pstep"><b>04</b><span>Prototype: sim → IQM Garnet</span></div><div class="arrow">→</div>
+    <div class="pstep"><b>05</b><span>Real world: atlases, biopsies</span></div>
+  </div>
+</section>
+
+<!-- 2 · DATA + CHALLENGE -->
+<section class="slide">
+  <div class="step"><span class="num">1</span>Dataset &nbsp;·&nbsp; <span class="num">2</span>Challenge</div>
+  <h2>PBMC3k: <span class="gold">huge feature space, almost all zeros, and the class you care about is rare</span></h2>
+  <div class="row">
+    <div class="col" style="flex:1.05">
+      <svg id="classbars" viewBox="0 0 560 330" width="100%"></svg>
+      <p class="note">Cells per type (log scale), 2,638 blood cells after QC. Rare types in gold.</p>
+    </div>
+    <div class="col" style="gap:12px;flex:1">
+      <table>
+        <tr><th>property</th><th>number</th><th>why it hurts</th></tr>
+        <tr><td>genes measured</td><td class="n gold" id="t-genes"></td><td>memory grows with features; p ≫ n</td></tr>
+        <tr><td>cells</td><td class="n" id="t-cells"></td><td>few samples per feature</td></tr>
+        <tr><td>zeros</td><td class="n gold" id="t-zeros"></td><td>the signal sits in a few genes per cell</td></tr>
+        <tr><td>dendritic cells</td><td class="n gold" id="t-dc"></td><td>the rare class is the interesting one</td></tr>
+        <tr><td>megakaryocytes</td><td class="n gold" id="t-mk"></td><td>15 examples to learn from</td></tr>
+        <tr><td>in the wild</td><td class="n">10⁷–10⁸ cells</td><td>atlases arrive as a stream; you cannot keep it</td></tr>
+      </table>
+      <p class="note"><b>The hard part is not accuracy on 2,638 cells</b> (classical solves that). It is learning from a stream whose feature space is bigger than the memory you can afford, while the class you need is ~1 % of it.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 3 · MECHANISM -->
+<section class="slide">
+  <div class="step"><span class="num">3</span>The quantum technique</div>
+  <h2>Oracle sketching: <span class="gold">each record is one phase kick, then it is gone</span></h2>
+  <svg viewBox="0 0 1120 250" width="100%">
+    <defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10z" fill="#FFC900"/></marker></defs>
+    <text x="16" y="28" fill="#08090B" fill-opacity=".6" font-size="14">① stream of records x = (cell, gene, label, value)</text>
+    <g font-family="JetBrains Mono" font-size="12" fill="#F5F3EF">
+      <rect x="16" y="46" width="62" height="40" rx="6" fill="#08090B" opacity=".85"/><text x="47" y="71" text-anchor="middle" font-size="14">x₁</text>
+      <rect x="88" y="46" width="62" height="40" rx="6" fill="#08090B" opacity=".85"/><text x="119" y="71" text-anchor="middle" font-size="14">x₂</text>
+      <rect x="160" y="46" width="62" height="40" rx="6" fill="#FFC900"/><text x="191" y="71" text-anchor="middle" font-size="14" fill="#08090B">x₃</text>
+      <text x="232" y="72" fill="#08090B" font-size="18">…</text>
+      <rect x="258" y="46" width="62" height="40" rx="6" fill="#08090B" opacity=".85"/><text x="289" y="71" text-anchor="middle" font-size="14">x_M</text>
+    </g>
+    <text x="16" y="112" fill="#08090B" fill-opacity=".55" font-size="13">read once · never stored · zero entries make no gate</text>
+    <line x1="326" y1="66" x2="352" y2="66" stroke="#FFC900" stroke-width="2" marker-end="url(#ah)"/>
+    <text x="362" y="28" fill="#08090B" fill-opacity=".6" font-size="14">② one diagonal phase gate per record on n = log₂N qubits</text>
+    <g stroke="#08090B" stroke-opacity=".5" stroke-width="1.5"><line x1="362" y1="52" x2="760" y2="52"/><line x1="362" y1="76" x2="760" y2="76"/><line x1="362" y1="100" x2="760" y2="100"/></g>
+    <g font-family="JetBrains Mono" font-size="12" font-weight="700" fill="#08090B">
+      <rect x="386" y="40" width="82" height="72" rx="8" fill="#F5F3EF" stroke="#FFC900" stroke-width="2.5"/><text x="427" y="72" text-anchor="middle">V(x₁)</text><text x="427" y="92" text-anchor="middle" font-size="10" font-weight="400">e^{iτw₁/M}|g₁⟩⟨g₁|</text>
+      <rect x="480" y="40" width="82" height="72" rx="8" fill="#F5F3EF" stroke="#FFC900" stroke-width="2.5"/><text x="521" y="72" text-anchor="middle">V(x₂)</text><text x="521" y="92" text-anchor="middle" font-size="10" font-weight="400">e^{iτw₂/M}|g₂⟩⟨g₂|</text>
+      <text x="578" y="80" font-size="18">…</text>
+      <rect x="608" y="40" width="82" height="72" rx="8" fill="#F5F3EF" stroke="#FFC900" stroke-width="2.5"/><text x="649" y="72" text-anchor="middle">V(x_M)</text><text x="649" y="92" text-anchor="middle" font-size="10" font-weight="400">e^{iτw_M/M}|g_M⟩⟨g_M|</text>
+    </g>
+    <text x="362" y="134" fill="#08090B" fill-opacity=".55" font-size="13">on basis state |gₜ⟩ only · all gates commute → the register keeps the SUM of the kicks</text>
+    <line x1="770" y1="76" x2="814" y2="76" stroke="#FFC900" stroke-width="2" marker-end="url(#ah)"/>
+    <text x="824" y="28" fill="#08090B" fill-opacity=".6" font-size="14">③ one query: Hadamard test</text>
+    <rect x="824" y="40" width="130" height="72" rx="10" fill="none" stroke="#08090B" stroke-opacity=".5" stroke-width="1.5"/>
+    <text x="889" y="70" text-anchor="middle" fill="#08090B" font-size="13">|ψ⟩ = Σ a_g|g⟩</text>
+    <text x="889" y="92" text-anchor="middle" fill="#08090B" font-size="13">ctrl-U, S†, H</text>
+    <line x1="962" y1="76" x2="1000" y2="76" stroke="#FFC900" stroke-width="2" marker-end="url(#ah)"/>
+    <rect x="1004" y="46" width="108" height="60" rx="10" fill="#FFC900"/>
+    <text x="1058" y="72" text-anchor="middle" fill="#08090B" font-size="14" font-weight="700">rare /</text>
+    <text x="1058" y="92" text-anchor="middle" fill="#08090B" font-size="14" font-weight="700">common</text>
+    <rect x="16" y="160" width="1100" height="76" rx="12" fill="rgba(255,201,0,.07)" stroke="#FFC900" stroke-opacity=".5"/>
+    <text x="36" y="190" fill="#08090B" font-size="17" font-weight="700">Analogy: raindrops on a set of tuned drums.</text>
+    <text x="36" y="216" fill="#08090B" font-size="15">No drum stores the rain, but after a storm each drum is turned by how much fell on it. The register keeps the sum, never the drops.</text>
+  </svg>
+  <div class="row" style="flex:none;gap:22px;margin-top:8px">
+    <div class="col eq" style="flex:1.2;font-size:17px">φ_g = (τ/M) · Σ_t w_t · [g_t = g]<br>w_t = +p_t/π̂ (rare) &nbsp;or&nbsp; −p_t/(1−π̂) (common)<br>⟹ E[φ_g] ∝ μ₁,g − μ₀,g<br>⟨Z_anc⟩ = Σ_g a_g² sin φ_g &nbsp;=&nbsp; the classifier score</div>
+    <div class="col card" style="flex:.9"><p style="color:var(--ink)"><b>Our addition:</b> the ±1/π̂ importance weights make the sketch imbalance-aware. The mean is unbiased for any π; the price is in the variance (next slides).</p><p>Zhao, Zlokapa, Preskill &amp; Huang 2026, arXiv:2604.07639 · no QRAM · p = squared amplitude of the cell</p></div>
+  </div>
+</section>
+
+<!-- 4 · WHY IT FITS -->
+<section class="slide">
+  <div class="step"><span class="num">3</span>Why it fits this data · mechanistic claims, each with a measurement</div>
+  <h2>Memory is <span class="gold">log₂N qubits</span>; the price is samples: err² ≈ C·N/M</h2>
+  <div class="row">
+    <div class="col" style="flex:1.25"><svg id="e2plot" viewBox="0 0 620 330" width="100%"></svg></div>
+    <div class="col" style="gap:10px">
+      <table>
+        <tr><th>data property</th><th>mechanism</th><th>claim</th></tr>
+        <tr><td>N features</td><td>index register</td><td class="n">⌈log₂N⌉ qubits: 15 for all genes, 30 for gene pairs</td></tr>
+        <tr><td>sparsity</td><td>gate per record</td><td class="n">cost ∝ nonzeros streamed, zeros are free</td></tr>
+        <tr><td>stream</td><td>no storage</td><td class="n">M = Θ(NQ²/ε) samples (paper)</td></tr>
+        <tr><td>classical</td><td>lower bound</td><td class="n">M·S ≥ Ω(N·Q_C) (paper's tasks)</td></tr>
+      </table>
+      <p class="note">Left: measured sketch error (5 seeds) vs records M, dashed = closed-form prediction with <b>no fitted parameter</b>. Slope −½ in log-log: error² ∝ 1/M; the offset grows with N (err²·M/N ≈ <span id="t-cfit"></span> for N ≥ 256).</p>
+      <p class="note">Classifier at N = 1024 (10 qubits) reaches the M→∞ centroid (bal. acc <span id="t-exact"></span>) by M ≈ <span id="t-mconv"></span> records.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 5 · OUR TWIST -->
+<section class="slide">
+  <div class="step"><span class="num">3</span>Our twist · the cost of rare classes</div>
+  <h2>Rare classes cost <span class="gold">samples, not qubits</span>: M ∝ 1/(π(1−π))</h2>
+  <div class="row">
+    <div class="col" style="flex:1.2"><svg id="e3plot" viewBox="0 0 620 330" width="100%"></svg></div>
+    <div class="col" style="flex:.95"><svg id="e3bars" viewBox="0 0 480 240" width="100%"></svg>
+      <table style="margin-top:8px">
+        <tr><th>real class</th><th>π</th><th>1/(π(1−π))</th><th>M for 10 % error</th></tr>
+        <tbody id="e3real"></tbody>
+      </table>
+    </div>
+  </div>
+  <p class="note">Two-line derivation: the ±1/π weights leave the mean of the kick unchanged, Σ p·w → μ₁−μ₀, but square inside the variance: E[p²]/π + E[p²]/(1−π) = E[p²]/(π(1−π)). Same two expression profiles in the synthetic, only π changes. Dendritic cells (π = 0.014) pay ×72 in samples over a balanced class, and being rare <i>and</i> subtle is the expensive combination.</p>
+</section>
+
+<!-- 6 · IT RUNS -->
+<section class="slide">
+  <div class="step"><span class="num">4</span>Prototype · classical → simulator → real hardware</div>
+  <h2 id="hw-title">It runs on IQM Garnet: <span class="gold">8/8 cells right from 3 qubits</span></h2>
+  <div class="row">
+    <div class="col" style="flex:1.3"><svg id="hwplot" viewBox="0 0 640 330" width="100%"></svg></div>
+    <div class="col" style="gap:10px">
+      <table>
+        <tr><th>stage</th><th>N=4 · 3 qubits</th><th>N=16 · 5 qubits</th></tr>
+        <tr><td>formula = statevector</td><td class="n">1e-15</td><td class="n">1e-13</td></tr>
+        <tr><td>2,000-shot simulator</td><td class="n">±0.03</td><td class="n">±0.04</td></tr>
+        <tr><td>CZ gates · depth</td><td class="n" id="t-cz4"></td><td class="n" id="t-cz16"></td></tr>
+        <tr><td>calibration α (signal left)</td><td class="n gold" id="t-a4"></td><td class="n gold" id="t-a16"></td></tr>
+        <tr><td>sign agreement raw → cal.</td><td class="n gold" id="t-s4"></td><td class="n gold" id="t-s16"></td></tr>
+      </table>
+      <p class="note" id="hw-meta"></p>
+      <p class="note">Phases trained in simulation (100k records), frozen and hashed; the QPU runs <b>inference only</b>. Calibration: the same oracle on 4 training cells + the zero sketch. Depth breaks first: at 53 CZ raw signs fail and calibration rescues them.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 7 · REAL WORLD + REALISM -->
+<section class="slide">
+  <div class="step"><span class="num">5</span>Real world · and an honest ledger</div>
+  <h2>Where it matters, and <span class="gold">what it would really cost</span></h2>
+  <div class="row" style="gap:22px">
+    <div class="col" style="flex:1.15;justify-content:flex-start">
+      <table id="ledger" style="font-size:15px">
+        <tr><th>quantity</th><th>all genes · N = 2¹⁵</th><th>gene pairs · N = 2³⁰</th></tr>
+      </table>
+      <p class="note" style="font-size:12px">ε = 0.1 · one query · π = 0.014 (dendritic) · gates: one n-controlled phase per record ≈ 2n−1 · 1 MHz logical gates (fault-tolerant, optimistic)</p>
+    </div>
+    <div class="col" style="gap:12px">
+      <div class="card" style="padding:12px 18px"><h3 style="font-size:18px">Where this data lives</h3><p style="font-size:15px">Cell atlases (CZ CELLxGENE, 10⁷–10⁸ cells), mass cytometry, liquid biopsies: tumour cells at 1 in 10⁶–10⁷. Huge feature spaces, one-pass acquisition, rare but critical classes. Same shape: fraud (0.17 %), AML (0.1 %), QEC decoding (0.14 %).</p></div>
+      <div class="card gold" style="padding:12px 18px"><h3 style="font-size:18px">What we claim · what we don't</h3><p style="color:var(--ink);font-size:15px"><b>Claim:</b> log₂N-qubit memory, N/ε samples, a measured 1/(π(1−π)) rare-class cost, and the primitive runs on a QPU today.<br><b>Don't claim:</b> a wall-clock speed-up; that our centroid task inherits the paper's lower bound (open); beating classical on 2,638 cells.</p></div>
+      <div class="card" style="padding:12px 18px"><h3 style="font-size:18px">Next</h3><p style="font-size:15px">Gene-pair features (30 qubits) · classical-shadow readout (reusable classical model, as in the thesis) · noisy-simulator study of depth vs M.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- B1 · BASELINES -->
+<section class="slide">
+  <div class="step backup"><span class="num">B</span>Backup · classical baselines (E1)</div>
+  <h2>Classical is better and cheap at this scale — <span class="gold">and the rare classes prefer few genes</span></h2>
+  <table id="e1table"></table>
+  <p class="note">Balanced accuracy / AUPRC on a 30 % stratified test split; genes chosen on the training split only by |μ₁−μ₀| of the squared-amplitude features. Exact centroid = the M→∞ sketch (a linear score p·sin φ). Logistic regression with class-balanced weights. With 10–26 training positives, adding genes adds noise: p ≫ n in action. Abstain rate (all-zero cells) was 0 % for every task shown.</p>
+</section>
+
+<!-- B2 · Q&A -->
+<section class="slide">
+  <div class="step backup"><span class="num">B</span>Backup · likely questions</div>
+  <h2>Q&amp;A register</h2>
+  <table>
+    <tr><th>question</th><th>answer</th></tr>
+    <tr><td>"Classical does this with 14k floats."</td><td>Yes, and we show it. The claim is about the regime N ≫ memory (gene pairs, 10⁹ features), where the paper proves a memory–sample trade-off.</td></tr>
+    <tr><td>"Does your centroid task inherit the lower bound?"</td><td>Not proven. The paper's bound is for its task families (NOPE, forrelation-type). We say it is open.</td></tr>
+    <tr><td>"Loading data kills quantum advantages."</td><td>Sketching <i>is</i> the loading. Each record is one gate and is never stored, so there is no QRAM. The cost is samples ∝ N/ε, which we show.</td></tr>
+    <tr><td>"Hardware noise?"</td><td>Known-answer circuits of the same family measure the shrink factor α. We report raw and calibrated values; 11 CZ works raw, 53 CZ needs the calibration.</td></tr>
+    <tr><td>"Why not train on hardware?"</td><td>Against the rules, and unnecessary: the sketch accumulation is classical simulation; hardware runs inference with fixed phases.</td></tr>
+    <tr><td>"Is this just a linear model?"</td><td>Yes, on purpose. One query = one linear functional. Nonlinear models need more queries Q, at cost Q², the paper's optimal scaling.</td></tr>
+    <tr><td>"The labels come from clustering the same data."</td><td>True (Louvain). Fine for a feasibility prototype; stated on the limits slide; a held-out annotated atlas is the next step.</td></tr>
+  </table>
+</section>
+
+<!-- B3 · HARDWARE DETAILS -->
+<section class="slide">
+  <div class="step backup"><span class="num">B</span>Backup · hardware details and the calibration lesson</div>
+  <h2>Two runs on Garnet, one lesson</h2>
+  <div class="row">
+    <div class="col">
+      <table id="caltable"></table>
+      <p class="note">Fit z_hw = α·z_ideal + β over the calibration circuits; inverted on the test cells. Fail-loud rule: α &lt; 0.3 means the device is too noisy for a sign readout.</p>
+    </div>
+    <div class="col card" style="justify-content:flex-start;gap:10px">
+      <h3>Run 1 (random-phase calibration) over-corrected</h3>
+      <p id="run1-note"></p>
+      <h3 style="margin-top:8px">Run 2: same-oracle calibration</h3>
+      <p>Calibration circuits = the frozen oracle on 4 <i>training</i> cells (2 rare, 2 common) + the zero sketch. Same gate structure → same shrinkage → the fit transfers. Mean |error| vs ideal dropped from <span id="t-err-raw"></span> (raw) to <span id="t-err-cal"></span> (calibrated), shot noise 0.022.</p>
+      <p class="mono" style="font-size:13px">No training on hardware · inference with frozen parameters · all numbers from results/*.json</p>
+    </div>
+  </div>
+</section>
+
+</div></div>
+<div id="progress"></div>
+<div id="hint">← → to navigate · F fullscreen · Ctrl+P to print</div>
+
+<script>
+const C={bg:"#F5F3EF",ink:"#08090B",gold:"#FFC900",dim:"rgba(8,9,11,.6)",faint:"rgba(8,9,11,.14)",red:"#FF5A4E",g1:"#C9C7C1",g2:"#8A8984",g3:"#4A4A48"};
+const NS="http://www.w3.org/2000/svg";
+function el(t,a,p,txt){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(txt!==undefined)e.textContent=txt;if(p)p.appendChild(e);return e;}
+const sci=v=>{if(v===0)return"0";const e=Math.floor(Math.log10(Math.abs(v)));const m=v/10**e;return (Math.abs(m-1)<.05?"":m.toFixed(1)+"×")+"10"+String(e).replace(/-/g,"⁻").replace(/\d/g,d=>"⁰¹²³⁴⁵⁶⁷⁸⁹"[d]);};
+const pct=v=>(v*100).toFixed(1)+" %";
+const R=RESULTS;
+if(!R){document.body.innerHTML='<p style="padding:40px;font:20px monospace">RESULTS missing — run scripts/08_slides.py</p>';throw new Error("no results");}
+function setText(id,v){const e=document.getElementById(id);if(e)e.textContent=v;}
+
+/* ---- log-log line chart ---- */
+function logChart(svg,W,H,series,opts){
+  const L=64,Rm=opts.right||20,T=24,B=50,pw=W-L-Rm,ph=H-T-B;
+  const xs=series.flatMap(s=>s.x),ys=series.flatMap(s=>s.y).filter(v=>v>0);
+  const lx0=Math.log10(Math.min(...xs)),lx1=Math.log10(Math.max(...xs));
+  const ly0=Math.floor(Math.log10(Math.min(...ys))),ly1=Math.ceil(Math.log10(Math.max(...ys)));
+  const X=v=>L+(Math.log10(v)-lx0)/(lx1-lx0)*pw, Y=v=>T+ph-(Math.log10(v)-ly0)/(ly1-ly0)*ph;
+  for(let e=ly0;e<=ly1;e++){el("line",{x1:L,x2:W-Rm,y1:Y(10**e),y2:Y(10**e),stroke:C.faint},svg);el("text",{x:L-8,y:Y(10**e)+4,"text-anchor":"end",fill:C.dim,"font-size":12,"font-family":"JetBrains Mono"},svg,sci(10**e));}
+  for(let e=Math.ceil(lx0);e<=Math.floor(lx1);e++) el("text",{x:X(10**e),y:H-B+20,"text-anchor":"middle",fill:C.dim,"font-size":12,"font-family":"JetBrains Mono"},svg,sci(10**e));
+  if(opts.hline){el("line",{x1:L,x2:W-Rm,y1:Y(opts.hline),y2:Y(opts.hline),stroke:C.red,"stroke-dasharray":"4 4","stroke-width":1.2},svg);el("text",{x:W-Rm,y:Y(opts.hline)-5,"text-anchor":"end",fill:C.red,"font-size":11},svg,opts.hlabel||"");}
+  el("text",{x:L+pw/2,y:H-6,"text-anchor":"middle",fill:C.dim,"font-size":13},svg,opts.xlabel);
+  el("text",{x:14,y:T+ph/2,"text-anchor":"middle",fill:C.dim,"font-size":13,transform:`rotate(-90 14 ${T+ph/2})`},svg,opts.ylabel);
+  series.forEach((s,i)=>{
+    let d="";s.x.forEach((x,k)=>{d+=(k?"L":"M")+X(x)+","+Y(s.y[k]);});
+    el("path",{d,fill:"none",stroke:s.col,"stroke-width":s.dash?2:3,"stroke-dasharray":s.dash||"",opacity:s.dash?.75:1},svg);
+    if(!s.dash) s.x.forEach((x,k)=>el("circle",{cx:X(x),cy:Y(s.y[k]),r:4,fill:s.col},svg));
+    if(s.name){const li=series.slice(0,i).filter(q=>q.name).length;const lx=opts.legend==="bl"?L+12:L+pw-150,ly=opts.legend==="bl"?T+ph-16-(series.filter(q=>q.name).length-1-li)*18:T+8+li*18;el("rect",{x:lx,y:ly,width:12,height:12,rx:2,fill:s.col},svg);el("text",{x:lx+18,y:ly+11,fill:C.ink,"font-size":12},svg,s.name);}
+  });
+  if(opts.title) el("text",{x:L,y:14,fill:C.dim,"font-size":12},svg,opts.title);
+}
+
+/* ---- slide 2: class bars ---- */
+(function(){
+  const svg=document.getElementById("classbars");const counts=R.dataset.class_counts;
+  const keys=Object.keys(counts);const x0=150,w=360,top=14,bh=28,gap=9,max=Math.log10(1300);
+  keys.forEach((k,i)=>{const v=counts[k],y=top+i*(bh+gap),len=Math.max(4,w*Math.log10(v)/max),rare=v<100;
+    el("text",{x:x0-10,y:y+bh/2+5,"text-anchor":"end",fill:C.ink,"font-size":14},svg,k);
+    el("rect",{x:x0,y,width:len,height:bh,rx:4,fill:rare?C.gold:C.ink,opacity:rare?1:.55},svg);
+    el("text",{x:x0+len+8,y:y+bh/2+5,fill:rare?C.ink:C.dim,"font-size":13,"font-family":"JetBrains Mono"},svg,v.toLocaleString()+(rare?"  ("+pct(v/R.dataset.n_cells)+")":""));});
+  setText("t-genes",R.dataset.genes_measured_in_10x_run.toLocaleString()+" ("+R.dataset.n_genes.toLocaleString()+" expressed)");
+  setText("t-cells",R.dataset.n_cells.toLocaleString());
+  setText("t-zeros",pct(R.dataset.fraction_zero));
+  setText("t-dc",counts["Dendritic cells"]+" ("+pct(counts["Dendritic cells"]/R.dataset.n_cells)+")");
+  setText("t-mk",counts["Megakaryocytes"]+" ("+pct(counts["Megakaryocytes"]/R.dataset.n_cells)+")");
+})();
+
+/* ---- slide 4: E2 ---- */
+(function(){
+  const svg=document.getElementById("e2plot");const cols=[C.g1,C.g2,C.g3,C.ink];const series=[];
+  R.e2.curves.forEach((c,i)=>{series.push({name:"N="+c.N,x:c.rows.map(r=>r.M),y:c.rows.map(r=>r.rel_error_mean),col:cols[i]});
+    series.push({x:c.rows.map(r=>r.M),y:c.rows.map(r=>r.rel_error_predicted),col:cols[i],dash:"5 4"});});
+  logChart(svg,620,330,series,{legend:"bl",xlabel:"records streamed M (uniform stream, B cells)",ylabel:"relative error of the sketch",title:"solid: measured, 5 seeds · dashed: closed-form prediction, no fit"});
+  const big=R.e2.curves.filter(c=>c.N>=256);setText("t-cfit",Math.round(big.reduce((a,c)=>a+c.C_fit,0)/big.length));
+  setText("t-exact",R.e2.classifier.exact_centroid.balanced_accuracy.toFixed(2));
+  const ex=R.e2.classifier.exact_centroid.balanced_accuracy;const conv=R.e2.classifier.rows.find(r=>r.balanced_accuracy_mean>=ex-0.01);
+  setText("t-mconv",conv?sci(conv.M):"n/a");
+})();
+
+/* ---- slide 5: E3 ---- */
+(function(){
+  const svg=document.getElementById("e3plot");const cols=[C.ink,C.g3,C.gold,C.red];const series=[];
+  R.e3.synthetic.forEach((s,i)=>{series.push({name:"π = "+s.pi,x:s.rows.map(r=>r.M),y:s.rows.map(r=>r.rel_error_mean),col:cols[i]});
+    series.push({x:s.rows.map(r=>r.M),y:s.rows.map(r=>r.rel_error_predicted),col:cols[i],dash:"5 4"});});
+  logChart(svg,620,330,series,{xlabel:"records streamed M (synthetic, N = "+R.e3.N+", only π changes)",ylabel:"relative error of the sketch",hline:0.1,hlabel:"10 % error",title:"solid: measured · dashed: predicted"});
+  const b=document.getElementById("e3bars");const W=480,H=240,L=60,T=28,B=40,pw=W-L-20,ph=H-T-B;
+  const vals=R.e3.synthetic.flatMap(s=>[s.cost_ratio_vs_balanced_measured,s.cost_ratio_vs_balanced_law]);const ymax=Math.log10(Math.max(...vals)*1.6);
+  const Y=v=>T+ph-Math.log10(Math.max(v,1))/ymax*ph;const gw=pw/R.e3.synthetic.length,bw=Math.min(40,(gw-30)/2);
+  [1,10,100].forEach(v=>{if(Math.log10(v)<=ymax){el("line",{x1:L,x2:W-20,y1:Y(v),y2:Y(v),stroke:C.faint},b);el("text",{x:L-8,y:Y(v)+4,"text-anchor":"end",fill:C.dim,"font-size":11,"font-family":"JetBrains Mono"},b,"×"+v);}});
+  R.e3.synthetic.forEach((s,i)=>{const gx=L+i*gw+(gw-2*bw-6)/2;
+    [[s.cost_ratio_vs_balanced_measured,C.ink,.6],[s.cost_ratio_vs_balanced_law,C.gold,1]].forEach(([v,col,op],j)=>{const x=gx+j*(bw+6);
+      el("rect",{x,y:Y(v),width:bw,height:ph-(Y(v)-T),rx:3,fill:col,opacity:op},b);el("text",{x:x+bw/2,y:Y(v)-5,"text-anchor":"middle",fill:C.ink,"font-size":11,"font-family":"JetBrains Mono"},b,"×"+v.toFixed(v<10?1:0));});
+    el("text",{x:L+i*gw+gw/2,y:H-B+18,"text-anchor":"middle",fill:C.ink,"font-size":13},b,"π = "+s.pi);});
+  el("rect",{x:L,y:6,width:12,height:12,rx:2,fill:C.ink,opacity:.6},b);el("text",{x:L+18,y:17,fill:C.ink,"font-size":12},b,"measured: M for 10 % error ÷ M at π = 0.5");
+  el("rect",{x:L+250,y:6,width:12,height:12,rx:2,fill:C.gold},b);el("text",{x:L+268,y:17,fill:C.ink,"font-size":12},b,"law: 1/(π(1−π)) ÷ 4");
+  const tb=document.getElementById("e3real");
+  R.e3.real.forEach(r=>{tb.innerHTML+=`<tr><td>${r.positive}</td><td class="n">${r.pi_hat.toFixed(3)}</td><td class="n gold">${r.law_factor.toFixed(0)}</td><td class="n">${sci(r.M_for_err_0p1)}</td></tr>`;});
+})();
+
+/* ---- slide 6: hardware ---- */
+(function(){
+  const d=R.e5.N4,d16=R.e5.N16;const svg=document.getElementById("hwplot");
+  const W=640,H=330,L=56,T=30,B=46,pw=W-L-20,ph=H-T-B;const ymin=-1.05,ymax=0.5;
+  const Y=v=>T+(ymax-v)/(ymax-ymin)*ph;const cells=d.cells;const gw=pw/cells.length,bw=Math.min(16,(gw-14)/3);
+  [-1,-.75,-.5,-.25,0,.25,.5].forEach(v=>{el("line",{x1:L,x2:W-20,y1:Y(v),y2:Y(v),stroke:v===0?C.line:C.faint},svg);el("text",{x:L-8,y:Y(v)+4,"text-anchor":"end",fill:C.dim,"font-size":11,"font-family":"JetBrains Mono"},svg,v.toFixed(2));});
+  el("line",{x1:L,x2:W-20,y1:Y(d.summary.threshold),y2:Y(d.summary.threshold),stroke:C.red,"stroke-width":1.5,"stroke-dasharray":"5 4"},svg);
+  el("text",{x:L+4,y:Y(d.summary.threshold)+13,fill:C.red,"font-size":11},svg,"decision threshold (set on training cells)");
+  cells.forEach((c,i)=>{const gx=L+i*gw+(gw-3*bw-8)/2;
+    const sim=(R.e4.find(b=>b.N===d.N).cells.find(q=>q.test_index===c.test_index)||{}).shots_ideal;
+    [[c.ideal,C.g1],[sim,C.g3],[c.raw,C.ink]].forEach(([v,col],j)=>{const x=gx+j*(bw+4);const y0=Y(0),y1=Y(v);
+      el("rect",{x,y:Math.min(y0,y1),width:bw,height:Math.abs(y1-y0),rx:2,fill:col},svg);});
+    el("text",{x:L+i*gw+gw/2,y:H-B+18,"text-anchor":"middle",fill:c.label?C.ink:C.dim,"font-size":12,"font-weight":c.label?700:400},svg,c.label?"rare (B)":"common");});
+  [["Classical (exact formula)",C.g1],["Quantum simulator (Qiskit)",C.g3],["Real IQM "+d.meta.alias.charAt(0).toUpperCase()+d.meta.alias.slice(1)+" (raw)",C.ink]].forEach(([n,col],i)=>{el("rect",{x:L+i*190,y:8,width:12,height:12,rx:2,fill:col},svg);el("text",{x:L+i*190+18,y:19,fill:C.ink,"font-size":12},svg,n);});
+  el("text",{x:14,y:T+ph/2,"text-anchor":"middle",fill:C.dim,"font-size":13,transform:`rotate(-90 14 ${T+ph/2})`},svg,"Hadamard-test score ⟨Z⟩");
+  el("text",{x:L+pw/2,y:H-4,"text-anchor":"middle",fill:C.dim,"font-size":12},svg,"same 8 held-out cells, same model · N = 4 genes · 3 qubits · 2,000 shots · all three: 8/8 correct");
+  const t4=d.meta.transpiled_test,t16=d16.meta.transpiled_test;
+  setText("t-cz4",t4.two_qubit+" · "+t4.depth);setText("t-cz16",t16.two_qubit+" · "+t16.depth);
+  setText("t-a4",d.summary.calibration.alpha.toFixed(2));setText("t-a16",d16.summary.calibration.alpha.toFixed(2));
+  setText("t-s4",Math.round(d.summary.sign_agreement_raw*8)+"/8 → "+Math.round(d.summary.sign_agreement_calibrated*8)+"/8");
+  setText("t-s16",Math.round(d16.summary.sign_agreement_raw*8)+"/8 → "+Math.round(d16.summary.sign_agreement_calibrated*8)+"/8");
+  setText("hw-meta",`IQM ${d.meta.alias} (20-qubit), ${d.meta.submitted_utc.slice(0,10)} · job ${d.meta.job_id} (N=4) · job ${d16.meta.job_id} (N=16) · ${d.meta.shots} shots/circuit · phases sha ${d.frozen_sha256}`);
+  setText("t-err-raw",d.summary.mean_abs_err_raw.toFixed(3));setText("t-err-cal",d.summary.mean_abs_err_calibrated.toFixed(3));
+  const ct=document.getElementById("caltable");
+  ct.innerHTML=`<tr><th>calibration circuit</th><th>ideal ⟨Z⟩</th><th>N=4 measured</th><th>N=16 ideal</th><th>N=16 measured</th></tr>`+
+    d.calibration_circuits.map((c,i)=>`<tr><td>${c.kind.replace("_"," ")}</td><td class="n">${c.ideal.toFixed(3)}</td><td class="n">${c.measured.toFixed(3)}</td><td class="n">${d16.calibration_circuits[i].ideal.toFixed(3)}</td><td class="n">${d16.calibration_circuits[i].measured.toFixed(3)}</td></tr>`).join("")+
+    `<tr><td><b>fit α · β</b></td><td></td><td class="n gold">${d.summary.calibration.alpha.toFixed(3)} · ${d.summary.calibration.beta.toFixed(3)}</td><td></td><td class="n gold">${d16.summary.calibration.alpha.toFixed(3)} · ${d16.summary.calibration.beta.toFixed(3)}</td></tr>`;
+  const r1=R.e5.run1;
+  if(r1) setText("run1-note",`Random-phase circuits on one cell gave ideal scores bunched near 0 (${r1.cal_ideals.map(v=>v.toFixed(2)).join(", ")}), so the fit was ill-conditioned: α = ${r1.alpha.toFixed(2)}, and the calibrated test scores overshot (mean |error| ${r1.err_cal.toFixed(3)} vs raw ${r1.err_raw.toFixed(3)}). Signs were still 8/8. Job ${r1.job_id}.`);
+})();
+
+/* ---- slide 7: ledger ---- */
+(function(){
+  const t=document.getElementById("ledger");const [a,b]=R.e6.ledger;
+  const rows=[["index qubits ⌈log₂N⌉",a.index_qubits,b.index_qubits],["logical qubits ≈ 2n",a.logical_qubits,b.logical_qubits],
+    ["samples M = NQ²/ε, balanced",sci(a.samples_balanced),sci(b.samples_balanced)],["× 1/(π(1−π)) at π = "+a.pi,sci(a.samples_rare),sci(b.samples_rare)],
+    ["gates per sketch ≈ M(2n−1)",sci(a.gates_per_sketch),sci(b.gates_per_sketch)],["time at 1 MHz logical gates",a.seconds_per_sketch<3600?Math.round(a.seconds_per_sketch)+" s":(a.years_per_sketch).toFixed(1)+" years",b.years_per_sketch<1?Math.round(b.seconds_per_sketch/86400)+" days":b.years_per_sketch.toFixed(1)+" years"],
+    ["classical memory, same sketch",(a.classical_bytes/1e3).toFixed(0)+" kB",(b.classical_bytes/1e9).toFixed(1)+" GB"]];
+  rows.forEach(([k,x,y],i)=>{t.innerHTML+=`<tr><td>${k}</td><td class="n${i<2?" gold":""}">${x}</td><td class="n${i<2?" gold":""}">${y}</td></tr>`;});
+  t.innerHTML+=`<tr><td><b>verdict</b></td><td>classical wins, easily</td><td>4 GB vs 60 qubits: size, not time; needs fault tolerance</td></tr>`;
+})();
+
+/* ---- B1: E1 table ---- */
+(function(){
+  const t=document.getElementById("e1table");const Ns=R.e1.tasks[0].by_N.map(r=>r.N);
+  t.innerHTML=`<tr><th>class (π)</th><th>all genes · logreg</th>${Ns.map(N=>`<th>N=${N} centroid</th><th>N=${N} logreg</th>`).join("")}</tr>`;
+  R.e1.tasks.forEach(tk=>{const f=e=>`${e.balanced_accuracy.toFixed(2)} / ${e.auprc.toFixed(2)}`;
+    t.innerHTML+=`<tr><td>${tk.positive} (${tk.base_rate.toFixed(3)})</td><td class="n">${f(tk.logreg_all_genes)}</td>${tk.by_N.map(r=>`<td class="n gold">${f(r.exact_centroid)}</td><td class="n">${f(r.logreg_p)}</td>`).join("")}</tr>`;});
+})();
+
+/* ---- navigation ---- */
+const slides=[...document.querySelectorAll(".slide")];let cur=0;
+slides.forEach((s,i)=>{const f=document.createElement("div");f.className="footer";f.innerHTML=`<span>Streaming cells into qubits · QSIP 2026 · all numbers from results/*.json</span><span>${String(i+1).padStart(2,"0")} / ${String(slides.length).padStart(2,"0")}</span>`;s.appendChild(f);});
+function show(i){cur=Math.max(0,Math.min(slides.length-1,i));slides.forEach((s,j)=>s.classList.toggle("active",j===cur));document.getElementById("progress").style.width=((cur+1)/slides.length*100)+"%";try{history.replaceState(null,"","#"+(cur+1));}catch(e){}}
+document.addEventListener("keydown",e=>{if(["ArrowRight","PageDown"," ","Enter"].includes(e.key)){e.preventDefault();show(cur+1);}if(["ArrowLeft","PageUp","Backspace"].includes(e.key)){e.preventDefault();show(cur-1);}if(e.key==="Home")show(0);if(e.key==="End")show(slides.length-1);if(e.key==="f"||e.key==="F"){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen().catch(()=>{});}});
+document.addEventListener("click",e=>{if(e.clientX>innerWidth/2)show(cur+1);else show(cur-1);});
+function fit(){const s=Math.min(innerWidth/1280,innerHeight/720);document.getElementById("stage").style.transform=`scale(${s})`;}
+addEventListener("resize",fit);fit();show((parseInt(location.hash.slice(1))||1)-1);
+</script>
+</body>
+</html>
