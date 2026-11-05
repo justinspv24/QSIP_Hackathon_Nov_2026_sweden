@@ -34,7 +34,31 @@ import e13_core as C  # noqa: E402
 
 sys.path.insert(0, str(C.ROOT / "HPC" / "scripts"))
 PARTS = C.E13 / "logs" / "parts_stage3"
-REC_CAP = 3e10                    # records per seed per M value (GPU sampler ~3e8 records/s)
+REC_CAP = 3e10                    # records per seed per M value (GPU sampler ~3e8 records/s); --rec-cap overrides
+
+
+def _patch_lbfgs():
+    """scipy's L-BFGS-B workspace (2m+5)*n is int32-indexed: E9 uses m = 5 above n = 5e7, which still overflows at
+    n > 1.4e8 (all-genes pairs, N = 1.47e8). Same objective and solver, m = 3 there. Patched here, pairs_gpu.py unchanged."""
+    import pairs_gpu
+    from scipy.optimize import minimize
+    orig = pairs_gpu.fit_logreg
+
+    def fit(forward, backward, n_w, y, C=1.0, max_iter=300, tol=1e-4):
+        if (2 * 5 + 5) * (n_w + 1) < 2**31 - 1:
+            return orig(forward, backward, n_w, y, C=C, max_iter=max_iter, tol=tol)
+        import scipy.optimize as so
+        real = so.minimize
+
+        def m3(*args, **kw):
+            kw["options"] = dict(kw["options"], maxcor=3)
+            return real(*args, **kw)
+        so.minimize = m3
+        try:
+            return orig(forward, backward, n_w, y, C=C, max_iter=max_iter, tol=tol)
+        finally:
+            so.minimize = real
+    pairs_gpu.fit_logreg = fit
 
 
 def s_grid_for(N):
@@ -69,6 +93,9 @@ def job(a):
     from qos_cells.sketch import rescale_safe
     from pairs_gpu import MG, PairData, TopS, d_eff, hashed_features, ledger, logreg_dense, logreg_pairs, sk_count_sketch, sk_hashing, sk_jl_sparse
 
+    global REC_CAP
+    REC_CAP = a.rec_cap
+    _patch_lbfgs()
     t0 = time.time()
     vt = VramTracker()
     cfg = C.load_config()
@@ -317,6 +344,7 @@ if __name__ == "__main__":
     j.add_argument("--out", default="")
     j.add_argument("--dataset", default="pbmc68k")
     j.add_argument("--split", type=int, default=0)
+    j.add_argument("--rec-cap", type=float, default=3e10)
     j.add_argument("--minf-seeds", type=int, default=1)
     j.add_argument("--hl-seeds", type=int, default=1)
     m = sub.add_parser("merge")

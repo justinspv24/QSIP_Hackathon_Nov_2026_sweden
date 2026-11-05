@@ -90,6 +90,48 @@ def ridge_cv(Xp, yp):
     return dict(acc=[float(v) for v in r["test_accuracy"]], bacc=[float(v) for v in r["test_balanced_accuracy"]])
 
 
+ALPHAS = [1.0, 10.0, 100.0, 1000.0, 10000.0]
+TUNED_MAX_S = 2048
+
+
+def ridge_tuned_cv(Xp, yp):
+    """Fairness variant: alpha chosen per training fold by efficient leave-one-out (RidgeClassifierCV, GCV) on the
+    training fold only (nested). Dense input (S <= 2048)."""
+    from sklearn.linear_model import RidgeClassifierCV
+    from sklearn.model_selection import cross_validate
+    Xd = Xp.toarray() if sp.issparse(Xp) else Xp
+    clf = RidgeClassifierCV(alphas=ALPHAS, class_weight="balanced")
+    r = cross_validate(clf, Xd, yp, cv=5, scoring=["accuracy", "balanced_accuracy"], return_estimator=True)
+    return dict(acc=[float(v) for v in r["test_accuracy"]], bacc=[float(v) for v in r["test_balanced_accuracy"]],
+                alpha=[float(e.alpha_) for e in r["estimator"]])
+
+
+def cs_select_cv(Xp, yp, S, seeds):
+    """Count-sketch feature selection + ridge, machine size S: pass 1 = count-sketch (3 rows, S counters) of the
+    class-mean difference on the training fold; keep the S genes with the largest |decoded Delta|; pass 2 = ridge on
+    those S genes (alpha by nested LOO if S <= 2048, else 200). Memory S floats (+ S indices)."""
+    from sklearn.linear_model import RidgeClassifier, RidgeClassifierCV
+    from sklearn.model_selection import StratifiedKFold
+    from sklearn.metrics import accuracy_score, balanced_accuracy_score
+    out = dict(acc=[], bacc=[], alpha=[])
+    for tr, te in StratifiedKFold(5).split(np.zeros(len(yp)), yp):
+        Xtr, ytr = Xp[tr], yp[tr]
+        delta = np.asarray(Xtr[ytr == 1].mean(0)).ravel() - np.asarray(Xtr[ytr == 0].mean(0)).ravel()
+        d, _ = C.E7.sk_count_sketch(delta, S, seeds)
+        keep = np.argsort(-np.abs(d), kind="stable")[:S]
+        A, B = Xtr[:, keep], Xp[te][:, keep]
+        if S <= TUNED_MAX_S:
+            clf = RidgeClassifierCV(alphas=ALPHAS, class_weight="balanced").fit(A.toarray(), ytr)
+            pred, al = clf.predict(B.toarray()), float(clf.alpha_)
+        else:
+            clf = RidgeClassifier(random_state=42, alpha=200.0, class_weight="balanced").fit(A, ytr)
+            pred, al = clf.predict(B), 200.0
+        out["acc"].append(float(accuracy_score(yp[te], pred)))
+        out["bacc"].append(float(balanced_accuracy_score(yp[te], pred)))
+        out["alpha"].append(al)
+    return out
+
+
 def centroid_cv(Xp, yp, S_list, seeds_list):
     """exact centroid (S = D) and count-sketch centroid at every S in S_list, per seed; same 5 folds as cross_val_score."""
     from sklearn.model_selection import StratifiedKFold
@@ -140,6 +182,14 @@ def task(t):
         Xs, _ = sketch_utils.sketch_features(X[mask], param, kind, seed=G["seeds"][si])
         r = ridge_cv(Xs, yp)
         r["S"] = int(param)
+    elif kind in ("bucket_tuned", "jl_tuned"):
+        Xs, _ = sketch_utils.sketch_features(X[mask], param, kind.replace("_tuned", ""), seed=G["seeds"][si])
+        r = ridge_tuned_cv(Xs, yp)
+        r["S"] = int(param)
+    elif kind == "cs_select":
+        rng = np.random.default_rng(np.random.SeedSequence([7, 5, pi, si]))
+        r = cs_select_cv(X[mask], yp, param, rng.integers(0, 2**62, size=16))
+        r["S"] = int(param)
     elif kind == "centroid":
         Xp = X[mask]
         rng = np.random.default_rng(np.random.SeedSequence([7, 4, pi]))
@@ -161,7 +211,16 @@ def run(a):
     G.update(X=X, y=y, upairs=upairs, cnt=cnt, seeds=sketch_utils.sample_sketch_seeds(N_SEEDS))
     D = X.shape[1]
     tasks = []
-    for pi in range(len(upairs)):
+    if a.fair:
+        for pi in range(len(upairs)):
+            for S in S_GRID:
+                for si in range(N_SEEDS):
+                    if S <= TUNED_MAX_S:
+                        tasks.append((pi, "jl_tuned", S, si))
+                        tasks.append((pi, "bucket_tuned", S, si))
+                    if S < D:
+                        tasks.append((pi, "cs_select", S, si))
+    for pi in ([] if a.fair else range(len(upairs))):
         tasks.append((pi, "full", 0, 0))
         tasks.append((pi, "centroid", 0, 0))
         for m in MIN_SAMPLES[1:]:
@@ -176,10 +235,12 @@ def run(a):
     OUT.mkdir(parents=True, exist_ok=True)
     C.log(f"stage 4: D = {D}, {len(upairs)} unique pairs (of 100 draws), {len(tasks)} tasks on {a.procs} procs")
     results = []
+    if a.fair:
+        results = [r for r in json.loads((OUT / "raw.json").read_text())["results"] if r["kind"] not in ("jl_tuned", "bucket_tuned", "cs_select")]
     with mp.get_context("fork").Pool(a.procs) as pool:
         for i, r in enumerate(pool.imap_unordered(task, tasks, chunksize=1)):
             results.append(r)
-            if (i + 1) % 200 == 0 or i + 1 == len(tasks):
+            if (i + 1) % 500 == 0 or i + 1 == len(tasks):
                 C.log(f"stage 4: {i + 1}/{len(tasks)} tasks ({(time.time() - t0) / 60:.1f} min)")
                 save(results, names, upairs, mult, X, y, D, t0, partial=(i + 1 < len(tasks)), a=a)
     C.log("stage 4 done")
@@ -218,7 +279,7 @@ def merge():
         return dict(mean=m, sem=sem, unweighted_mean=float(v.mean()), n_pairs=len(idx))
 
     curves, labels = {}, {}
-    for kind in MODES + ["trunc"]:
+    for kind in MODES + ["trunc", "jl_tuned", "bucket_tuned", "cs_select"]:
         Ss = sorted({r["param"] for r in res if r["kind"] == kind})
         rows = []
         for S in Ss:
@@ -232,7 +293,8 @@ def merge():
                 size = float(np.mean([r["S"] for r in rr]))
                 rows.append(dict(S=size, param=S, accuracy_mean=A["mean"], accuracy_sem=A["sem"], accuracy_unweighted=A["unweighted_mean"],
                                  balanced_accuracy_mean=B["mean"], balanced_accuracy_sem=B["sem"], n_pairs=A["n_pairs"]))
-        curves[kind] = sorted(rows, key=lambda r: r["S"])
+        if rows:
+            curves[kind] = sorted(rows, key=lambda r: r["S"])
     pa, pb, ca, cb = {}, {}, {}, {}
     for r in res:
         if r["kind"] == "full":
@@ -257,7 +319,9 @@ def merge():
     curves["cs_centroid"] = rows
     labels = {"bucket": "paper: feature hashing, unsigned balanced buckets + ridge", "jl": "paper: sparse JL s=1 (signed hashing) + ridge",
               "jl4": "sparse JL s=4 + ridge", "trunc": "paper: rare-gene truncation + ridge",
-              "cs_centroid": "one-pass count-sketch centroid (3 rows)"}
+              "cs_centroid": "one-pass count-sketch centroid (3 rows)",
+              "jl_tuned": "sparse JL s=1 + ridge, alpha by nested LOO", "bucket_tuned": "paper hashing + ridge, alpha by nested LOO",
+              "cs_select": "count-sketch gene selection (S counters) + ridge"}
 
     def s_star(rows, target, tol=0.01):
         ok = [r["accuracy_mean"] >= target - tol for r in rows]
@@ -280,11 +344,13 @@ def merge():
                            S_grid=S_GRID, modes=MODES, min_samples=MIN_SAMPLES, sketch_seeds=N_SEEDS,
                            metric="5-fold CV ACCURACY (the paper's metric); balanced accuracy stored alongside"),
                git_commit=C.git_commit(), hardware=C.hardware(), wall_seconds=raw["wall_seconds"], peak_ram_gb=raw["peak_ram_gb"],
+               wall_note="base pass (8,924 tasks) 2.2 min + fairness pass (6,670 tasks) 25.9 min on 64 CPU processes (logs/stage4*.out); wall_seconds = last pass",
+               peak_ram_note="peak RSS of the parent process; each of the 64 forked workers holds one pair (< 2 GB)",
                peak_vram_gb=0.0, procs=raw["procs"], D=D, N=D, n_pairs=P, n_draws=int(w.sum()), pairs=pairs,
                full_ridge=dict(**(full_a or {}), balanced=full_b, label="ridge on all D genes"),
                exact={"accuracy_mean": (full_a or {}).get("mean"), "label": "ridge, all genes"},
                exact_centroid=dict(accuracy=ex_a, balanced_accuracy=ex_b),
-               curve_methods=["bucket", "jl", "jl4", "trunc", "cs_centroid"], labels=labels, curves=curves, S_star_tol001=sstar,
+               curve_methods=[k for k in ["bucket", "jl", "jl4", "trunc", "cs_centroid", "jl_tuned", "bucket_tuned", "cs_select"] if curves.get(k)], labels=labels, curves=curves, S_star_tol001=sstar,
                quantum=dict(index_qubits=int(math.ceil(math.log2(D))), logical_qubits_approx=2 * int(math.ceil(math.log2(D))),
                             paper_machine_size_mean=float(np.mean(qs)), paper_machine_size_range=[float(min(qs)), float(max(qs))],
                             note="formula only (paper's accounting: qubits + 1 float); no quantum run; ideal quantum accuracy = full ridge"))
@@ -298,6 +364,7 @@ if __name__ == "__main__":
     r = sub.add_parser("run")
     r.add_argument("--procs", type=int, default=16)
     r.add_argument("--limit", type=int, default=0, help="only the first n unique pairs (timing test)")
+    r.add_argument("--fair", action="store_true", help="add the fairness variants (tuned alpha, count-sketch selection) to raw.json")
     sub.add_parser("merge")
     a = ap.parse_args()
     run(a) if a.cmd == "run" else merge()

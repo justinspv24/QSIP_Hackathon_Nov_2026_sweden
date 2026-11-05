@@ -4,7 +4,8 @@
 - Stage 1: **no memory advantage on PBMC68k.** On gene pairs (N = 1.3·10⁵ – 2.1·10⁶), a one-pass sketch matches the exact centroid with S* = 16–512 counters (S*/N ≤ 3.9·10⁻³, ≤ 4 kB). This matches PBMC3k (S* = 8–1,024).
 - Stage 1: on 1,024 genes, S*/N reaches 0.5–1.0 for B and naive CD4 T. N is small and the ±0.01 band is strict; it is still ≤ 8 kB.
 - Stage 1: Th2 (97 cells) has no signal (exact BA 0.55–0.60, logreg 0.50). Its S* means nothing.
-- Stages 2–4: pending.
+- Stage 4 (paper's protocol: ridge, 46 cell-type pairs, CV accuracy): **the paper's gap is reproduced with fair baselines.** At S ≈ 64, classical sketches give 0.80–0.81 vs 0.90 for full ridge (= the ideal quantum LS-SVM, formula only); matching it takes ~2,000–8,000 numbers. Not an advantage claim: the quantum side is not simulated, and sample and time costs are not compared.
+- Stages 2–3: pending.
 
 Branch `hpc-e13` (worktree `qos_cells_e13`). All numbers come from `results/*.json`, and all figures are built from that JSON.
 **Not pushed**: this node has no GitHub credentials. Push with `git push -u origin hpc-e13` from the worktree.
@@ -70,6 +71,41 @@ What it means:
 - Linear sketches (hashing, JL, count-sketch) beat heavy hitters by 10–1,000× on PBMC68k. d_eff is 1,300–5,700, so Δ is spread out and a top-S list needs many entries.
 - The centroid itself is a weak classifier here: B 0.85 vs logreg 0.90–0.95, and naive CD4 T AUPRC 0.06. The memory question is answered for the centroid. A stronger classifier needs more than this test shows.
 - Th2: logreg overfits its 68 training positives (test BA 0.50). It is kept and flagged, not dropped.
+
+## Stage 4 — the paper's protocol (`results/e13_stage4.json`, `figures/fig_e13_paper_protocol.png`)
+
+Setup copied from the paper's code (`quantum-oracle-sketching/real_datasets/pbmc68k_svm.py`, `sketch_utils.py`, commit 07e9167):
+
+| item | value |
+|---|---|
+| data | the paper's own input: scvelo PBMC68k h5ad (`https://ndownloader.figshare.com/files/27686886`, sha256 `c93b1cca…dfa26fb`), 65,877 cells × 33,939 genes, same Zheng labels; log1p(raw counts), genes with ≥ 1 count → D = 16,122 |
+| pairs | the paper's 100 random draws (rng 42, with replacement) = 46 unique pairs; each evaluated once, means weighted by draw count |
+| model | RidgeClassifier(alpha=200, class_weight='balanced'), 5-fold CV **accuracy** (the paper's metric; balanced accuracy also stored) |
+| classical, paper | its own code: balanced unsigned feature hashing, balanced signed sparse JL (s=1), rare-gene truncation; 5 sketch seeds |
+| classical, added | sparse JL s=4; ridge with alpha tuned by nested leave-one-out; count-sketch gene selection (S counters) + ridge; one-pass count-sketch centroid |
+| quantum | the paper's machine-size formula, 2⌈log₂(n+2D)⌉ + ⌈log₂(s+1)⌉ + 4 = 42–44 (mean 44); log₂D = 14 index qubits (≈ 28 logical). **Formula only; nothing quantum was simulated or run.** Its ideal accuracy = ridge on all genes |
+
+Reference: ridge on all genes = **0.901 ± 0.015**; exact centroid = 0.845.
+
+5-fold CV accuracy vs classical machine size S:
+
+| method | S=16 | 64 | 256 | 1,024 | 4,096 | S within 0.01 of full ridge |
+|---|---|---|---|---|---|---|
+| paper: sparse JL s=1 + ridge | 0.731 | 0.809 | 0.852 | 0.872 | 0.886 | 8,192 |
+| paper: feature hashing + ridge | 0.732 | 0.803 | 0.848 | 0.871 | 0.886 | 8,192 |
+| sparse JL s=4 + ridge | 0.721 | 0.806 | 0.852 | 0.871 | 0.886 | 8,192 |
+| sparse JL s=1 + ridge, alpha tuned | 0.727 | 0.807 | 0.856 | 0.878 | (≤ 2,048 run) | — |
+| count-sketch gene selection + ridge | 0.461 | 0.682 | 0.828 | 0.870 | 0.894 | 4,096 |
+| one-pass count-sketch centroid | 0.691 | 0.786 | 0.833 | 0.845 | 0.844 | never (centroid ceiling 0.845) |
+
+Paper's truncation (keep the most-detected genes): 74 genes 0.811, 157 → 0.856, 532 → 0.878, 1,934 → 0.892 (within 0.01 of full ridge).
+
+What it means:
+- **Under the paper's protocol, the gap it reports is reproduced.** At S ≈ 44–64 (the paper's quantum machine size) every classical method tested reaches 0.79–0.81. The ideal quantum LS-SVM would give 0.90. Matching full ridge takes ~2,000 (truncation) to ~8,000 (sketches) classical numbers.
+- The fair-baseline fixes do not close it. Tuning alpha changes accuracy by < 0.01. Sparse JL s=4 equals s=1. Count-sketch selection is collision-dominated at S ≤ 32 (≈ 3 buckets per row: decoded |Δ| ties) and only catches up at S ≥ 1,024.
+- This is a different classifier from Stages 1–3. There the quantum sketch computes the class centroid, and a few hundred classical counters match it. Here the target is ridge / LS-SVM, which needs the inverse covariance, and oblivious sketches lose accuracy slowly.
+- **Not a demonstrated quantum advantage.** The quantum point is a formula with an assumed ideal accuracy. Sample count, run time, QSVT error and readout shots are not in the comparison. A qubit and a float are different units. Truncation needs D counters in its counting pass, which the paper's "machine size" does not count.
+- **Note: the paper's classical baselines are general-purpose, data-oblivious methods** (feature hashing, sparse JL, truncation). They are not streaming learners designed for ridge (e.g. frequent-directions or sketched-covariance ridge). Those were not tested here, so the classical side is not shown to be optimal.
 
 ## Limits
 - One split in Stage 1 (Stage 2 adds 5 splits × 5 seeds).

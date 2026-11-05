@@ -3,4 +3,4 @@
 cd "$(dirname "$0")/.."
 mkdir -p logs/parts_stage2
 export CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=6 NUMBA_NUM_THREADS=6
-tr '\n' '\0' < logs/stage2_gpu_jobs.txt | xargs -0 -P 2 -I{} taskset -c 72-87 bash -c '{}'
+tr '\n' '\0' < logs/stage2_gpu_jobs.txt | xargs -0 -P 3 -I{} taskset -c 72-87 bash -c '{}'

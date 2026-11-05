@@ -39,3 +39,29 @@ Decisions:
 - D11. Pairs K=2048 moved from CPU (would finish ~22:00) to the GPU path (E9 pairs_gpu.py, gated vs materialisation). CPU logs in logs/superseded/. M→∞ and hashing+logreg use 1 seed on this path.
 - Result: best one-pass S*/N ≤ 3.9e-3 on all pair tasks (S* 8–512); genes K=1024 up to 1.0 (B). Th2 no signal. Matches PBMC3k.
 - Peak RAM 36.8 GB (CPU job), sum of job wall time 2.0 h.
+
+## 21:25 — status 2 (T+85 min)
+
+| stage | state | key numbers | ETA |
+|---|---|---|---|
+| 1 | **done**, committed 902820e (not pushed: no credentials) | best one-pass S*/N ≤ 3.9e-3 on pairs; genes up to 1.0 (B); Th2 no signal | — |
+| 2 | genes: 35/35 done (CPU, 11 min). pairs: 70 jobs on GPU, 3 at a time, ~5 min each | — | ~23:00 |
+| 3 | K=8192: 4/4 done. All genes (K=17,138, N=1.47e8, 28 qubits): first try crashed in L-BFGS (int32 workspace overflow, fixed: m=3 above 1.4e8); reruns after Stage 2 GPU work | K=8192 CD34+ logreg BA 0.94 | ~01:30 |
+| 4 | running on CPU cores 0–63 (8,924 tasks) | paper file, D = 16,122 genes, 46 unique pairs | ~22:00 |
+
+Decisions:
+- D12. Stage 2 pair jobs run on the GPU path (CPU path ~100× slower at K=2048). Record cap 1e9 per seed, 5 seeds, M→∞ 5 seeds, hashing+logreg 2 seeds, no full-N logreg.
+- D13. All-genes Stage-3 run stopped while Stage 2 uses the GPU (it slowed the Stage-2 jobs 3–4×); it reruns alone afterwards and its timing is measured then (2 h rule).
+- D14. Stage 4 computes on the idle CPUs now; it is committed after Stages 2 and 3.
+
+## 21:31 — interrupted by user, resumed with 8 GPUs
+
+- State at resume: 3 Stage-2 jobs running on GPU 0, Stage-4 fairness pass on CPU, nothing half-edited (all scripts parse). Stage 1 is on origin (902820e); credentials now work.
+- D15. All 8 GPUs used, one job per GPU (scripts/gpu_worker.sh, shared list logs/gpu_jobs_all.txt, atomic mkdir locks). The 3 running GPU-0 jobs were kept (≈2 min into ≈5-min jobs, restarting is slower); only their queue launcher was stopped; worker 0 starts after them.
+- D16. The 4 all-genes Stage-3 tasks (K=17,138, N=1.47e8) run in parallel on GPUs 1, 2, 6, 7, alone on their GPU, with the L-BFGS fix (m=3). Timing per task is measured as it runs (2 h rule applies per task).
+- D17. Stages 2, 3, 4 run in parallel; each is committed and pushed when it finishes.
+
+## 21:58 — Stage 4 done
+
+- Full ridge 0.901 (= ideal quantum accuracy, formula machine size 44). Classical at S=64: 0.80–0.81. Within 0.01 of full ridge: truncation 1,934 genes, sketches 8,192. Tuned alpha, JL s=4 and count-sketch selection do not close the gap.
+- D18. Fairness pass: alpha tuned by nested LOO (RidgeClassifierCV on each training fold) for S ≤ 2,048, and count-sketch gene selection + ridge. Neither changes the verdict.

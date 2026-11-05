@@ -117,26 +117,32 @@ def fig_robustness():
 
 def fig_paper():
     d = load("e13_stage4.json")
-    fig, ax = plt.subplots(figsize=(7.2, 4.6))
-    meths = d["curve_methods"]
-    for i, m in enumerate(meths):
-        rows = d["curves"][m]
-        S = [r["S"] for r in rows]
-        y = [r["accuracy_mean"] for r in rows]
-        e = [r["accuracy_sem"] for r in rows]
-        ax.errorbar(S, y, yerr=e, color=SERIES[i], marker=MARK[i], ms=4, lw=1.5, capsize=0, label=d["labels"][m])
-    ax.axhline(d["exact"]["accuracy_mean"], color=INK, ls=":", lw=1.2)
-    ax.text(10, d["exact"]["accuracy_mean"] + 0.005, f"full-memory linear classifier ({d['exact']['label']})", fontsize=7.5, color=INK)
-    q = d["quantum"]["index_qubits"]
+    fig, ax = plt.subplots(figsize=(8.0, 5.0))
+    show = [("jl", "paper: sparse JL s=1 + ridge"), ("bucket", "paper: feature hashing (unsigned) + ridge"),
+            ("trunc", "paper: keep most-detected genes + ridge"), ("jl_tuned", "sparse JL s=1 + ridge, alpha tuned (nested)"),
+            ("cs_select", "count-sketch gene selection + ridge"), ("cs_centroid", "one-pass count-sketch centroid")]
+    for i, (m, lab) in enumerate(show):
+        rows = d["curves"].get(m)
+        if not rows:
+            continue
+        ax.errorbar([r["S"] for r in rows], [r["accuracy_mean"] for r in rows], yerr=[r["accuracy_sem"] for r in rows],
+                    color=SERIES[i], marker=MARK[i], ms=4, lw=1.5, capsize=0, label=lab)
+    fr = d["full_ridge"]["mean"]
+    ax.axhline(fr, color=INK, ls=":", lw=1.2)
+    ax.text(9, fr + 0.004, f"ridge on all {d['D']:,} genes = {fr:.3f} (ideal quantum LS-SVM accuracy)", fontsize=7.5, color=INK)
+    ec = d["exact_centroid"]["accuracy"]["mean"]
+    ax.axhline(ec, color=INK2, ls=":", lw=1)
+    ax.text(9, ec + 0.004, f"exact centroid, all genes = {ec:.3f}", fontsize=7.5, color=INK2)
+    q = d["quantum"]["paper_machine_size_mean"]
     ax.axvline(q, color=INK2, ls="--", lw=1)
-    ax.text(q * 1.1, 0.52, f"{q} index qubits (≈{2 * q} logical,\nsimulated, not run)", fontsize=7.5, color=INK2)
+    ax.text(q * 1.08, 0.53, f"quantum machine size\n(paper formula) ≈ {q:.0f}\nformula only, not run", fontsize=7.5, color=INK2)
     ax.set_xscale("log", base=2)
-    ax.set_xlabel("classical machine size S (counters / hashed features)")
-    ax.set_ylabel("5-fold CV accuracy (balanced pairs)")
-    ax.set_title(f"Paper protocol (Fig. 2b style): {d['n_pairs']} random cell-type pairs, PBMC68k, N = {d['N']:,}\n"
-                 "CV accuracy, mean ± s.e.m. over pairs", fontsize=9.5, loc="left")
+    ax.set_xlabel("classical machine size S (counters / features kept)")
+    ax.set_ylabel("5-fold CV accuracy (paper's metric)")
+    ax.set_title(f"Paper protocol (Fig. 2b style), PBMC68k: {d['n_pairs']} unique cell-type pairs (paper's {d['n_draws']} draws), D = {d['D']:,} genes\n"
+                 "mean ± s.e.m. over pairs, weighted by draw count · RidgeClassifier(alpha=200, balanced) unless noted", fontsize=9, loc="left")
     ax.legend(fontsize=7.5, frameon=False, loc="lower right")
-    ax.set_ylim(0.5, 1.0)
+    ax.set_ylim(0.45, 0.95)
     fig.tight_layout()
     fig.savefig(FIG / "fig_e13_paper_protocol.png")
     print("wrote fig_e13_paper_protocol.png")
