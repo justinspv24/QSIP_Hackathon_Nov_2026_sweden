@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import katex from 'katex'
 import 'katex/dist/katex.min.css'
-import { Bar, BarChart, CartesianGrid, Legend, Line, LineChart, ReferenceArea, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
-import { data, human_bytes, human_time, ledger, METHOD_NAMES, ONE_PASS, problems, route2Blood, route2Genomes, sci } from './data'
+import { Bar, BarChart, CartesianGrid, Legend, Line, LineChart, ReferenceArea, ReferenceLine, ResponsiveContainer, Scatter, ScatterChart, Tooltip, XAxis, YAxis } from 'recharts'
+import { data, human_bytes, human_time, ledger, METHOD_NAMES, ONE_PASS, problems, route2Blood, route2Genomes, scaleup, sci } from './data'
 
 // Palette shared with the final slides: toned white, ink, one blue accent, orange only for the rare class / real QPU.
 const INK = '#16192B', BODY = '#4A5163', BLUE = '#2B59C3', ORANGE = '#E8772E', MUTE = '#A9AEBB', GRID = '#E6E9EF'
@@ -306,6 +306,71 @@ function Route2() {
   )
 }
 
+
+// ---------------- Panel 6: scale-up and stress test (E8' to E14) ----------------
+const GAP_KEYS: { k: string; name: string; color: string; dash?: string }[] = [
+  { k: 'jl', name: "paper's sketch + ridge (E13)", color: MUTE, dash: '5 4' },
+  { k: 'bucket', name: "paper's hashing + ridge (E13)", color: '#7F8799', dash: '5 4' },
+  { k: 'm0_hashridge', name: 'hashing + ridge, tuned (E14)', color: INK },
+  { k: 'm3_fd', name: 'Frequent Directions ridge (E14)', color: '#8E6BBF' },
+  { k: 'm2_select', name: 'sketch-selected genes + ridge (E14)', color: ORANGE },
+  { k: 'm1_log_1p', name: 'one-pass SGD, logistic (E14)', color: BLUE },
+]
+const DS_COLORS: Record<string, string> = { PBMC3k: MUTE, PBMC68k: BLUE, 'AIDA atlas (1.27 M cells)': ORANGE }
+
+function ScaleUp() {
+  const s = scaleup
+  const byDs = Object.keys(DS_COLORS).map(d => ({ d, pts: s.scale.filter(p => p.dataset === d).map(p => ({ N: p.N, S: p.S_star, task: `${p.task} (${p.source})` })) }))
+  const Ns = s.scale.map(p => p.N), nMin = Math.min(...Ns), nMax = Math.max(...Ns)
+  const keys = GAP_KEYS.filter(g => s.gap.curves[g.k])
+  const Ss = Array.from(new Set(keys.flatMap(g => s.gap.curves[g.k].map(r => r.S)))).sort((a, b) => a - b)
+  const gapRows = Ss.map(S => { const o: Record<string, number> = { S }; keys.forEach(g => { const r = s.gap.curves[g.k].find(q => q.S === S); if (r) o[g.k] = r.acc }); return o })
+  const sgd = s.gap.S_star['m1_log_1p']
+  return (
+    <Panel step="Stress test · bigger data, the paper's own dataset, stronger baselines (E8′–E14)" title="At every scale, small classical memory keeps up; a stronger baseline shrinks the paper's gap"
+      note={<>Left: best one-pass classical sketch S* (smallest memory matching the exact classifier) vs feature-space size N; the grey line is S = N (store everything). Excluded, no signal: {s.excluded_no_signal.join('; ')}. Right: the paper's own PBMC68k protocol (46 cell-type pairs, 5-fold CV, ridge). The quantum line is the paper's formula (≈{s.gap.quantum_size.toFixed(0)} qubits, ideal readout, no quantum run); qubits and floats are different units.</>}>
+      <div className="kpis">
+        <div className="kpi accent"><b>{(s.e10.n_cells / 1e6).toFixed(2)} M</b><span>cells in the atlas test · {s.e10.n_donors} donors, split by donor</span></div>
+        <div className="kpi"><b>{sci(nMax)}</b><span>largest feature space tested ({Math.ceil(Math.log2(nMax))} index qubits)</span></div>
+        <div className="kpi"><b>{s.e8.max_abs_diff.toExponential(0)}</b><span>circuit vs formula, up to {s.e8.largest_n} qubits on GPU</span></div>
+        <div className="kpi rare"><b>{sgd?.a ?? '—'}–{sgd?.b ?? '—'}</b><span>numbers one-pass SGD needs to match full ridge</span></div>
+      </div>
+      <div className="two" style={{ marginTop: 18 }}>
+        <div>
+          <h3>Classical memory needed vs feature-space size (log–log)</h3>
+          <ResponsiveContainer width="100%" height={320}>
+            <ScatterChart margin={{ top: 10, right: 20, left: 0, bottom: 14 }}>
+              <CartesianGrid stroke={GRID} />
+              <XAxis dataKey="N" type="number" scale="log" domain={[nMin / 2, nMax * 2]} tickFormatter={fmtN} name="features N" label={{ value: 'features N', position: 'insideBottom', offset: -6, fill: BODY }} />
+              <YAxis dataKey="S" type="number" scale="log" domain={[4, nMax * 2]} allowDataOverflow tickFormatter={fmtN} width={60} name="S*" />
+              <Tooltip {...tip} formatter={(v) => (typeof v === 'number' ? v.toLocaleString() : String(v))} />
+              <Legend verticalAlign="top" />
+              <ReferenceLine segment={[{ x: nMin / 2, y: nMin / 2 }, { x: nMax * 2, y: nMax * 2 }]} stroke={MUTE} strokeDasharray="4 4" label={{ value: 'S = N', position: 'insideTopLeft', fontSize: 12, fill: BODY }} />
+              {byDs.map(g => <Scatter key={g.d} name={g.d} data={g.pts} fill={DS_COLORS[g.d]} isAnimationActive={false} />)}
+            </ScatterChart>
+          </ResponsiveContainer>
+        </div>
+        <div>
+          <h3>Accuracy vs classical memory, paper's protocol (PBMC68k)</h3>
+          <ResponsiveContainer width="100%" height={320}>
+            <LineChart data={gapRows} margin={{ top: 10, right: 20, left: 0, bottom: 14 }}>
+              <CartesianGrid stroke={GRID} />
+              <XAxis dataKey="S" type="number" scale="log" domain={['auto', 'auto']} tickFormatter={fmtN} label={{ value: 'classical memory S (numbers)', position: 'insideBottom', offset: -6, fill: BODY }} />
+              <YAxis domain={[0.6, 0.95]} width={44} />
+              <Tooltip {...tip} formatter={(v) => (typeof v === 'number' ? v.toFixed(3) : String(v))} labelFormatter={l => `S = ${Number(l).toLocaleString()}`} />
+              <Legend verticalAlign="top" />
+              <ReferenceLine y={s.gap.full_ridge} stroke={INK} strokeDasharray="3 3" label={{ value: `full ridge ${s.gap.full_ridge.toFixed(3)}`, position: 'insideBottomRight', fontSize: 12, fill: INK }} />
+              <ReferenceLine x={s.gap.quantum_size} stroke={ORANGE} strokeWidth={2} label={{ value: `quantum ≈ ${s.gap.quantum_size.toFixed(0)} qubits`, position: 'insideTopLeft', fontSize: 12, fill: ORANGE }} />
+              {keys.map(g => <Line key={g.k} type="monotone" dataKey={g.k} name={g.name} stroke={g.color} strokeDasharray={g.dash} strokeWidth={g.k === 'm1_log_1p' ? 3 : 2} dot={{ r: 2 }} connectNulls isAnimationActive={false} />)}
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+      <p className="verdict"><b>Verdict:</b> memory barely grows while features grow 1,000× (up to {sci(nMax)}) and cells grow to {(s.e10.n_cells / 1e6).toFixed(2)} M. On the paper's own protocol, one-pass SGD matches full ridge with {sgd?.a}–{sgd?.b} numbers instead of ~8,192: the gap narrows from ~190× to ~10×, but does not close at ≈{s.gap.quantum_size.toFixed(0)}.</p>
+    </Panel>
+  )
+}
+
 export default function App() {
   const ds = data.dataset as { n_cells: number; n_genes: number; fraction_zero: number; genes_measured_in_10x_run: number; class_counts: Record<string, number> }
   const dc = ds.class_counts['Dendritic cells'], mk = ds.class_counts['Megakaryocytes']
@@ -330,6 +395,7 @@ export default function App() {
       {problems.length > 0 && <div className="banner">Results files do not match this dashboard: {problems.join(' · ')}</div>}
       <HardwarePanel />
       <Route2 />
+      <ScaleUp />
       <Scaling />
       <Imbalance />
       <Estimator />

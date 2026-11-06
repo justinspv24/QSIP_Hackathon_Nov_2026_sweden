@@ -45,3 +45,25 @@ table.ledger th { font-size: 12px; letter-spacing: .06em; text-transform: upperc
 footer { color: var(--dim); font-size: 13px; text-align: center; margin-top: 8px; }
 .recharts-legend-item-text { font-size: 13px; }
 .recharts-cartesian-axis-tick-value { font-size: 12px; fill: var(--body); }
+
+/* ---------- 3D depth (matches the slides' card3d look) ---------- */
+body { background: radial-gradient(1400px 800px at 20% 0%, #FFFFFF 0%, var(--bg) 45%, #EEF0F4 100%) fixed; }
+main { perspective: 1600px; }
+.panel { background: linear-gradient(180deg, #FFFFFF 0%, #F7F8FB 100%); border: 1px solid #E2E5EC; border-radius: 22px;
+  box-shadow: 0 1px 0 #FFFFFF inset, 0 2px 4px rgba(22,25,43,.06), 0 12px 24px rgba(22,25,43,.08), 0 32px 64px rgba(22,25,43,.10);
+  transform-style: preserve-3d; transition: transform .45s cubic-bezier(.2,.8,.2,1), box-shadow .45s ease; }
+.panel:hover { transform: translateY(-4px) rotateX(1.2deg);
+  box-shadow: 0 1px 0 #FFFFFF inset, 0 4px 8px rgba(22,25,43,.07), 0 20px 36px rgba(22,25,43,.11), 0 48px 90px rgba(22,25,43,.14); }
+.kpi { background: linear-gradient(180deg, #FFFFFF 0%, #F5F6F9 100%); border-color: #E2E5EC; border-radius: 14px;
+  box-shadow: 0 1px 0 #FFFFFF inset, 0 2px 3px rgba(22,25,43,.06), 0 8px 16px rgba(22,25,43,.07);
+  transition: transform .3s cubic-bezier(.2,.8,.2,1), box-shadow .3s ease; }
+.kpi:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 1px 0 #FFFFFF inset, 0 6px 10px rgba(22,25,43,.08), 0 18px 30px rgba(22,25,43,.12); }
+.kpi.accent { background: linear-gradient(180deg, #F8FAFF 0%, #EAF0FC 100%); }
+.kpi.rare { background: linear-gradient(180deg, #FFFAF5 0%, #FBEDE2 100%); }
+.kpi b { text-shadow: 0 1px 0 #FFFFFF, 0 2px 6px rgba(22,25,43,.10); }
+.toggle { box-shadow: inset 0 2px 4px rgba(22,25,43,.08); }
+.toggle button.on { background: linear-gradient(180deg, #FFFFFF 0%, #F3F5FA 100%); box-shadow: 0 1px 0 #FFFFFF inset, 0 2px 4px rgba(22,25,43,.12), 0 6px 12px rgba(22,25,43,.08); }
+.verdict, .eqrow { box-shadow: inset 0 2px 6px rgba(22,25,43,.07); }
+.recharts-surface { filter: drop-shadow(0 6px 10px rgba(22,25,43,.08)); }
+@media (prefers-reduced-motion: reduce) { .panel, .kpi { transition: none; } .panel:hover, .kpi:hover { transform: none; } }
+@media print { .panel, .kpi { box-shadow: none; transform: none !important; } }

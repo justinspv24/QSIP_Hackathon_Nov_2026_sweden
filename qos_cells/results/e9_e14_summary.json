@@ -1,0 +1,787 @@
+{
+ "schema_version": 1,
+ "experiment": "e9_e14_summary",
+ "e8": {
+  "max_abs_diff": 3.1474389067254194e-16,
+  "largest_n": 30
+ },
+ "e10": {
+  "n_cells": 1265624,
+  "n_donors": 625,
+  "n_genes": 35477
+ },
+ "e11": {
+  "caption": "Synthetic: one-pass sketches need S*/N >= 0.25 (or never reach the exact centroid) at alpha in [0.75, 1.0]; S*/N <= 1e-2 at alpha in [0.0, 0.25, 0.5] for some N (best = Misra-Gries, S* ~ d_eff). Linear sketches (count-sketch, hashing, sparse JL) never reach the exact centroid at any S <= N here: dense noise collides into the signal. Real gene-pair tasks (20; PBMC3k K = 512\u202613,714, AIDA K = 512/2,048): log d_eff / log N = 0.23\u20130.74; measured best one-pass S*/N = 8.5e-08\u20133.9e-03 (all <= 1e-2). The most spread real task (AIDA hematopoietic stem cell (pairs), y = 0.74) sits next to the synthetic failure edge (y ~ 0.75) but still needs only S*/N = 1e-04: the isotropic-noise model is pessimistic, so d_eff alone does not predict failure. No real task falls where classical sketches fail.",
+  "real_points": [
+   {
+    "label": "PBMC3k B cells K=512",
+    "log2N": 17.002815015607055,
+    "y": 0.5006222099608749,
+    "S_over_N": 0.0009746588693957114
+   },
+   {
+    "label": "PBMC3k Dendritic cells K=512",
+    "log2N": 17.002815015607055,
+    "y": 0.5114769781211151,
+    "S_over_N": 0.00024366471734892786
+   },
+   {
+    "label": "PBMC3k Megakaryocytes K=512",
+    "log2N": 17.002815015607055,
+    "y": 0.3825753285668528,
+    "S_over_N": 0.00012183235867446393
+   },
+   {
+    "label": "PBMC3k B cells K=2048",
+    "log2N": 21.000704269011248,
+    "y": 0.4117388692405057,
+    "S_over_N": 0.00012201073694485115
+   },
+   {
+    "label": "PBMC3k Dendritic cells K=2048",
+    "log2N": 21.000704269011248,
+    "y": 0.42118453518130017,
+    "S_over_N": 1.5251342118106394e-05
+   },
+   {
+    "label": "PBMC3k Megakaryocytes K=2048",
+    "log2N": 21.000704269011248,
+    "y": 0.30486727950966624,
+    "S_over_N": 3.8128355295265984e-06
+   },
+   {
+    "label": "PBMC3k B cells K=8192",
+    "log2N": 25.000176099486442,
+    "y": 0.3464710163037261,
+    "S_over_N": 1.5256926644696692e-05
+   },
+   {
+    "label": "PBMC3k Dendritic cells K=8192",
+    "log2N": 25.000176099486442,
+    "y": 0.3565972393180497,
+    "S_over_N": 4.7677895764677163e-07
+   },
+   {
+    "label": "PBMC3k Megakaryocytes K=8192",
+    "log2N": 25.000176099486442,
+    "y": 0.24340402552132365,
+    "S_over_N": 2.3838947882338582e-07
+   },
+   {
+    "label": "PBMC3k B cells K=13714",
+    "log2N": 26.486828808601505,
+    "y": 0.3272331870035778,
+    "S_over_N": 1.0888548633558922e-05
+   },
+   {
+    "label": "PBMC3k Dendritic cells K=13714",
+    "log2N": 26.486828808601505,
+    "y": 0.3373424344723204,
+    "S_over_N": 8.506678619967908e-08
+   },
+   {
+    "label": "PBMC3k Megakaryocytes K=13714",
+    "log2N": 26.486828808601505,
+    "y": 0.22880036258504405,
+    "S_over_N": 8.506678619967908e-08
+   },
+   {
+    "label": "AIDA CD1c-positive myeloid dendritic cell (pairs)",
+    "log2N": 21.000704269011248,
+    "y": 0.5494232531586046,
+    "S_over_N": 0.0002440214738897023
+   },
+   {
+    "label": "AIDA CD1c-positive myeloid dendritic cell (pairs)",
+    "log2N": 17.002815015607055,
+    "y": 0.6505210927647023,
+    "S_over_N": 0.003898635477582846
+   },
+   {
+    "label": "AIDA plasma cell (pairs)",
+    "log2N": 21.000704269011248,
+    "y": 0.47006726012736555,
+    "S_over_N": 6.1005368472425575e-05
+   },
+   {
+    "label": "AIDA plasma cell (pairs)",
+    "log2N": 17.002815015607055,
+    "y": 0.5965419089964642,
+    "S_over_N": 0.0004873294346978557
+   },
+   {
+    "label": "AIDA hematopoietic stem cell (pairs)",
+    "log2N": 21.000704269011248,
+    "y": 0.6168177618459623,
+    "S_over_N": 3.0502684236212788e-05
+   },
+   {
+    "label": "AIDA hematopoietic stem cell (pairs)",
+    "log2N": 17.002815015607055,
+    "y": 0.7394324967583938,
+    "S_over_N": 0.00012183235867446393
+   },
+   {
+    "label": "AIDA CD14-positive monocyte (pairs)",
+    "log2N": 21.000704269011248,
+    "y": 0.6015401381739441,
+    "S_over_N": 3.0502684236212788e-05
+   },
+   {
+    "label": "AIDA CD14-positive monocyte (pairs)",
+    "log2N": 17.002815015607055,
+    "y": 0.7131051409657369,
+    "S_over_N": 0.00024366471734892786
+   }
+  ]
+ },
+ "scale": [
+  {
+   "dataset": "PBMC3k",
+   "source": "E7",
+   "task": "B cells",
+   "N": 131328,
+   "S_star": 128.04479999999998
+  },
+  {
+   "dataset": "PBMC3k",
+   "source": "E7",
+   "task": "Dendritic cells",
+   "N": 131328,
+   "S_star": 32.044032
+  },
+  {
+   "dataset": "PBMC3k",
+   "source": "E7",
+   "task": "Megakaryocytes",
+   "N": 131328,
+   "S_star": 8.011008
+  },
+  {
+   "dataset": "PBMC3k",
+   "source": "E7",
+   "task": "B cells",
+   "N": 2098176,
+   "S_star": 255.977472
+  },
+  {
+   "dataset": "PBMC3k",
+   "source": "E7",
+   "task": "Dendritic cells",
+   "N": 2098176,
+   "S_star": 31.472640000000002
+  },
+  {
+   "dataset": "PBMC3k",
+   "source": "E7",
+   "task": "Megakaryocytes",
+   "N": 2098176,
+   "S_star": 8.392704
+  },
+  {
+   "dataset": "PBMC3k",
+   "source": "E9",
+   "task": "B cells",
+   "N": 131328,
+   "S_star": 128.0
+  },
+  {
+   "dataset": "PBMC3k",
+   "source": "E9",
+   "task": "Dendritic cells",
+   "N": 131328,
+   "S_star": 32.0
+  },
+  {
+   "dataset": "PBMC3k",
+   "source": "E9",
+   "task": "Megakaryocytes",
+   "N": 131328,
+   "S_star": 16.0
+  },
+  {
+   "dataset": "PBMC3k",
+   "source": "E9",
+   "task": "B cells",
+   "N": 2098176,
+   "S_star": 256.0
+  },
+  {
+   "dataset": "PBMC3k",
+   "source": "E9",
+   "task": "Dendritic cells",
+   "N": 2098176,
+   "S_star": 32.0
+  },
+  {
+   "dataset": "PBMC3k",
+   "source": "E9",
+   "task": "Megakaryocytes",
+   "N": 2098176,
+   "S_star": 8.0
+  },
+  {
+   "dataset": "PBMC3k",
+   "source": "E9",
+   "task": "B cells",
+   "N": 33558528,
+   "S_star": 512.0
+  },
+  {
+   "dataset": "PBMC3k",
+   "source": "E9",
+   "task": "Dendritic cells",
+   "N": 33558528,
+   "S_star": 16.0
+  },
+  {
+   "dataset": "PBMC3k",
+   "source": "E9",
+   "task": "Megakaryocytes",
+   "N": 33558528,
+   "S_star": 8.0
+  },
+  {
+   "dataset": "PBMC3k",
+   "source": "E9",
+   "task": "B cells",
+   "N": 94043755,
+   "S_star": 1024.0
+  },
+  {
+   "dataset": "PBMC3k",
+   "source": "E9",
+   "task": "Dendritic cells",
+   "N": 94043755,
+   "S_star": 8.0
+  },
+  {
+   "dataset": "PBMC3k",
+   "source": "E9",
+   "task": "Megakaryocytes",
+   "N": 94043755,
+   "S_star": 8.0
+  },
+  {
+   "dataset": "AIDA atlas (1.27 M cells)",
+   "source": "E10",
+   "task": "CD1c-positive myeloid dendritic cell",
+   "N": 512,
+   "S_star": 256
+  },
+  {
+   "dataset": "AIDA atlas (1.27 M cells)",
+   "source": "E10",
+   "task": "CD1c-positive myeloid dendritic cell",
+   "N": 2098176,
+   "S_star": 512
+  },
+  {
+   "dataset": "AIDA atlas (1.27 M cells)",
+   "source": "E10",
+   "task": "CD1c-positive myeloid dendritic cell",
+   "N": 131328,
+   "S_star": 512
+  },
+  {
+   "dataset": "AIDA atlas (1.27 M cells)",
+   "source": "E10",
+   "task": "plasma cell",
+   "N": 512,
+   "S_star": 64
+  },
+  {
+   "dataset": "AIDA atlas (1.27 M cells)",
+   "source": "E10",
+   "task": "plasma cell",
+   "N": 2098176,
+   "S_star": 128
+  },
+  {
+   "dataset": "AIDA atlas (1.27 M cells)",
+   "source": "E10",
+   "task": "plasma cell",
+   "N": 131328,
+   "S_star": 64
+  },
+  {
+   "dataset": "AIDA atlas (1.27 M cells)",
+   "source": "E10",
+   "task": "hematopoietic stem cell",
+   "N": 512,
+   "S_star": 256
+  },
+  {
+   "dataset": "AIDA atlas (1.27 M cells)",
+   "source": "E10",
+   "task": "hematopoietic stem cell",
+   "N": 2098176,
+   "S_star": 64
+  },
+  {
+   "dataset": "AIDA atlas (1.27 M cells)",
+   "source": "E10",
+   "task": "hematopoietic stem cell",
+   "N": 131328,
+   "S_star": 16
+  },
+  {
+   "dataset": "AIDA atlas (1.27 M cells)",
+   "source": "E10",
+   "task": "CD14-positive monocyte",
+   "N": 512,
+   "S_star": 16
+  },
+  {
+   "dataset": "AIDA atlas (1.27 M cells)",
+   "source": "E10",
+   "task": "CD14-positive monocyte",
+   "N": 2098176,
+   "S_star": 64
+  },
+  {
+   "dataset": "AIDA atlas (1.27 M cells)",
+   "source": "E10",
+   "task": "CD14-positive monocyte",
+   "N": 131328,
+   "S_star": 32
+  },
+  {
+   "dataset": "PBMC68k",
+   "source": "E13",
+   "task": "CD34+",
+   "N": 131328,
+   "S_star": 128
+  },
+  {
+   "dataset": "PBMC68k",
+   "source": "E13",
+   "task": "CD19+ B",
+   "N": 33558528,
+   "S_star": 1024
+  },
+  {
+   "dataset": "PBMC68k",
+   "source": "E13",
+   "task": "CD34+",
+   "N": 33558528,
+   "S_star": 1024
+  },
+  {
+   "dataset": "PBMC68k",
+   "source": "E13",
+   "task": "CD4+/CD45RA+/CD25- Naive T",
+   "N": 33558528,
+   "S_star": 512
+  },
+  {
+   "dataset": "PBMC68k",
+   "source": "E13",
+   "task": "CD19+ B",
+   "N": 145991328,
+   "S_star": 1024
+  },
+  {
+   "dataset": "PBMC68k",
+   "source": "E13",
+   "task": "CD34+",
+   "N": 146864091,
+   "S_star": 4096
+  },
+  {
+   "dataset": "PBMC68k",
+   "source": "E13",
+   "task": "CD4+/CD45RA+/CD25- Naive T",
+   "N": 146076778,
+   "S_star": 512
+  }
+ ],
+ "excluded_no_signal": [
+  "CD4+ T Helper2 N=33558528 (exact bal. acc 0.56)",
+  "CD4+ T Helper2 N=146367495 (exact bal. acc 0.58)"
+ ],
+ "gap": {
+  "full_ridge": 0.90146,
+  "full_ridge_nested": 0.913027,
+  "quantum_size": 43.956522,
+  "curves": {
+   "jl": [
+    {
+     "S": 8.0,
+     "acc": 0.67801
+    },
+    {
+     "S": 16.0,
+     "acc": 0.7314
+    },
+    {
+     "S": 32.0,
+     "acc": 0.77172
+    },
+    {
+     "S": 64.0,
+     "acc": 0.80866
+    },
+    {
+     "S": 128.0,
+     "acc": 0.835927
+    },
+    {
+     "S": 256.0,
+     "acc": 0.852027
+    },
+    {
+     "S": 512.0,
+     "acc": 0.863421
+    },
+    {
+     "S": 1024.0,
+     "acc": 0.87202
+    },
+    {
+     "S": 2048.0,
+     "acc": 0.879116
+    },
+    {
+     "S": 4096.0,
+     "acc": 0.886407
+    },
+    {
+     "S": 8192.0,
+     "acc": 0.893849
+    }
+   ],
+   "bucket": [
+    {
+     "S": 8.0,
+     "acc": 0.696066
+    },
+    {
+     "S": 16.0,
+     "acc": 0.731855
+    },
+    {
+     "S": 32.0,
+     "acc": 0.771097
+    },
+    {
+     "S": 64.0,
+     "acc": 0.803455
+    },
+    {
+     "S": 128.0,
+     "acc": 0.829388
+    },
+    {
+     "S": 256.0,
+     "acc": 0.848379
+    },
+    {
+     "S": 512.0,
+     "acc": 0.861057
+    },
+    {
+     "S": 1024.0,
+     "acc": 0.87051
+    },
+    {
+     "S": 2048.0,
+     "acc": 0.878234
+    },
+    {
+     "S": 4096.0,
+     "acc": 0.885921
+    },
+    {
+     "S": 8192.0,
+     "acc": 0.893641
+    }
+   ],
+   "m1_log_1p": [
+    {
+     "S": 16,
+     "acc": 0.825008
+    },
+    {
+     "S": 32,
+     "acc": 0.851289
+    },
+    {
+     "S": 44,
+     "acc": 0.860824
+    },
+    {
+     "S": 64,
+     "acc": 0.872539
+    },
+    {
+     "S": 128,
+     "acc": 0.891168
+    },
+    {
+     "S": 256,
+     "acc": 0.901829
+    },
+    {
+     "S": 512,
+     "acc": 0.908602
+    },
+    {
+     "S": 1024,
+     "acc": 0.912322
+    },
+    {
+     "S": 2048,
+     "acc": 0.91499
+    },
+    {
+     "S": 4096,
+     "acc": 0.916517
+    },
+    {
+     "S": 8192,
+     "acc": 0.917389
+    }
+   ],
+   "m1_sq_1p": [
+    {
+     "S": 16,
+     "acc": 0.823987
+    },
+    {
+     "S": 32,
+     "acc": 0.848305
+    },
+    {
+     "S": 44,
+     "acc": 0.858124
+    },
+    {
+     "S": 64,
+     "acc": 0.870163
+    },
+    {
+     "S": 128,
+     "acc": 0.889423
+    },
+    {
+     "S": 256,
+     "acc": 0.89982
+    },
+    {
+     "S": 512,
+     "acc": 0.907377
+    },
+    {
+     "S": 1024,
+     "acc": 0.911486
+    },
+    {
+     "S": 2048,
+     "acc": 0.914445
+    },
+    {
+     "S": 4096,
+     "acc": 0.9161
+    },
+    {
+     "S": 8192,
+     "acc": 0.917134
+    }
+   ],
+   "m0_hashridge": [
+    {
+     "S": 16,
+     "acc": 0.72727
+    },
+    {
+     "S": 32,
+     "acc": 0.773566
+    },
+    {
+     "S": 44,
+     "acc": 0.790527
+    },
+    {
+     "S": 64,
+     "acc": 0.811268
+    },
+    {
+     "S": 128,
+     "acc": 0.84394
+    },
+    {
+     "S": 256,
+     "acc": 0.863227
+    },
+    {
+     "S": 512,
+     "acc": 0.878401
+    },
+    {
+     "S": 1024,
+     "acc": 0.889591
+    },
+    {
+     "S": 2048,
+     "acc": 0.89818
+    },
+    {
+     "S": 4096,
+     "acc": 0.904662
+    },
+    {
+     "S": 8192,
+     "acc": 0.909666
+    }
+   ],
+   "m2_select": [
+    {
+     "S": 16,
+     "acc": 0.583218
+    },
+    {
+     "S": 32,
+     "acc": 0.73183
+    },
+    {
+     "S": 44,
+     "acc": 0.743492
+    },
+    {
+     "S": 64,
+     "acc": 0.755896
+    },
+    {
+     "S": 128,
+     "acc": 0.780221
+    },
+    {
+     "S": 256,
+     "acc": 0.835539
+    },
+    {
+     "S": 512,
+     "acc": 0.865216
+    },
+    {
+     "S": 1024,
+     "acc": 0.876556
+    },
+    {
+     "S": 2048,
+     "acc": 0.887469
+    },
+    {
+     "S": 4096,
+     "acc": 0.890869
+    },
+    {
+     "S": 8192,
+     "acc": 0.895763
+    }
+   ],
+   "m3_fd": [
+    {
+     "S": 16,
+     "acc": 0.717554
+    },
+    {
+     "S": 32,
+     "acc": 0.768254
+    },
+    {
+     "S": 44,
+     "acc": 0.785964
+    },
+    {
+     "S": 64,
+     "acc": 0.81144
+    },
+    {
+     "S": 128,
+     "acc": 0.84285
+    },
+    {
+     "S": 256,
+     "acc": 0.857511
+    },
+    {
+     "S": 512,
+     "acc": 0.864215
+    },
+    {
+     "S": 1024,
+     "acc": 0.867002
+    },
+    {
+     "S": 2048,
+     "acc": 0.868703
+    },
+    {
+     "S": 4096,
+     "acc": 0.868703
+    },
+    {
+     "S": 8192,
+     "acc": 0.868703
+    }
+   ]
+  },
+  "labels": {
+   "jl": "paper: sparse JL s=1 (signed hashing) + ridge",
+   "bucket": "paper: feature hashing, unsigned balanced buckets + ridge",
+   "m1_log_1p": "hashing + SGD, logistic loss, 1 pass",
+   "m1_sq_1p": "hashing + SGD, squared loss (ridge), 1 pass",
+   "m0_hashridge": "control: paper hashing (signed, 'jl') + exact ridge, alpha by the same nested CV",
+   "m2_select": "count-sketch supervised gene selection + exact ridge (2 passes)",
+   "m3_fd": "hashing to d + Frequent Directions (rank ell) ridge, 1 pass"
+  },
+  "S_star": {
+   "m1_sq_1p": {
+    "a": 256,
+    "b": 512
+   },
+   "m1_sq_5ep": {
+    "a": 512,
+    "b": 1024
+   },
+   "m1_log_1p": {
+    "a": 256,
+    "b": 512
+   },
+   "m1_log_5ep": {
+    "a": 256,
+    "b": 512
+   },
+   "m1b_sq_1p": {
+    "a": 512,
+    "b": 1024
+   },
+   "m1b_sq_5ep": {
+    "a": 1024,
+    "b": 2048
+   },
+   "m1b_log_1p": {
+    "a": 256,
+    "b": 512
+   },
+   "m1b_log_5ep": {
+    "a": 512,
+    "b": 1024
+   },
+   "m2_select": {
+    "a": 8192,
+    "b": null
+   },
+   "m0_hashridge": {
+    "a": 2048,
+    "b": null
+   },
+   "m3_fd": {
+    "a": null,
+    "b": null
+   }
+  }
+ }
+}

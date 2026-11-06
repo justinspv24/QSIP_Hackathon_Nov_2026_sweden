@@ -11,6 +11,7 @@ import ibm4 from '../../results/e5_ibm_N4.json'
 import ibm16 from '../../results/e5_ibm_N16.json'
 import e7 from '../../results/e7_route2.json'
 import e8 from '../../results/e8_route2_genotypes.json'
+import hpc from '../../results/e9_e14_summary.json'
 
 export const SCHEMA_VERSION = 1
 
@@ -25,7 +26,7 @@ export type Hardware = {
   cells: HwCell[]
 }
 
-const files: Record<string, { schema_version?: number }> = { 'e1_baselines.json': e1, 'e2_scaling.json': e2, 'e3_imbalance.json': e3, 'e5_hardware.json': e5, 'e5_hardware_N16.json': e5n16, 'e6_resources.json': e6, 'e5_ibm_N4.json': ibm4, 'e5_ibm_N16.json': ibm16, 'e7_route2.json': e7, 'e8_route2_genotypes.json': e8 }
+const files: Record<string, { schema_version?: number }> = { 'e1_baselines.json': e1, 'e2_scaling.json': e2, 'e3_imbalance.json': e3, 'e5_hardware.json': e5, 'e5_hardware_N16.json': e5n16, 'e6_resources.json': e6, 'e5_ibm_N4.json': ibm4, 'e5_ibm_N16.json': ibm16, 'e7_route2.json': e7, 'e8_route2_genotypes.json': e8, 'e9_e14_summary.json': hpc }
 
 export const problems: string[] = Object.entries(files)
   .filter(([, d]) => d.schema_version !== SCHEMA_VERSION)
@@ -109,3 +110,16 @@ export const route2Genomes = e8x.tasks.map(t => ({
   task: t.task,
   points: t.by_N.map(bn => toRow(bn.real[0], bn.quantum.index_qubits, t.task)),
 }))
+
+// ---- Scale-up and stress test (E8' to E14), from results/e9_e14_summary.json (scripts/12_hpc_summary.py) ----
+export type ScalePoint = { dataset: string; source: string; task: string; N: number; S_star: number }
+export type GapCurve = { S: number; acc: number }[]
+export const scaleup = hpc as unknown as {
+  e8: { max_abs_diff: number; largest_n: number }
+  e10: { n_cells: number; n_donors: number; n_genes: number }
+  scale: ScalePoint[]
+  excluded_no_signal: string[]
+  gap: { full_ridge: number; full_ridge_nested: number; quantum_size: number; curves: Record<string, GapCurve>; labels: Record<string, string>; S_star: Record<string, { a: number | null; b: number | null }> }
+}
+need('e9_e14_summary.json', 'scale', hpc as Record<string, unknown>)
+need('e9_e14_summary.json', 'gap', hpc as Record<string, unknown>)
