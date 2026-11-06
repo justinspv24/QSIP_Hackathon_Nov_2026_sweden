@@ -39,3 +39,11 @@ Start 22:42 UTC (2026-11-05). Hard stop 04:42. Node: 8x RTX A6000, 128 cores, id
   | full ridge alpha=200 / alpha nested | 0.901 / 0.913 | |
   M2 fails at small budgets because a count-sketch with C << D = 16,122 cannot rank genes (oracle exact top-k ridge:
   0.872 at k = 44, 0.876 at k = 64, but needs D counters to find them).
+- 00:44 m0 run 1 lost 5 pairs (my error: parts/m0 moved during a merge while workers saved) -> relaunched; merge now
+  uses E14_SKIP instead of moving directories.
+- 00:56 M1b (AdaGrad, setup check for M1) done, 10.4 min: better at large S (0.924 @ 8192) but worse at S = 64 (0.859
+  vs 0.873; accumulators double memory). Method 5 not run; this check took its slot.
+- 01:20 m0 done. Hashed exact ridge, alpha by the same nested CV, at S = 64: 0.811 (E13 0.809). SGD's gain is not
+  explained by alpha tuning; it comes with lower balanced accuracy (0.766 vs 0.784).
+- 01:25 FINAL: README, SLIDE_NOTES, figures, results/e14_stage1.json (partial = false). Verdict: gap narrowed, not closed.
+  Wall time total ~2 h 45 min of the 6 h cap.

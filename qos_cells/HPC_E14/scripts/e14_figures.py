@@ -27,6 +27,8 @@ STY = {
     "m1_log_1p": dict(c="#17becf", m="o", ls="-", lab="M1 hashing + SGD (logistic), 1 pass"),
     "m1_sq_5ep": dict(c="#1f77b4", m="^", ls=":", lab="M1 squared, 5 epochs [multi-pass]"),
     "m1_log_5ep": dict(c="#17becf", m="^", ls=":", lab="M1 logistic, 5 epochs [multi-pass]"),
+    "m1b_log_1p": dict(c="#ff7f0e", m="P", ls="-", lab="M1b hashing + AdaGrad SGD (logistic), 1 pass"),
+    "m1b_sq_1p": dict(c="#e377c2", m="P", ls="-", lab="M1b hashing + AdaGrad SGD (squared), 1 pass"),
     "m2_select": dict(c="#d62728", m="s", ls="--", lab="M2/M4 sketch selection + exact ridge / RLS [2 passes]"),
     "m3_fd": dict(c="#2ca02c", m="D", ls="-", lab="M3 hashing + Frequent Directions ridge, 1 pass"),
     "m0_hashridge": dict(c="#9467bd", m="v", ls="-.", lab="control: hashing + exact ridge, same nested tuning"),

@@ -82,8 +82,9 @@ def s_star(rows, target=TARGET):
 
 
 # ---------------------------------------------------------------- method 1
-def load_m1(npairs):
+def load_m1(npairs, part="m1", prefix="m1", memf=None):
     import e14_m1_sgd as M1
+    memf = memf or M1.mem
     res = {}
     for loss in ("sq", "log"):
         for snap, ep in ((0, "1p"), (1, "5ep")):
@@ -91,7 +92,7 @@ def load_m1(npairs):
             for pi in range(npairs):
                 seeds = []
                 for si in range(M1.N_SEEDS):
-                    fs = [K.E14 / "parts" / "m1" / f"p{pi:02d}_S{S}_s{si}_{loss}.npz" for S in M1.SH_GRID]
+                    fs = [K.E14 / "parts" / part / f"p{pi:02d}_S{S}_s{si}_{loss}.npz" for S in M1.SH_GRID]
                     if not all(f.exists() for f in fs):
                         continue
                     I, IB, T, TB, MA, MB = [], [], [], [], [], []
@@ -106,12 +107,12 @@ def load_m1(npairs):
                         I.append(inner); IB.append(innerb); T.append(test); TB.append(testb)
                         for g in range(NG):
                             for avg in (0, 1):
-                                a, b = M1.mem(S, avg)
+                                a, b = memf(S, avg)
                                 MA.append(a); MB.append(b)
                     seeds.append((np.concatenate(I, -1), np.concatenate(IB, -1), np.concatenate(T, -1), np.concatenate(TB, -1), np.array(MA, float), np.array(MB, float)))
                 if seeds:
                     pps[pi] = seeds
-            res[f"m1_{loss}_{ep}"] = pps
+            res[f"{prefix}_{loss}_{ep}"] = pps
     return res
 
 
@@ -211,12 +212,16 @@ LABELS = {
     "m1_log_1p": "hashing + SGD, logistic loss, 1 pass",
     "m1_sq_5ep": "hashing + SGD, squared loss, 5 epochs (multi-pass)",
     "m1_log_5ep": "hashing + SGD, logistic loss, 5 epochs (multi-pass)",
+    "m1b_sq_1p": "hashing + AdaGrad SGD (VW default), squared loss, 1 pass",
+    "m1b_log_1p": "hashing + AdaGrad SGD (VW default), logistic loss, 1 pass",
+    "m1b_sq_5ep": "hashing + AdaGrad SGD, squared, 5 epochs (multi-pass)",
+    "m1b_log_5ep": "hashing + AdaGrad SGD, logistic, 5 epochs (multi-pass)",
     "m2_select": "count-sketch supervised gene selection + exact ridge (2 passes)",
     "m0_hashridge": "control: paper hashing (signed, 'jl') + exact ridge, alpha by the same nested CV",
     "m3_fd": "hashing to d + Frequent Directions (rank ell) ridge, 1 pass",
     "m2_oracle_k": "reference: exact |Delta| / t-score top-k genes + ridge (selection NOT memory limited), x = k",
 }
-PASSES = {"m0_hashridge": 1, "m3_fd": 1, "m1_sq_1p": 1, "m1_log_1p": 1, "m1_sq_5ep": 5, "m1_log_5ep": 5, "m2_select": 2, "m2_oracle_k": 2}
+PASSES = {"m0_hashridge": 1, "m3_fd": 1, "m1b_sq_1p": 1, "m1b_log_1p": 1, "m1b_sq_5ep": 5, "m1b_log_5ep": 5, "m1_sq_1p": 1, "m1_log_1p": 1, "m1_sq_5ep": 5, "m1_log_5ep": 5, "m2_select": 2, "m2_oracle_k": 2}
 
 
 def main():
@@ -227,14 +232,20 @@ def main():
     methods = {}
     if glob.glob(str(K.E14 / "parts" / "m1" / "*.npz")):
         methods.update(load_m1(P))
+    if glob.glob(str(K.E14 / "parts" / "m1b" / "*.npz")) and "m1b" not in os.environ.get("E14_SKIP", ""):
+        import e14_m1b_adagrad as M1B
+        methods.update(load_m1(P, "m1b", "m1b", M1B.mem))
     ora = {}
     if glob.glob(str(K.E14 / "parts" / "m2" / "*.npz")):
         m2, ora = load_m2(P)
         methods.update(m2)
     import e14_m0_hashridge as M0
     import e14_m3_fd as M3
-    methods["m0_hashridge"] = load_grid("m0", P, M0.mem, lambda z: K.S_GRID)
-    methods["m3_fd"] = load_grid("m3", P, lambda c: M3.mem(*c), lambda z: [tuple(c) for c in z["cfg"]])
+    skip = os.environ.get("E14_SKIP", "").split(",")      # e.g. E14_SKIP=m0 while m0 is incomplete
+    if "m0" not in skip:
+        methods["m0_hashridge"] = load_grid("m0", P, M0.mem, lambda z: K.S_GRID)
+    if "m3" not in skip:
+        methods["m3_fd"] = load_grid("m3", P, lambda c: M3.mem(*c), lambda z: [tuple(c) for c in z["cfg"]])
     curves, sstar, npairs = {}, {}, {}
     for name, pps in methods.items():
         if not pps:
