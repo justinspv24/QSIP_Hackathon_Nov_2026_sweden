@@ -27,3 +27,15 @@ Start 22:42 UTC (2026-11-05). Hard stop 04:42. Node: 8x RTX A6000, 128 cores, id
 - 23:31 FD: rows centred in-stream by Welford (exact centred scatter); robust-FD shrinkage correction tuned on/off.
 - 23:35 M4 (RLS) = exact ridge on the same genes: 12/12 cases identical predictions (results/e14_m4_rls_check.json).
 - m2 at ~17 min per 22k-cell pair per GPU; ETA ~00:05. m0 sharing GPUs. m3 next.
+- 00:40 m2 done (88.9 min; slowed by GPU sharing). m3 done (46 pairs, all before 00:40). m0 paused 23:52-00:40 to
+  prioritise m2, now resumed.
+- Stage 1+2 snapshot (accuracy, nested-CV tuned on accuracy; S = 64):
+  | method | (a) paper | (b) true floats |
+  |---|---|---|
+  | M1 hashing + SGD logistic, 1 pass | 0.873 | 0.861 |
+  | M2 sketch selection + ridge, 2 pass | 0.756 | 0.746 |
+  | M3 hashing + FD ridge, 1 pass | 0.811 | 0.716 |
+  | E13 best data-oblivious (jl) | 0.809 | ~0.70 (S=8 hashed) |
+  | full ridge alpha=200 / alpha nested | 0.901 / 0.913 | |
+  M2 fails at small budgets because a count-sketch with C << D = 16,122 cannot rank genes (oracle exact top-k ridge:
+  0.872 at k = 44, 0.876 at k = 64, but needs D counters to find them).
